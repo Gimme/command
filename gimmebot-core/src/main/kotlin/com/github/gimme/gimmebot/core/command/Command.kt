@@ -7,6 +7,6 @@ package com.github.gimme.gimmebot.core.command
 interface Command {
     val name: String
 
-    /** Executes this command. */
-    fun execute(): String?
+    /** Executes this command as the given [commandSender] and returns an optional response. */
+    fun execute(commandSender: CommandSender): CommandResponse?
 }

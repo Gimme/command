@@ -10,4 +10,7 @@ interface CommandManager {
 
     /** Returns the command with the specified [name] if it has been registered. */
     fun getCommand(name: String): Command?
+
+    /** Executes the given [command] as the given [commandSender]. */
+    fun executeCommand(commandSender: CommandSender, command: Command)
 }

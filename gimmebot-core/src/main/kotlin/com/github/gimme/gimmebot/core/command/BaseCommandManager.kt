@@ -14,4 +14,10 @@ abstract class BaseCommandManager : CommandManager {
     override fun getCommand(name: String): Command? {
         return commandByName[name]
     }
+
+    override fun executeCommand(commandSender: CommandSender, command: Command) {
+        val response: CommandResponse? = command.execute(commandSender)
+
+        response?.send(commandSender)
+    }
 }
