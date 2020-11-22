@@ -19,6 +19,9 @@ abstract class GimmeBot : Bot {
 
     private lateinit var botConfig: BotConfig
 
+    /** If the bot is started. */
+    var started = false
+
     /** The data manager. */
     lateinit var dataManager: DataManager
 
@@ -26,6 +29,8 @@ abstract class GimmeBot : Bot {
     var commandManager: CommandManager = SimpleCommandManager()
 
     override fun start() {
+        if (started) return
+
         botConfig = requireResource(loadYamlFromResource(botResourcePath, BotConfig::class.java), botResourcePath)
         val name = botConfig.name
 
@@ -35,12 +40,17 @@ abstract class GimmeBot : Bot {
             logger.error("Failed to connect $name")
             return
         }
+
+        started = true
         onStart()
 
         logger.info("$name started!")
     }
 
     override fun stop() {
+        if (!started) return
+        started = false
+
         onStop()
 
         logger.info("${botConfig.name} stopped!")
