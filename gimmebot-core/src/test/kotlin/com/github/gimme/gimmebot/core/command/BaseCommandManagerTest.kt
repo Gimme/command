@@ -1,7 +1,8 @@
 package com.github.gimme.gimmebot.core.command
 
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.function.Executable
 
 class BaseCommandManagerTest {
     private val commandManager: CommandManager = object : BaseCommandManager() {}
@@ -15,6 +16,9 @@ class BaseCommandManagerTest {
     fun `registerCommand should add command`() {
         commandManager.registerCommand(testCommand)
 
-        assertEquals(testCommand, commandManager.getCommand("testt"))
+        assertAll(
+            Executable { assertEquals(testCommand, commandManager.getCommand("test")) },
+            Executable { assertNull(commandManager.getCommand("test726")) },
+        )
     }
 }
