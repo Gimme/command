@@ -21,6 +21,7 @@ abstract class GimmeBot : Bot {
 
     /** If the bot is started. */
     var started = false
+        private set
 
     /** The data manager. */
     lateinit var dataManager: DataManager
