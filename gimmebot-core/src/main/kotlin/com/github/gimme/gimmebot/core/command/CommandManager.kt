@@ -11,6 +11,6 @@ interface CommandManager {
     /** Returns the command with the specified [name] if it has been registered. */
     fun getCommand(name: String): Command?
 
-    /** Executes the given [command] as the given [commandSender]. */
-    fun executeCommand(commandSender: CommandSender, command: Command)
+    /** Checks the given [input] if a valid command and then executes it as the given [commandSender]. */
+    fun parseInput(commandSender: CommandSender, input: String)
 }

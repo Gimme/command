@@ -9,7 +9,7 @@ class CommandResponseTest {
         val response = CommandResponse("message")
 
         var actual: String? = null
-        response.send { message -> actual = message }
+        response.sendTo { message -> actual = message }
 
         assertEquals("message", actual)
     }

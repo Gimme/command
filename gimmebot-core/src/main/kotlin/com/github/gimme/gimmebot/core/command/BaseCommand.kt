@@ -3,6 +3,8 @@ package com.github.gimme.gimmebot.core.command
 /**
  * Represents a command with base functionality.
  */
-abstract class BaseCommand(override val name: String) : Command {
+abstract class BaseCommand(name: String) : Command {
+    override val name: String = name.toLowerCase()
+
     //TODO
 }

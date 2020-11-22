@@ -17,7 +17,7 @@ class CommandResponse(
     }
 
     /** Sends this response to the given [receiver]. */
-    fun send(receiver: MessageReceiver) {
+    fun sendTo(receiver: MessageReceiver) {
         receiver.sendMessage(message)
     }
 }
