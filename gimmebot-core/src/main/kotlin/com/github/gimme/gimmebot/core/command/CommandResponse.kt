@@ -7,7 +7,7 @@ class CommandResponse(
     private val message: String,
     private val status: Status = Status.SUCCESS,
 ) {
-    /** The status of the command execution. */
+    /** The status of a command execution. */
     enum class Status {
         /** The command execution was successful. */
         SUCCESS,

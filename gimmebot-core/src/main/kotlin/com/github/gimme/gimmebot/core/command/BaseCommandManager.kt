@@ -18,14 +18,26 @@ abstract class BaseCommandManager(
         return commandByName[name]
     }
 
-    override fun parseInput(commandSender: CommandSender, input: String) {
-        val lowerCaseInput = input.toLowerCase().trimEnd()
-        if (!lowerCaseInput.startsWith(commandPrefix)) return
+    override fun parseInput(commandSender: CommandSender, input: String): Boolean {
+        var lowerCaseInput = input.toLowerCase().trimEnd()
 
-        val words = lowerCaseInput.substring(commandPrefix.length).split(" ")
-        val command = getCommand(words[0])
+        if (commandSender.medium.requiresCommandPrefix) {
+            // Has to start with the command prefix
+            if (!lowerCaseInput.startsWith(commandPrefix)) return false
+            // Remove prefix
+            lowerCaseInput = lowerCaseInput.substring(commandPrefix.length)
+        }
 
-        val response: CommandResponse? = command?.execute(commandSender, words.drop(1))
+        // Split into words
+        val words = lowerCaseInput.split(" ")
+        val commandName = words[0]
+        val args = words.drop(1)
+
+        // Return if not a valid command
+        val command = getCommand(commandName) ?: return false
+
+        val response: CommandResponse? = command.execute(commandSender, args)
         response?.sendTo(commandSender)
+        return true
     }
 }

@@ -17,9 +17,8 @@ class BaseCommandManagerTest {
             return null
         }
     }
-    private val dummyCommandSender: CommandSender = object : CommandSender {
-        override fun sendMessage(message: String) {}
-    }
+    private val consoleCommandSender = DummyCommandSender(CommandSender.Medium.CONSOLE)
+    private val chatCommandSender = DummyCommandSender(CommandSender.Medium.CHAT)
 
     @Test
     fun `should register command`() {
@@ -49,7 +48,7 @@ class BaseCommandManagerTest {
         }
 
         commandManager.registerCommand(command)
-        commandManager.parseInput(dummyCommandSender, prefix + inputCommand)
+        commandManager.parseInput(consoleCommandSender, inputCommand)
 
         assertTrue(executed)
     }
@@ -67,10 +66,24 @@ class BaseCommandManagerTest {
         }
 
         commandManager.registerCommand(command)
-        commandManager.parseInput(dummyCommandSender, prefix + input)
+        commandManager.parseInput(consoleCommandSender, input)
 
         assertNotNull(actualArgs)
         assertIterableEquals(expectedArgs, actualArgs)
+    }
+
+    @ParameterizedTest
+    @MethodSource("commandSenderMedium")
+    fun `should accept command if correct prefix`(medium: CommandSender.Medium, input: String, shouldExecute: Boolean) {
+        commandManager.registerCommand(testCommand)
+        val executed: Boolean = commandManager.parseInput(object : CommandSender {
+            override val medium: CommandSender.Medium
+                get() = medium
+
+            override fun sendMessage(message: String) {}
+        }, input)
+
+        assertEquals(shouldExecute, executed)
     }
 
     companion object {
@@ -82,5 +95,17 @@ class BaseCommandManagerTest {
             Arguments.of("c one two", listOf("one", "two")),
             Arguments.of("c one two three", listOf("one", "two", "three")),
         )
+
+        @JvmStatic
+        fun commandSenderMedium() = listOf(
+            Arguments.of(CommandSender.Medium.CONSOLE, "test", true),
+            Arguments.of(CommandSender.Medium.CONSOLE, "!test", false),
+            Arguments.of(CommandSender.Medium.CHAT, "test", false),
+            Arguments.of(CommandSender.Medium.CHAT, "!test", true),
+        )
+    }
+
+    private class DummyCommandSender(override val medium: CommandSender.Medium) : CommandSender {
+        override fun sendMessage(message: String) {}
     }
 }
