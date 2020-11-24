@@ -19,7 +19,7 @@ dependencies {
     testImplementation(platform("org.junit:junit-bom:5.7.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     api(project(":gimmebot-core"))
-    implementation("net.dv8tion:JDA:4.2.0_217")
+    api("net.dv8tion:JDA:4.2.0_217")
 }
 
 tasks.test {
