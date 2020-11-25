@@ -25,17 +25,17 @@ class BaseCommandManagerTest {
         commandManager.registerCommand(testCommand)
 
         assertAll(
-            Executable { assertEquals(testCommand, commandManager.getCommand("test")) },
             Executable { assertNull(commandManager.getCommand("test726")) },
+            Executable { assertEquals(testCommand, commandManager.getCommand("test")) },
         )
     }
 
     @ParameterizedTest
     @CsvSource(
-        "test, test",
-        "Test, test",
-        "test, TEST",
-        "Test, Test",
+        "test, !test",
+        "Test, !test",
+        "test, !TEST",
+        "Test, !Test",
     )
     fun `should execute command`(commandName: String, inputCommand: String) {
         var executed = false
@@ -48,7 +48,7 @@ class BaseCommandManagerTest {
         }
 
         commandManager.registerCommand(command)
-        commandManager.parseInput(consoleCommandSender, inputCommand)
+        commandManager.parseInput(chatCommandSender, inputCommand)
 
         assertTrue(executed)
     }

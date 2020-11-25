@@ -7,11 +7,14 @@ abstract class BaseCommandManager(
     /** Prefix required to execute commands. */
     var commandPrefix: String,
 ) : CommandManager {
-
     private val commandByName = HashMap<String, Command>()
 
     override fun registerCommand(command: Command) {
         commandByName[command.name] = command
+    }
+
+    override fun getCommands(): Collection<Command> {
+        return commandByName.values
     }
 
     override fun getCommand(name: String): Command? {

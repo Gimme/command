@@ -8,6 +8,9 @@ interface CommandManager {
     /** Registers the given [command] the be executable by this command manager. */
     fun registerCommand(command: Command)
 
+    /** Returns all registered commands. */
+    fun getCommands(): Collection<Command>
+
     /** Returns the command with the specified [name] if it has been registered. */
     fun getCommand(name: String): Command?
 
