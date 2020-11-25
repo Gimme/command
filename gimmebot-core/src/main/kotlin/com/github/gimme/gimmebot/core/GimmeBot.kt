@@ -1,6 +1,7 @@
 package com.github.gimme.gimmebot.core
 
 import com.github.gimme.gimmebot.core.command.CommandManager
+import com.github.gimme.gimmebot.core.command.CommandSender
 import com.github.gimme.gimmebot.core.command.HelpCommand
 import com.github.gimme.gimmebot.core.command.SimpleCommandManager
 import com.github.gimme.gimmebot.core.data.config.BotConfig
@@ -8,8 +9,11 @@ import com.github.gimme.gimmebot.core.data.yaml.loadYamlFromResource
 import com.github.gimme.gimmebot.core.data.DataManager
 import com.github.gimme.gimmebot.core.data.requireResource
 import com.github.gimme.gimmebot.core.plugin.GimmeBotPlugin
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import mu.KotlinLogging
 import java.io.File
+import java.util.*
 
 /**
  * Represents a bot that can be started to perform tasks and respond to commands.
@@ -46,6 +50,24 @@ open class GimmeBot : Bot {
         onStart()
 
         logger.info("$name started!")
+
+        startInputCoroutine()
+
+        while (true) {
+        }
+    }
+
+    private fun startInputCoroutine() {
+        val sc = Scanner(System.`in`)
+        val consoleSender: CommandSender = object : CommandSender {
+            override val medium: CommandSender.Medium
+                get() = CommandSender.Medium.CONSOLE
+
+            override fun sendMessage(message: String) {
+            }
+        }
+
+        GlobalScope.launch { while (true) commandManager.parseInput(consoleSender, sc.nextLine()) }
     }
 
     override fun stop() {

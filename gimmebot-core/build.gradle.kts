@@ -20,6 +20,8 @@ dependencies {
     implementation("io.github.microutils:kotlin-logging:2.0.3")
     implementation("org.slf4j:slf4j-simple:1.7.30")
     implementation("org.yaml:snakeyaml:1.27")
+    // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-core
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.1")
 }
 
 tasks.test {
