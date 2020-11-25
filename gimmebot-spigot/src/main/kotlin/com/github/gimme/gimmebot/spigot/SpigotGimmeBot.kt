@@ -11,9 +11,5 @@ abstract class SpigotGimmeBot : GimmeBot() {
     /** The plugin that this bot started through. */
     lateinit var plugin: JavaPlugin internal set
 
-    override fun connect(): Boolean {
-        TODO("Not yet implemented (e.g., connect command system)")
-    }
-
-    override fun disconnect() {}
+    //TODO: Not yet implemented (e.g., connect command system)
 }
