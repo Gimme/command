@@ -1,26 +1,29 @@
 package com.github.gimme.gimmebot.core.command
 
+import com.github.gimme.gimmebot.core.command.manager.SimpleCommandManager
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
-class HelpCommandTest : CommandTest() {
+class HelpCommandTest {
 
     @Test
     fun `should return list of commands`() {
+        val commandManager = SimpleCommandManager()
+
         commandManager.registerCommand(DummyCommand("one"))
         commandManager.registerCommand(DummyCommand("two"))
         commandManager.registerCommand(DummyCommand("three"))
 
-        var actual = ""
-
-        val commandSender: CommandSender = DummyCommandSender { message -> actual = message }
-        val response: CommandResponse? = HelpCommand(commandManager).execute(commandSender, listOf())
-        response?.sendTo(commandSender)
+        val response: CommandResponse? = HelpCommand(commandManager).execute(DUMMY_CONSOLE_COMMAND_SENDER, listOf())
 
         assertNotNull(response)
-        assertTrue(actual.contains("one"))
-        assertTrue(actual.contains("two"))
-        assertTrue(actual.contains("three"))
+
+        val message = response!!.message
+        assertTrue(message.contains("one"))
+        assertTrue(message.contains("two"))
+        assertTrue(message.contains("three"))
     }
+
+    private class DummyCommand(name: String) : BaseCommand(name)
 }

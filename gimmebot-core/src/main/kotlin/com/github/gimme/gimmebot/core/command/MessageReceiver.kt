@@ -5,6 +5,6 @@ package com.github.gimme.gimmebot.core.command
  */
 fun interface MessageReceiver {
 
-    /** Sends this sender a [message]. */
+    /** Sends the specified [message] to this receiver. */
     fun sendMessage(message: String)
 }

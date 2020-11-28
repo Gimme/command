@@ -1,4 +1,4 @@
-package com.github.gimme.gimmebot.core.command
+package com.github.gimme.gimmebot.core.command.manager
 
 /**
  * A minimal implementation of the base command manager.

@@ -27,7 +27,6 @@ class DiscordPlugin : GimmeBotPlugin() {
             jda = JDABuilder.createDefault(token).build()
         } catch (e: LoginException) {
             e.printStackTrace()
-            return
         }
     }
 }

@@ -1,9 +1,9 @@
 package com.github.gimme.gimmebot.core
 
-import com.github.gimme.gimmebot.core.command.CommandManager
+import com.github.gimme.gimmebot.core.command.manager.CommandManager
 import com.github.gimme.gimmebot.core.command.CommandSender
 import com.github.gimme.gimmebot.core.command.HelpCommand
-import com.github.gimme.gimmebot.core.command.SimpleCommandManager
+import com.github.gimme.gimmebot.core.command.manager.SimpleCommandManager
 import com.github.gimme.gimmebot.core.data.config.BotConfig
 import com.github.gimme.gimmebot.core.data.yaml.loadYamlFromResource
 import com.github.gimme.gimmebot.core.data.DataManager

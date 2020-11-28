@@ -6,6 +6,6 @@ import com.github.gimme.gimmebot.core.GimmeBot
 fun main() {
     val bot = GimmeBot()
 
-    bot.install(DiscordPlugin())
+    //bot.install(DiscordPlugin())
     bot.start()
 }

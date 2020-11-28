@@ -1,5 +1,8 @@
 package com.github.gimme.gimmebot.core.command
 
+import com.github.gimme.gimmebot.core.command.manager.CommandManager
+import com.github.gimme.gimmebot.core.command.executor.CommandExecutor
+
 /**
  * Displays a list of available commands.
  */
@@ -7,7 +10,9 @@ class HelpCommand(
     private val commandManager: CommandManager,
 ) : BaseCommand("help") {
 
-    override fun execute(commandSender: CommandSender, args: List<String>): CommandResponse? {
+    /** Prints available commands. */
+    @CommandExecutor
+    fun printCommands(commandSender: CommandSender, vararg args: String): CommandResponse {
         val sb = StringBuilder("Commands:")
 
         commandManager.getCommands().forEach { command ->

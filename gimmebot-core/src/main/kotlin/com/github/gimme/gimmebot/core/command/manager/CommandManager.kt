@@ -1,4 +1,7 @@
-package com.github.gimme.gimmebot.core.command
+package com.github.gimme.gimmebot.core.command.manager
+
+import com.github.gimme.gimmebot.core.command.CommandSender
+import com.github.gimme.gimmebot.core.command.Command
 
 /**
  * Represents a command manager that handles the registration and execution of commands.
@@ -16,7 +19,7 @@ interface CommandManager {
 
     /**
      * Checks the given [input] if a valid command and then executes it as the given [commandSender]. Returns if a valid
-     * command.
+     * command and it was successfully executed.
      */
     fun parseInput(commandSender: CommandSender, input: String): Boolean
 }

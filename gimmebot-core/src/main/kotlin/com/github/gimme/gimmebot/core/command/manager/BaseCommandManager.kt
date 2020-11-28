@@ -1,12 +1,21 @@
-package com.github.gimme.gimmebot.core.command
+package com.github.gimme.gimmebot.core.command.manager
+
+import com.github.gimme.gimmebot.core.command.CommandSender
+import com.github.gimme.gimmebot.core.command.Command
+import kotlin.collections.Collection
+import kotlin.collections.HashMap
+import kotlin.collections.drop
+import kotlin.collections.set
+
 
 /**
  * Represents a command manager with base functionality.
  */
 abstract class BaseCommandManager(
     /** Prefix required to execute commands. */
-    var commandPrefix: String,
+    private var commandPrefix: String,
 ) : CommandManager {
+
     private val commandByName = HashMap<String, Command>()
 
     override fun registerCommand(command: Command) {
@@ -22,7 +31,7 @@ abstract class BaseCommandManager(
     }
 
     override fun parseInput(commandSender: CommandSender, input: String): Boolean {
-        var lowerCaseInput = input.toLowerCase().trimEnd()
+        var lowerCaseInput = input.toLowerCase()
 
         if (commandSender.medium.requiresCommandPrefix) {
             // Has to start with the command prefix
@@ -31,16 +40,18 @@ abstract class BaseCommandManager(
             lowerCaseInput = lowerCaseInput.substring(commandPrefix.length)
         }
 
-        // Split into words
-        val words = lowerCaseInput.split(" ")
+        // Split into words on spaces, ignoring spaces between two quotation marks
+        val words = lowerCaseInput.split("\\s(?=(?:[^\\\"]*\\\"[^\\\"]*\\\")*[^\\\"]*\$)".toRegex())
+            .map { s -> s.replace("\"", "") }
+
         val commandName = words[0]
         val args = words.drop(1)
 
         // Return if not a valid command
         val command = getCommand(commandName) ?: return false
 
-        val response: CommandResponse? = command.execute(commandSender, args)
-        response?.sendTo(commandSender)
+        // Execute the command
+        command.execute(commandSender, args)?.sendTo(commandSender)
         return true
     }
 }
