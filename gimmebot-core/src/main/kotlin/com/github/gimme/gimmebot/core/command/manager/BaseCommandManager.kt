@@ -46,7 +46,7 @@ abstract class BaseCommandManager(
         lowerCaseInput.removePrefix(command.name)
 
         // Split into words on spaces, ignoring spaces between two quotation marks
-        val args = lowerCaseInput.split("\\s(?=(?:[^\\\"]*\\\"[^\\\"]*\\\")*[^\\\"]*\$)".toRegex())
+        val args = lowerCaseInput.split("\\s(?=(?:[^\"]*\"[^\"]*\")*[^\"]*\$)".toRegex())
             .map { s -> s.replace("\"", "") }.drop(1)
 
         // Execute the command
