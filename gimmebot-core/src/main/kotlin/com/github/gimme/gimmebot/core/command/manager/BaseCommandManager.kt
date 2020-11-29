@@ -2,32 +2,32 @@ package com.github.gimme.gimmebot.core.command.manager
 
 import com.github.gimme.gimmebot.core.command.CommandSender
 import com.github.gimme.gimmebot.core.command.Command
-import kotlin.collections.Collection
-import kotlin.collections.HashMap
+import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandCollection
+import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandTree
 import kotlin.collections.drop
-import kotlin.collections.set
 
 
 /**
  * Represents a command manager with base functionality.
+ *
+ * @param commandPrefix prefix required to execute commands from chat
  */
 abstract class BaseCommandManager(
-    /** Prefix required to execute commands. */
     private var commandPrefix: String,
 ) : CommandManager {
 
-    private val commandByName = HashMap<String, Command>()
+    private val commandCollection: CommandCollection = CommandTree()
 
     override fun registerCommand(command: Command) {
-        commandByName[command.name] = command
-    }
-
-    override fun getCommands(): Collection<Command> {
-        return commandByName.values
+        commandCollection.addCommand(command)
     }
 
     override fun getCommand(name: String): Command? {
-        return commandByName[name]
+        return commandCollection.getCommand(name)
+    }
+
+    override fun getCommandCollection(): CommandCollection {
+        return commandCollection
     }
 
     override fun parseInput(commandSender: CommandSender, input: String): Boolean {
@@ -40,15 +40,14 @@ abstract class BaseCommandManager(
             lowerCaseInput = lowerCaseInput.substring(commandPrefix.length)
         }
 
-        // Split into words on spaces, ignoring spaces between two quotation marks
-        val words = lowerCaseInput.split("\\s(?=(?:[^\\\"]*\\\"[^\\\"]*\\\")*[^\\\"]*\$)".toRegex())
-            .map { s -> s.replace("\"", "") }
-
-        val commandName = words[0]
-        val args = words.drop(1)
-
         // Return if not a valid command
-        val command = getCommand(commandName) ?: return false
+        val command = getCommand(lowerCaseInput) ?: return false
+        // Remove command name, leaving only the arguments
+        lowerCaseInput.removePrefix(command.name)
+
+        // Split into words on spaces, ignoring spaces between two quotation marks
+        val args = lowerCaseInput.split("\\s(?=(?:[^\\\"]*\\\"[^\\\"]*\\\")*[^\\\"]*\$)".toRegex())
+            .map { s -> s.replace("\"", "") }.drop(1)
 
         // Execute the command
         command.execute(commandSender, args)?.sendTo(commandSender)

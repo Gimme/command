@@ -1,6 +1,6 @@
 package com.github.gimme.gimmebot.core.command
 
-import com.github.gimme.gimmebot.core.command.manager.SimpleCommandManager
+import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandTree
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -9,13 +9,13 @@ class HelpCommandTest {
 
     @Test
     fun `should return list of commands`() {
-        val commandManager = SimpleCommandManager()
+        val commandCollection = CommandTree()
 
-        commandManager.registerCommand(DummyCommand("one"))
-        commandManager.registerCommand(DummyCommand("two"))
-        commandManager.registerCommand(DummyCommand("three"))
+        commandCollection.addCommand(DummyCommand("one"))
+        commandCollection.addCommand(DummyCommand("two"))
+        commandCollection.addCommand(DummyCommand("three"))
 
-        val response: CommandResponse? = HelpCommand(commandManager).execute(DUMMY_CONSOLE_COMMAND_SENDER, listOf())
+        val response: CommandResponse? = HelpCommand(commandCollection).execute(DUMMY_CONSOLE_COMMAND_SENDER, listOf())
 
         assertNotNull(response)
 

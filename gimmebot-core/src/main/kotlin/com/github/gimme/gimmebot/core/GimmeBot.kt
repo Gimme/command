@@ -45,7 +45,7 @@ open class GimmeBot : Bot {
 
         dataManager = DataManager(File(name))
 
-        commandManager.registerCommand(HelpCommand(commandManager))
+        commandManager.registerCommand(HelpCommand(commandManager.getCommandCollection()))
 
         onStart()
 
