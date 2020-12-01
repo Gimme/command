@@ -6,9 +6,7 @@ import com.github.gimme.gimmebot.core.command.CommandSender
 import java.security.InvalidParameterException
 import kotlin.reflect.KFunction
 import kotlin.reflect.KParameter
-import kotlin.reflect.full.createType
-import kotlin.reflect.full.hasAnnotation
-import kotlin.reflect.full.isSubtypeOf
+import kotlin.reflect.full.*
 import kotlin.reflect.jvm.jvmErasure
 import kotlin.reflect.jvm.jvmName
 import kotlin.reflect.jvm.kotlinFunction
@@ -55,9 +53,12 @@ private fun attemptToCallFunction(
     var argIndex = 0 // Current argument index
 
     // If the first parameter has the command sender type, we inject it
-    if (parameters.size > paramIndex && parameters[paramIndex].type.isSubtypeOf(CommandSender::class.createType())) {
-        typedArgsMap[parameters[paramIndex]] = commandSender
-        paramIndex++
+    if (parameters.size > paramIndex) {
+        val firstParam: KParameter = parameters[paramIndex]
+        if (firstParam.type.isSubtypeOf(CommandSender::class.createType())) {
+            typedArgsMap[firstParam] = firstParam.type.jvmErasure.safeCast(commandSender) ?: return null
+            paramIndex++
+        }
     }
 
     val amountOfInputParameters = parameters.size - paramIndex

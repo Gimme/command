@@ -24,7 +24,7 @@ class BaseCommandTest {
     }
 
     @Test
-    fun `input parser should execute reflection command with all types`() {
+    fun `should execute reflection command with all types`() {
         var called = false
 
         val command = object : BaseCommand("c") {
@@ -62,7 +62,7 @@ class BaseCommandTest {
 
     @ParameterizedTest
     @MethodSource("commandExecutor")
-    fun `input parser should execute reflection command`(
+    fun `should execute reflection command`(
         input: String?,
         command: Command,
         shouldExecute: Boolean,
@@ -72,6 +72,23 @@ class BaseCommandTest {
 
         if (shouldExecute) assertEquals(expected, actual, "Command was not executed when it should have been")
         else Assertions.assertNull(actual, "Command was executed when it shouldn't have been")
+    }
+
+    @Test
+    fun `should execute reflection command passing command sender subtypes`() {
+        val command: Command = object : BaseCommand("c") {
+            @CommandExecutor
+            fun c(sender: CommandSenderImpl): CommandResponse? {
+                assertEquals(1, sender.getInt())
+                return DUMMY_RESPONSE
+            }
+        }
+        val commandSender: CommandSender = CommandSenderImpl()
+
+        val expected = DUMMY_RESPONSE
+        val actual = command.execute(commandSender, listOf())
+
+        assertEquals(expected, actual, "Command was not executed when it should have been")
     }
 
     companion object {
@@ -202,6 +219,41 @@ class BaseCommandTest {
                     }
                 },
                 true),
+
+            // COMMAND SENDER TESTS
+            Arguments.of(
+                null,
+                object : BaseCommand("c") {
+                    @CommandExecutor
+                    fun c(sender: CommandSender): CommandResponse {
+                        assertEquals(DUMMY_CONSOLE_COMMAND_SENDER, sender)
+                        return DUMMY_RESPONSE
+                    }
+                },
+                true),
+            Arguments.of(
+                "1",
+                object : BaseCommand("c") {
+                    @CommandExecutor
+                    fun c(sender: CommandSender, a: Int = 0): CommandResponse {
+                        assertEquals(DUMMY_CONSOLE_COMMAND_SENDER, sender)
+                        assertEquals(1, a)
+                        return DUMMY_RESPONSE
+                    }
+                },
+                true),
         )
+    }
+
+    private class CommandSenderImpl() : CommandSender {
+        override val medium: CommandSender.Medium
+            get() = CommandSender.Medium.CONSOLE
+
+        override fun sendMessage(message: String) {
+        }
+
+        fun getInt(): Int {
+            return 1
+        }
     }
 }
