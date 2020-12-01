@@ -30,13 +30,15 @@ internal fun tryExecuteCommandByReflection(
         return attemptToCallFunction(function, command, commandSender, args)
     }
 
-    return null
+    throw IllegalStateException("No function marked with @" + CommandExecutor::class.simpleName + " in the command \""
+            + command.name + "\"")
 }
 
 /**
  * Attempts to call the specified [function] in the given [command] as the given [commandSender], and returns the
  * optional command response if the given [args] fit the parameters of the [function] and it was successfully called.
  */
+// TODO: return response with error message instead of null
 private fun attemptToCallFunction(
     function: KFunction<*>,
     command: Command,
@@ -56,7 +58,8 @@ private fun attemptToCallFunction(
     if (parameters.size > paramIndex) {
         val firstParam: KParameter = parameters[paramIndex]
         if (firstParam.type.isSubtypeOf(CommandSender::class.createType())) {
-            typedArgsMap[firstParam] = firstParam.type.jvmErasure.safeCast(commandSender) ?: return null
+            typedArgsMap[firstParam] =
+                firstParam.type.jvmErasure.safeCast(commandSender) ?: return CommandResponse.INCOMPATIBLE_SENDER
             paramIndex++
         }
     }
@@ -70,11 +73,11 @@ private fun attemptToCallFunction(
     val hasVararg = parameters[parameters.size - 1].isVararg
     val minRequiredAmountOfArgs = amountOfInputParameters - (if (hasVararg) 1 else 0) - amountOfOptionalArgs
 
-    if (args.size < minRequiredAmountOfArgs) return null // Too few arguments!
-    if (!hasVararg && args.size > amountOfInputParameters) return null // Too many arguments!
+    if (args.size < minRequiredAmountOfArgs) return CommandResponse.TOO_FEW_ARGUMENTS
+    if (!hasVararg && args.size > amountOfInputParameters) return CommandResponse.TOO_MANY_ARGUMENTS
 
     while (argIndex < args.size) {
-        if (paramIndex >= parameters.size) return null // Too many arguments!
+        if (paramIndex >= parameters.size) return CommandResponse.TOO_MANY_ARGUMENTS
         val param = parameters[paramIndex]
         val arg = args[argIndex]
 
@@ -89,7 +92,7 @@ private fun attemptToCallFunction(
             typedArgsMap[param] = parameterType.castArray(varargCollection)
         } else {
             val value = ParameterType.fromClass(param)?.castArg(arg)
-            if (value == null && !param.type.isMarkedNullable) return null // Wrong argument type!
+            if (value == null && !param.type.isMarkedNullable) return CommandResponse.INVALID_ARGUMENT
             typedArgsMap[param] = value
             argIndex++
         }

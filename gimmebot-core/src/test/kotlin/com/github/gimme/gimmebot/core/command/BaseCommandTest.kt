@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertAll
+import org.junit.jupiter.api.function.Executable
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.CsvSource
@@ -40,15 +42,17 @@ class BaseCommandTest {
                 boolean2: Boolean?,
                 boolean3: Boolean?,
             ) {
-                assertEquals("string", string1)
-                assertEquals("", string2)
-                assertEquals(1, int1)
-                assertEquals(-999, int2)
-                assertEquals(0.5, double1)
-                assertEquals(36.0, double2)
-                assertEquals(true, boolean1)
-                assertEquals(false, boolean2)
-                Assertions.assertNull(boolean3)
+                Assertions.assertAll(
+                    Executable { assertEquals("string", string1) },
+                    Executable { assertEquals("", string2) },
+                    Executable { assertEquals(1, int1) },
+                    Executable { assertEquals(-999, int2) },
+                    Executable { assertEquals(0.5, double1) },
+                    Executable { assertEquals(36.0, double2) },
+                    Executable { assertEquals(true, boolean1) },
+                    Executable { assertEquals(false, boolean2) },
+                    Executable { Assertions.assertNull(boolean3) },
+                )
 
                 called = true
             }
@@ -63,19 +67,21 @@ class BaseCommandTest {
     @ParameterizedTest
     @MethodSource("commandExecutor")
     fun `should execute reflection command`(
-        input: String?,
+        args: String?,
         command: Command,
-        shouldExecute: Boolean,
+        shouldExecute: Boolean = true,
     ) {
         val expected = DUMMY_RESPONSE
-        val actual = command.execute(DUMMY_CONSOLE_COMMAND_SENDER, input?.split(" ") ?: listOf())
+        val actual = command.execute(DUMMY_CONSOLE_COMMAND_SENDER, args?.split(" ") ?: listOf())
 
         if (shouldExecute) assertEquals(expected, actual, "Command was not executed when it should have been")
-        else Assertions.assertNull(actual, "Command was executed when it shouldn't have been")
+        else assertEquals(CommandResponse.Status.ERROR,
+            actual!!.status,
+            "Command did not return an error message when it should have")
     }
 
     @Test
-    fun `should execute reflection command passing command sender subtypes`() {
+    fun `should execute reflection command when using sender subtypes`() {
         val command: Command = object : BaseCommand("c") {
             @CommandExecutor
             fun c(sender: CommandSenderImpl): CommandResponse? {
@@ -91,6 +97,24 @@ class BaseCommandTest {
         assertEquals(expected, actual, "Command was not executed when it should have been")
     }
 
+    @ParameterizedTest
+    @MethodSource("commandError")
+    fun `should return command error`(
+        args: String?,
+        response: CommandResponse,
+        sender: CommandSender,
+    ) {
+        val command: Command = object : BaseCommand("c") {
+            @CommandExecutor
+            fun c(sender: CommandSenderImpl, a: Int): CommandResponse? {
+                assertEquals(1, sender.getInt())
+                return DUMMY_RESPONSE
+            }
+        }
+
+        assertEquals(response, command.execute(sender, args?.split(" ") ?: listOf()))
+    }
+
     companion object {
         @JvmStatic
         fun commandExecutor() = listOf(
@@ -101,7 +125,8 @@ class BaseCommandTest {
                     @CommandExecutor
                     fun c(): CommandResponse? = DUMMY_RESPONSE
                 },
-                true),
+                true,
+            ),
 
             // VARARG TESTS
             Arguments.of(
@@ -113,7 +138,8 @@ class BaseCommandTest {
                         return DUMMY_RESPONSE
                     }
                 },
-                true),
+                true,
+            ),
             Arguments.of(
                 "string1 string2 string3",
                 object : BaseCommand("c") {
@@ -123,7 +149,8 @@ class BaseCommandTest {
                         return DUMMY_RESPONSE
                     }
                 },
-                true),
+                true,
+            ),
             Arguments.of(
                 "a 1 2 3",
                 object : BaseCommand("c") {
@@ -134,21 +161,24 @@ class BaseCommandTest {
                         return DUMMY_RESPONSE
                     }
                 },
-                true),
+                true,
+            ),
             Arguments.of(
                 "1",
                 object : BaseCommand("c") {
                     @CommandExecutor
                     fun c(vararg a: Double): CommandResponse = DUMMY_RESPONSE
                 },
-                true),
+                true,
+            ),
             Arguments.of(
                 "true",
                 object : BaseCommand("c") {
                     @CommandExecutor
                     fun c(vararg a: Boolean): CommandResponse = DUMMY_RESPONSE
                 },
-                true),
+                true,
+            ),
 
             Arguments.of(
                 null,
@@ -156,35 +186,40 @@ class BaseCommandTest {
                     @CommandExecutor
                     fun c(a: String): CommandResponse = DUMMY_RESPONSE
                 },
-                false),
+                false,
+            ),
             Arguments.of(
                 "a b",
                 object : BaseCommand("c") {
                     @CommandExecutor
                     fun c(a: String): CommandResponse = DUMMY_RESPONSE
                 },
-                false),
+                false,
+            ),
             Arguments.of(
                 "a",
                 object : BaseCommand("c") {
                     @CommandExecutor
                     fun c(a: Int): CommandResponse = DUMMY_RESPONSE
                 },
-                false),
+                false,
+            ),
             Arguments.of(
                 "1.0",
                 object : BaseCommand("c") {
                     @CommandExecutor
                     fun c(vararg a: Int): CommandResponse = DUMMY_RESPONSE
                 },
-                false),
+                false,
+            ),
             Arguments.of(
                 "a",
                 object : BaseCommand("c") {
                     @CommandExecutor
                     fun c(a: Boolean): CommandResponse = DUMMY_RESPONSE
                 },
-                false),
+                false,
+            ),
 
             // DEFAULTS TESTS
             Arguments.of(
@@ -196,7 +231,8 @@ class BaseCommandTest {
                         return DUMMY_RESPONSE
                     }
                 },
-                true),
+                true,
+            ),
             Arguments.of(
                 "a",
                 object : BaseCommand("c") {
@@ -206,7 +242,8 @@ class BaseCommandTest {
                         return DUMMY_RESPONSE
                     }
                 },
-                true),
+                true,
+            ),
             Arguments.of(
                 "1",
                 object : BaseCommand("c") {
@@ -218,7 +255,8 @@ class BaseCommandTest {
                         return DUMMY_RESPONSE
                     }
                 },
-                true),
+                true,
+            ),
 
             // COMMAND SENDER TESTS
             Arguments.of(
@@ -230,7 +268,8 @@ class BaseCommandTest {
                         return DUMMY_RESPONSE
                     }
                 },
-                true),
+                true,
+            ),
             Arguments.of(
                 "1",
                 object : BaseCommand("c") {
@@ -241,7 +280,37 @@ class BaseCommandTest {
                         return DUMMY_RESPONSE
                     }
                 },
-                true),
+                true,
+            ),
+        )
+
+        @JvmStatic
+        fun commandError() = listOf(
+            Arguments.of(
+                "1",
+                DUMMY_RESPONSE,
+                CommandSenderImpl(),
+            ),
+            Arguments.of(
+                "a",
+                CommandResponse.INVALID_ARGUMENT,
+                CommandSenderImpl(),
+            ),
+            Arguments.of(
+                "1",
+                CommandResponse.INCOMPATIBLE_SENDER,
+                DUMMY_CONSOLE_COMMAND_SENDER,
+            ),
+            Arguments.of(
+                null,
+                CommandResponse.TOO_FEW_ARGUMENTS,
+                CommandSenderImpl(),
+            ),
+            Arguments.of(
+                "1 2",
+                CommandResponse.TOO_MANY_ARGUMENTS,
+                CommandSenderImpl(),
+            ),
         )
     }
 
