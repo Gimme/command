@@ -41,7 +41,7 @@ class BaseCommandManagerTest {
         "Test, !test",
         "test, !TEST",
         "Test, !Test",
-        "test test, !test test",
+        "test1 test2, !test1 test2",
     )
     fun `should execute command`(commandName: String, inputCommand: String) {
         var executed = false
@@ -57,6 +57,44 @@ class BaseCommandManagerTest {
         commandManager.parseInput(DUMMY_CHAT_COMMAND_SENDER, inputCommand)
 
         assertTrue(executed)
+    }
+
+    @Test
+    fun `should execute parent child commands separately`() {
+        var parentExecuted = false
+        var childExecuted = false
+
+        val parentCommand: Command = object : BaseCommand("parent") {
+            override fun execute(commandSender: CommandSender, args: List<String>): CommandResponse? {
+                assertIterableEquals(listOf("a", "b"), args)
+                parentExecuted = true
+                return null
+            }
+        }
+        val childCommand: Command = object : BaseCommand("parent child") {
+            override fun execute(commandSender: CommandSender, args: List<String>): CommandResponse? {
+                assertIterableEquals(listOf("x", "y"), args)
+                childExecuted = true
+                return null
+            }
+        }
+
+        commandManager.registerCommand(parentCommand)
+        commandManager.registerCommand(childCommand)
+        commandManager.parseInput(DUMMY_CONSOLE_COMMAND_SENDER, "parent a b")
+        commandManager.parseInput(DUMMY_CONSOLE_COMMAND_SENDER, "parent child x y")
+
+        assertTrue(parentExecuted)
+        assertTrue(childExecuted)
+
+        val commandManager2 = SimpleCommandManager()
+        commandManager2.registerCommand(childCommand)
+        commandManager2.registerCommand(parentCommand)
+        commandManager2.parseInput(DUMMY_CONSOLE_COMMAND_SENDER, "parent child x y")
+        commandManager2.parseInput(DUMMY_CONSOLE_COMMAND_SENDER, "parent a b")
+
+        assertTrue(childExecuted)
+        assertTrue(parentExecuted)
     }
 
     @ParameterizedTest

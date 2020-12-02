@@ -43,7 +43,7 @@ abstract class BaseCommandManager(
         // Return if not a valid command
         val command = getCommand(lowerCaseInput) ?: return false
         // Remove command name, leaving only the arguments
-        lowerCaseInput.removePrefix(command.name)
+        lowerCaseInput = lowerCaseInput.removePrefix(command.name)
 
         // Split into words on spaces, ignoring spaces between two quotation marks
         val args = lowerCaseInput.split("\\s(?=(?:[^\"]*\"[^\"]*\")*[^\"]*\$)".toRegex())
