@@ -3,6 +3,7 @@ package com.github.gimme.gimmebot.core.command.manager
 import com.github.gimme.gimmebot.core.command.CommandSender
 import com.github.gimme.gimmebot.core.command.Command
 import com.github.gimme.gimmebot.core.command.HelpCommand
+import com.github.gimme.gimmebot.core.command.MessageReceiver
 import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandCollection
 import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandTree
 import kotlin.collections.drop
@@ -18,8 +19,10 @@ class SimpleCommandManager(
 ) : CommandManager {
 
     private val commandCollection: CommandCollection = CommandTree()
+    private val outputListeners: MutableList<MessageReceiver> = mutableListOf()
 
     init {
+        addOutputListener { message -> println(message) }
         registerCommand(HelpCommand(commandCollection))
     }
 
@@ -33,6 +36,10 @@ class SimpleCommandManager(
 
     override fun getCommandCollection(): CommandCollection {
         return commandCollection
+    }
+
+    override fun addOutputListener(messageReceiver: MessageReceiver) {
+        outputListeners.add(messageReceiver)
     }
 
     override fun parseInput(commandSender: CommandSender, input: String): Boolean {
@@ -55,7 +62,11 @@ class SimpleCommandManager(
             .map { s -> s.replace("\"", "") }.drop(1)
 
         // Execute the command
-        command.execute(commandSender, args)?.sendTo(commandSender)
+        val response = command.execute(commandSender, args)
+        if (response != null) {
+            response.sendTo(commandSender)
+            outputListeners.forEach { outputListener -> response.sendTo(outputListener) }
+        }
         return true
     }
 }

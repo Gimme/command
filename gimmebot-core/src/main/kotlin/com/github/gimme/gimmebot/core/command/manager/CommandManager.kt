@@ -2,6 +2,7 @@ package com.github.gimme.gimmebot.core.command.manager
 
 import com.github.gimme.gimmebot.core.command.CommandSender
 import com.github.gimme.gimmebot.core.command.Command
+import com.github.gimme.gimmebot.core.command.MessageReceiver
 import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandCollection
 
 /**
@@ -15,8 +16,11 @@ interface CommandManager {
     /** Returns the command with the specified [name] if it has been registered. */
     fun getCommand(name: String): Command?
 
-    /** Collection of all registered commands. */
+    /** Returns the mutable collection of all registered commands. */
     fun getCommandCollection(): CommandCollection
+
+    /** Adds the given [messageReceiver] to be sent all command output. */
+    fun addOutputListener(messageReceiver: MessageReceiver)
 
     /**
      * Checks the given [input] if a valid command and then executes it as the given [commandSender]. Returns if a valid

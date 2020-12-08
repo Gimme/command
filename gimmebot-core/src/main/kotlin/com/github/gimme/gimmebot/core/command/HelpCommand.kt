@@ -13,7 +13,7 @@ class HelpCommand(
 
     /** Prints available commands. */
     @CommandExecutor
-    fun printCommands(commandSender: CommandSender, vararg args: String): CommandResponse {
+    fun printCommands(): CommandResponse {
         val sb = StringBuilder("Commands:")
 
         commandCollection.getCommands().forEach { command ->
@@ -22,7 +22,6 @@ class HelpCommand(
             sb.append(command.name)
         }
 
-        println(sb.toString())
         return CommandResponse(sb.toString())
     }
 }
