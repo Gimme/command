@@ -2,6 +2,7 @@ package com.github.gimme.gimmebot.core.command.manager
 
 import com.github.gimme.gimmebot.core.command.CommandSender
 import com.github.gimme.gimmebot.core.command.Command
+import com.github.gimme.gimmebot.core.command.HelpCommand
 import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandCollection
 import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandTree
 import kotlin.collections.drop
@@ -17,6 +18,10 @@ class SimpleCommandManager(
 ) : CommandManager {
 
     private val commandCollection: CommandCollection = CommandTree()
+
+    init {
+        registerCommand(HelpCommand(commandCollection))
+    }
 
     override fun registerCommand(command: Command) {
         commandCollection.addCommand(command)

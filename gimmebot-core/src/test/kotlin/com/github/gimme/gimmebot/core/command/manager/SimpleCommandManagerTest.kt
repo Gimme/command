@@ -18,6 +18,11 @@ class SimpleCommandManagerTest {
     private val commandManager: CommandManager = SimpleCommandManager("!")
 
     @Test
+    fun `should have a help command by default`() {
+        assertNotNull(commandManager.getCommand("help"))
+    }
+
+    @Test
     fun `should register command`() {
         commandManager.registerCommand(DUMMY_COMMAND)
 
