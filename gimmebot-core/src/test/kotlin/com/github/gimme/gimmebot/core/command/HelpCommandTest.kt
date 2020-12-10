@@ -20,6 +20,7 @@ class HelpCommandTest {
         assertNotNull(response)
 
         val message = response!!.message
+        assertNotNull(message!!)
         assertTrue(message.contains("one"))
         assertTrue(message.contains("two"))
         assertTrue(message.contains("three"))

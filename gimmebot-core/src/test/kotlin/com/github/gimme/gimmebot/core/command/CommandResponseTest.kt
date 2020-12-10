@@ -13,4 +13,16 @@ class CommandResponseTest {
 
         assertEquals("message", actual)
     }
+
+    @Test
+    fun `response should accept body`() {
+        val response = CommandResponse(ResponseBody("abc", 3))
+
+        assertEquals(ResponseBody("abc", 3), response.body)
+    }
+
+    private data class ResponseBody(
+        val a: String,
+        val b: Int,
+    )
 }
