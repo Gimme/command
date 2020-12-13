@@ -80,8 +80,7 @@ open class GimmeBot : Bot {
     /** Performs shutdown logic. */
     protected open fun onStop() {}
 
-    /** Adds and enables the given [plugin]. */
-    fun install(plugin: GimmeBotPlugin) {
+    override fun install(plugin: GimmeBotPlugin) {
         plugins.add(plugin)
         plugin.init(this)
         plugin.enabled = true
