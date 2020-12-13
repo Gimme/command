@@ -1,5 +1,6 @@
-package com.github.gimme.gimmebot.core.command
+package com.github.gimme.gimmebot.core.command.medium
 
+import com.github.gimme.gimmebot.core.command.CommandSender
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.*

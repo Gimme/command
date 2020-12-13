@@ -1,6 +1,7 @@
 package com.github.gimme.gimmebot.core.command
 
 import com.github.gimme.gimmebot.core.command.manager.SimpleCommandManager
+import com.github.gimme.gimmebot.core.command.medium.BaseCommandInputMedium
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.*
 

@@ -1,4 +1,4 @@
-package com.github.gimme.gimmebot.core.command
+package com.github.gimme.gimmebot.core.command.medium
 
 import com.github.gimme.gimmebot.core.command.manager.CommandManager
 

@@ -1,6 +1,6 @@
 package com.github.gimme.gimmebot.discord.command.mediums
 
-import com.github.gimme.gimmebot.core.command.BaseCommandInputMedium
+import com.github.gimme.gimmebot.core.command.medium.BaseCommandInputMedium
 import com.github.gimme.gimmebot.discord.command.ChannelCommandSender
 import com.github.gimme.gimmebot.discord.config.DiscordConfig
 import net.dv8tion.jda.api.JDA

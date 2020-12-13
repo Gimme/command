@@ -1,6 +1,6 @@
 package com.github.gimme.gimmebot.core
 
-import com.github.gimme.gimmebot.core.command.ConsoleCommandInputMedium
+import com.github.gimme.gimmebot.core.command.medium.ConsoleCommandInputMedium
 import com.github.gimme.gimmebot.core.command.manager.CommandManager
 import com.github.gimme.gimmebot.core.command.manager.SimpleCommandManager
 import com.github.gimme.gimmebot.core.data.DataManager
