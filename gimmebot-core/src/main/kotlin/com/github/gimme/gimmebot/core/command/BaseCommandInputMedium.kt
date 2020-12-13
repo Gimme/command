@@ -7,8 +7,9 @@ import com.github.gimme.gimmebot.core.command.manager.CommandManager
  *
  * @property commandPrefix prefix required for the input to be recognized as a command
  */
-abstract class BaseCommandInputMedium(private val commandPrefix: String? = null) : CommandInputMedium {
+abstract class BaseCommandInputMedium : CommandInputMedium {
 
+    protected abstract val commandPrefix: String?
     private lateinit var commandManager: CommandManager
 
     override fun install(commandManager: CommandManager) {
@@ -22,12 +23,13 @@ abstract class BaseCommandInputMedium(private val commandPrefix: String? = null)
     /** Sends the specified command [input] as the given [sender]. */
     protected fun send(sender: CommandSender, input: String) {
         var commandInput = input
+        val prefix = commandPrefix
 
-        if (!commandPrefix.isNullOrEmpty()) {
+        if (!prefix.isNullOrEmpty()) {
             // Has to start with the command prefix
-            if (!input.startsWith(commandPrefix)) return
+            if (!input.startsWith(prefix)) return
             // Remove prefix
-            commandInput = input.removePrefix(commandPrefix)
+            commandInput = input.removePrefix(prefix)
         }
 
         commandManager.parseInput(sender, commandInput)

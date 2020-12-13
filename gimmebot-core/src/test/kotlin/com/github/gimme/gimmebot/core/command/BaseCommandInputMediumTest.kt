@@ -10,7 +10,10 @@ class BaseCommandInputMediumTest {
 
     @Test
     fun `should send command input`() {
-        val commandInputMedium = object : BaseCommandInputMedium(null) {
+        val commandInputMedium = object : BaseCommandInputMedium() {
+            override val commandPrefix: String?
+                get() = null
+
             override fun onInstall() {
                 send(DUMMY_COMMAND_SENDER, "abc")
             }
@@ -22,7 +25,10 @@ class BaseCommandInputMediumTest {
 
     @Test
     fun `should send command input with prefix`() {
-        val commandInputMedium = object : BaseCommandInputMedium("!") {
+        val commandInputMedium = object : BaseCommandInputMedium() {
+            override val commandPrefix: String
+                get() = "!"
+
             override fun onInstall() {
                 send(DUMMY_COMMAND_SENDER, "!abc def")
             }

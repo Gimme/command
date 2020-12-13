@@ -1,6 +1,8 @@
 package com.github.gimme.gimmebot.discord.config
 
-internal data class DiscordConfig(
+data class DiscordConfig(
+    /** Discord bot authentication token. */
     var token: String = "",
+    /** Command prefix. */
     var prefix: String = "!",
 )
