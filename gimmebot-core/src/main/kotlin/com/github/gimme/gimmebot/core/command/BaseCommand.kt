@@ -22,7 +22,7 @@ abstract class BaseCommand(name: String) : Command {
         val sb = StringBuilder(name)
 
         for (parameter in function.parameters.drop(1)) {
-            sb.append(" ").append(parameter.name)
+            sb.append(" <${parameter.name}>")
         }
 
         return sb.toString()

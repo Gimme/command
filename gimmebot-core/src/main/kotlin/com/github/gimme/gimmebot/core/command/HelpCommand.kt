@@ -1,6 +1,5 @@
 package com.github.gimme.gimmebot.core.command
 
-import com.github.gimme.gimmebot.core.command.manager.CommandManager
 import com.github.gimme.gimmebot.core.command.executor.CommandExecutor
 import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandCollection
 
@@ -17,9 +16,7 @@ class HelpCommand(
         val sb = StringBuilder("Commands:")
 
         commandCollection.getCommands().forEach { command ->
-            sb.append("\n")
-            sb.append("  ")
-            sb.append(command.getUsage())
+            sb.append("\n|  ${command.getUsage()}")
         }
 
         return CommandResponse(sb.toString())
