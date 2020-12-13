@@ -11,12 +11,8 @@ import kotlin.collections.drop
 
 /**
  * Represents a command manager with base functionality.
- *
- * @param commandPrefix prefix required to execute commands from chat
  */
-class SimpleCommandManager(
-    private var commandPrefix: String = "/",
-) : CommandManager {
+class SimpleCommandManager : CommandManager {
 
     private val commandCollection: CommandCollection = CommandTree()
     private val outputListeners: MutableList<MessageReceiver> = mutableListOf()
@@ -44,13 +40,6 @@ class SimpleCommandManager(
 
     override fun parseInput(commandSender: CommandSender, input: String): Boolean {
         var lowerCaseInput = input.toLowerCase()
-
-        if (commandSender.medium.requiresCommandPrefix) {
-            // Has to start with the command prefix
-            if (!lowerCaseInput.startsWith(commandPrefix)) return false
-            // Remove prefix
-            lowerCaseInput = lowerCaseInput.substring(commandPrefix.length)
-        }
 
         // Return if not a valid command
         val command = getCommand(lowerCaseInput) ?: return false

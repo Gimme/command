@@ -1,5 +1,6 @@
 package com.github.gimme.gimmebot.core.command
 
+import com.github.gimme.gimmebot.core.command.executor.CommandExecutor
 import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandTree
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -15,7 +16,7 @@ class HelpCommandTest {
         commandCollection.addCommand(DummyCommand("two"))
         commandCollection.addCommand(DummyCommand("three"))
 
-        val response: CommandResponse? = HelpCommand(commandCollection).execute(DUMMY_CONSOLE_COMMAND_SENDER, listOf())
+        val response: CommandResponse? = HelpCommand(commandCollection).execute(DUMMY_COMMAND_SENDER, listOf())
 
         assertNotNull(response)
 
@@ -26,5 +27,8 @@ class HelpCommandTest {
         assertTrue(message.contains("three"))
     }
 
-    private class DummyCommand(name: String) : BaseCommand(name)
+    private class DummyCommand(name: String) : BaseCommand(name) {
+        @CommandExecutor
+        fun execute() {}
+    }
 }

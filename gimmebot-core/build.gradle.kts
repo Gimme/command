@@ -17,6 +17,10 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
     testImplementation(platform("org.junit:junit-bom:5.7.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+    // https://mvnrepository.com/artifact/org.mockito/mockito-core
+    testImplementation("org.mockito:mockito-core:3.6.28")
+    // https://mvnrepository.com/artifact/org.mockito/mockito-inline
+    testImplementation("org.mockito:mockito-inline:3.6.28")
     implementation("io.github.microutils:kotlin-logging:2.0.3")
     implementation("org.slf4j:slf4j-simple:1.7.30")
     implementation("org.yaml:snakeyaml:1.27")

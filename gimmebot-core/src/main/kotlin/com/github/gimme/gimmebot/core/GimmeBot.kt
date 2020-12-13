@@ -1,13 +1,12 @@
 package com.github.gimme.gimmebot.core
 
-import com.github.gimme.gimmebot.core.command.manager.CommandManager
 import com.github.gimme.gimmebot.core.command.CommandSender
-import com.github.gimme.gimmebot.core.command.HelpCommand
+import com.github.gimme.gimmebot.core.command.manager.CommandManager
 import com.github.gimme.gimmebot.core.command.manager.SimpleCommandManager
-import com.github.gimme.gimmebot.core.data.config.BotConfig
-import com.github.gimme.gimmebot.core.data.yaml.loadYamlFromResource
 import com.github.gimme.gimmebot.core.data.DataManager
+import com.github.gimme.gimmebot.core.data.config.BotConfig
 import com.github.gimme.gimmebot.core.data.requireResource
+import com.github.gimme.gimmebot.core.data.yaml.loadYamlFromResource
 import com.github.gimme.gimmebot.core.plugin.GimmeBotPlugin
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -58,11 +57,7 @@ open class GimmeBot : Bot {
     private fun startInputCoroutine() {
         val sc = Scanner(System.`in`)
         val consoleSender: CommandSender = object : CommandSender {
-            override val medium: CommandSender.Medium
-                get() = CommandSender.Medium.CONSOLE
-
-            override fun sendMessage(message: String) {
-            }
+            override fun sendMessage(message: String) {}
         }
 
         GlobalScope.launch { while (true) commandManager.parseInput(consoleSender, sc.nextLine()) }

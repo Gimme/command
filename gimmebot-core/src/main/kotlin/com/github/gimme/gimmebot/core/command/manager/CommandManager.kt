@@ -1,7 +1,8 @@
 package com.github.gimme.gimmebot.core.command.manager
 
-import com.github.gimme.gimmebot.core.command.CommandSender
 import com.github.gimme.gimmebot.core.command.Command
+import com.github.gimme.gimmebot.core.command.CommandInputMedium
+import com.github.gimme.gimmebot.core.command.CommandSender
 import com.github.gimme.gimmebot.core.command.MessageReceiver
 import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandCollection
 
@@ -27,4 +28,9 @@ interface CommandManager {
      * command and it was successfully executed.
      */
     fun parseInput(commandSender: CommandSender, input: String): Boolean
+
+    /** Installs the given [commandInputMedium] to accept command input for this manager. */
+    fun install(commandInputMedium: CommandInputMedium) {
+        commandInputMedium.install(this)
+    }
 }

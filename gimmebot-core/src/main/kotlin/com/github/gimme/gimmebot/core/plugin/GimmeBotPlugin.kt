@@ -7,7 +7,7 @@ import com.github.gimme.gimmebot.core.GimmeBot
  */
 abstract class GimmeBotPlugin {
     /** The bot that this plugin is installed in. */
-    lateinit var bot: GimmeBot
+    protected lateinit var bot: GimmeBot
         private set
 
     /** If this plugin is enabled. */
