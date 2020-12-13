@@ -46,9 +46,6 @@ open class GimmeBot : Bot {
         onStart()
 
         logger.info("$name started!")
-
-        while (true) {
-        }
     }
 
     override fun stop() {
