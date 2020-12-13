@@ -10,4 +10,7 @@ interface Command {
 
     /** Executes this command as the given [commandSender] with the given [args] and returns an optional response. */
     fun execute(commandSender: CommandSender, args: List<String>): CommandResponse?
+
+    /** Returns how to use the command. */
+    fun getUsage(): String
 }

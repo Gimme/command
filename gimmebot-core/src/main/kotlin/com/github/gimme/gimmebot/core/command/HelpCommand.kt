@@ -19,7 +19,7 @@ class HelpCommand(
         commandCollection.getCommands().forEach { command ->
             sb.append("\n")
             sb.append("  ")
-            sb.append(command.name)
+            sb.append(command.getUsage())
         }
 
         return CommandResponse(sb.toString())
