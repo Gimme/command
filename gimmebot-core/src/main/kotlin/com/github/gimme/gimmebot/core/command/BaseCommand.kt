@@ -1,9 +1,7 @@
 package com.github.gimme.gimmebot.core.command
 
-import com.github.gimme.gimmebot.core.command.executor.CommandExecutor
+import com.github.gimme.gimmebot.core.command.executor.getFirstCommandExecutorFunction
 import com.github.gimme.gimmebot.core.command.executor.tryExecuteCommandByReflection
-import kotlin.reflect.full.hasAnnotation
-import kotlin.reflect.jvm.kotlinFunction
 
 /**
  * Represents a command with base functionality.
@@ -19,22 +17,14 @@ abstract class BaseCommand(name: String) : Command {
     }
 
     override fun getUsage(): String {
-        // Look through the public methods in the command class
-        for (method in javaClass.methods) {
-            val function = method.kotlinFunction ?: continue
-            // Make sure it has the right annotation
-            if (!function.hasAnnotation<CommandExecutor>()) continue
+        val function = getFirstCommandExecutorFunction()
 
-            val sb = StringBuilder(name)
+        val sb = StringBuilder(name)
 
-            for (parameter in function.parameters.drop(1)) {
-                sb.append(" ").append(parameter.name)
-            }
-
-            return sb.toString()
+        for (parameter in function.parameters.drop(1)) {
+            sb.append(" ").append(parameter.name)
         }
 
-        throw IllegalStateException("No function marked with @" + CommandExecutor::class.simpleName + " in the command \""
-                + name + "\"")
+        return sb.toString()
     }
 }

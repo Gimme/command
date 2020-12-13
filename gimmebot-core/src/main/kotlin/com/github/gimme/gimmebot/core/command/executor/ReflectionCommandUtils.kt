@@ -6,7 +6,10 @@ import com.github.gimme.gimmebot.core.command.CommandSender
 import java.security.InvalidParameterException
 import kotlin.reflect.KFunction
 import kotlin.reflect.KParameter
-import kotlin.reflect.full.*
+import kotlin.reflect.full.createType
+import kotlin.reflect.full.hasAnnotation
+import kotlin.reflect.full.isSubtypeOf
+import kotlin.reflect.full.safeCast
 import kotlin.reflect.jvm.jvmErasure
 import kotlin.reflect.jvm.jvmName
 import kotlin.reflect.jvm.kotlinFunction
@@ -21,17 +24,28 @@ internal fun tryExecuteCommandByReflection(
     commandSender: CommandSender,
     args: List<String>,
 ): CommandResponse? {
+    val function = command.getFirstCommandExecutorFunction()
+
+    return attemptToCallFunction(function, command, commandSender, args)
+}
+
+/**
+ * Returns the first found method that is annotated with @[CommandExecutor].
+ *
+ * @throws IllegalStateException if there is no method annotated with @[CommandExecutor]
+ */
+internal fun Command.getFirstCommandExecutorFunction(): KFunction<*> {
     // Look through the public methods in the command class
-    for (method in command.javaClass.methods) {
+    for (method in this.javaClass.methods) {
         val function = method.kotlinFunction ?: continue
         // Make sure it has the right annotation
         if (!function.hasAnnotation<CommandExecutor>()) continue
 
-        return attemptToCallFunction(function, command, commandSender, args)
+        return function
     }
 
     throw IllegalStateException("No function marked with @" + CommandExecutor::class.simpleName + " in the command \""
-            + command.name + "\"")
+            + this.name + "\"")
 }
 
 /**
