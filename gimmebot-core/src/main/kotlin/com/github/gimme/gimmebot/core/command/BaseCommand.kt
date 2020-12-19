@@ -5,14 +5,6 @@ import com.github.gimme.gimmebot.core.command.executor.tryExecuteCommandByReflec
 import org.apache.commons.lang3.StringUtils
 
 /**
- * Converts this string from camel case to separate lowercase words with spaces.
- */
-internal fun String.splitCamelCase(): String =
-    StringUtils.join(StringUtils.splitByCharacterTypeCamelCase(this), StringUtils.SPACE)
-        .toLowerCase()
-        .replace(" +".toRegex(), " ")
-
-/**
  * Represents a command with base functionality.
  *
  * A public method marked with @[com.github.gimme.gimmebot.core.command.executor.CommandExecutor] is called when the
@@ -37,3 +29,11 @@ abstract class BaseCommand(name: String) : Command {
         return tryExecuteCommandByReflection(this, commandSender, args)
     }
 }
+
+/**
+ * Converts this string from camel case to separate lowercase words with spaces.
+ */
+internal fun String.splitCamelCase(): String =
+    StringUtils.join(StringUtils.splitByCharacterTypeCamelCase(this), StringUtils.SPACE)
+        .toLowerCase()
+        .replace(" +".toRegex(), " ")
