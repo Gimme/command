@@ -27,6 +27,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-core
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.1")
     implementation(kotlin("reflect"))
+    implementation("org.apache.commons:commons-lang3:3.11")
 }
 
 tasks.test {

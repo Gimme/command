@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.function.Executable
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -112,6 +113,16 @@ class BaseCommandTest {
         }
 
         assertEquals(response, command.execute(sender, args?.split(" ") ?: listOf()))
+    }
+
+    @Test
+    fun `camel case should be split into separate lowercase words with spaces`() {
+        assertAll(
+            { assertEquals("lorem ipsum", "loremIpsum".splitCamelCase()) },
+            { assertEquals("lorem ipsum", "LoremIpsum".splitCamelCase()) },
+            { assertEquals("lorem ipsum", "lorem ipsum".splitCamelCase()) },
+            { assertEquals("lorem ipsum", "Lorem Ipsum".splitCamelCase()) },
+        )
     }
 
     companion object {
