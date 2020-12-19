@@ -3,7 +3,9 @@ package com.github.gimme.gimmebot.core.command
 import com.github.gimme.gimmebot.core.command.manager.SimpleCommandManager
 import com.github.gimme.gimmebot.core.command.medium.BaseCommandInputMedium
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito.*
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.times
+import org.mockito.Mockito.verify
 
 class BaseCommandInputMediumTest {
 

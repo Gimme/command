@@ -1,7 +1,16 @@
 package com.github.gimme.gimmebot.core.command.manager
 
-import com.github.gimme.gimmebot.core.command.*
-import org.junit.jupiter.api.Assertions.*
+import com.github.gimme.gimmebot.core.command.BaseCommand
+import com.github.gimme.gimmebot.core.command.Command
+import com.github.gimme.gimmebot.core.command.CommandResponse
+import com.github.gimme.gimmebot.core.command.CommandSender
+import com.github.gimme.gimmebot.core.command.DUMMY_COMMAND
+import com.github.gimme.gimmebot.core.command.DUMMY_COMMAND_SENDER
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertIterableEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.params.ParameterizedTest

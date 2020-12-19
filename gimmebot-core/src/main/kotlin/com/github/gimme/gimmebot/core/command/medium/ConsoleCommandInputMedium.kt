@@ -3,12 +3,13 @@ package com.github.gimme.gimmebot.core.command.medium
 import com.github.gimme.gimmebot.core.command.CommandSender
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.util.*
+import java.util.Scanner
 
 /**
  * Accepts input from the main console.
  */
 class ConsoleCommandInputMedium : BaseCommandInputMedium() {
+
     override val commandPrefix: String?
         get() = null
 
