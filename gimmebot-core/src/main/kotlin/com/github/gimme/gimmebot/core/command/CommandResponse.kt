@@ -42,10 +42,8 @@ data class CommandResponse(
         ERROR,
     }
 
-    /** Sends this response to the given [receiver]. */
+    /** Sends this response's message to the given [receiver]. */
     fun sendTo(receiver: MessageReceiver) {
-        if (message != null) {
-            receiver.sendMessage(message)
-        }
+        message?.let { receiver.sendMessage(it) }
     }
 }
