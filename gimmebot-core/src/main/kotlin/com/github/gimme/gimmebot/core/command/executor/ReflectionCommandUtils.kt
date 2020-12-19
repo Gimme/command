@@ -6,6 +6,7 @@ import com.github.gimme.gimmebot.core.command.CommandSender
 import java.security.InvalidParameterException
 import kotlin.reflect.KFunction
 import kotlin.reflect.KParameter
+import kotlin.reflect.KType
 import kotlin.reflect.full.createType
 import kotlin.reflect.full.hasAnnotation
 import kotlin.reflect.full.isSubtypeOf
@@ -13,6 +14,9 @@ import kotlin.reflect.full.safeCast
 import kotlin.reflect.jvm.jvmErasure
 import kotlin.reflect.jvm.jvmName
 import kotlin.reflect.jvm.kotlinFunction
+
+private val COMMAND_SENDER_TYPE: KType = CommandSender::class.createType()
+private val NULLABLE_COMMAND_RESPONSE_TYPE: KType = CommandResponse::class.createType(emptyList(), true)
 
 /**
  * Attempts to execute the given [command] as the given [commandSender], and returns the optional command response if
@@ -71,7 +75,7 @@ private fun attemptToCallFunction(
     // If the first parameter has the command sender type, we inject it
     if (parameters.size > paramIndex) {
         val firstParam: KParameter = parameters[paramIndex]
-        if (firstParam.type.isSubtypeOf(CommandSender::class.createType())) {
+        if (firstParam.type.isSubtypeOf(COMMAND_SENDER_TYPE)) {
             typedArgsMap[firstParam] =
                 firstParam.type.jvmErasure.safeCast(commandSender) ?: return CommandResponse.INCOMPATIBLE_SENDER
             paramIndex++
@@ -119,7 +123,7 @@ private fun attemptToCallFunction(
             ParameterType.fromArrayClass(parameters[paramIndex])!!.castArray(mutableListOf<String>())
     }
 
-    return if (function.returnType.isSubtypeOf(CommandResponse::class.createType(emptyList(), true))) {
+    return if (function.returnType.isSubtypeOf(NULLABLE_COMMAND_RESPONSE_TYPE)) {
         function.callBy(typedArgsMap) as CommandResponse?
     } else {
         function.callBy(typedArgsMap)
