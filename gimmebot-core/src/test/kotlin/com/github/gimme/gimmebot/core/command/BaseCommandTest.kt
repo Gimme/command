@@ -115,12 +115,14 @@ class BaseCommandTest {
     }
 
     @Test
-    fun `camel case should be split into separate lowercase words with spaces`() {
+    fun `camel case should be split into separate lowercase words`() {
         assertAll(
-            { assertEquals("lorem ipsum", "loremIpsum".splitCamelCase()) },
-            { assertEquals("lorem ipsum", "LoremIpsum".splitCamelCase()) },
-            { assertEquals("lorem ipsum", "lorem ipsum".splitCamelCase()) },
-            { assertEquals("lorem ipsum", "Lorem Ipsum".splitCamelCase()) },
+            { assertEquals("lorem ipsum", "loremIpsum".splitCamelCase(" ")) },
+            { assertEquals("lorem ipsum", "LoremIpsum".splitCamelCase(" ")) },
+            { assertEquals("lorem ipsum", "lorem ipsum".splitCamelCase(" ")) },
+            { assertEquals("lorem ipsum", "Lorem Ipsum".splitCamelCase(" ")) },
+            { assertEquals("lorem-ipsum", "loremIpsum".splitCamelCase("-")) },
+            { assertEquals("lorem-ipsum", "lorem ipsum".splitCamelCase("-")) },
         )
     }
 

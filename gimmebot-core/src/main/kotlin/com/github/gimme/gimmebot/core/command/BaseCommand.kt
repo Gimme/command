@@ -19,7 +19,7 @@ abstract class BaseCommand(name: String) : Command {
             val sb = StringBuilder(name)
 
             for (parameter in function.parameters.drop(1)) {
-                sb.append(" <${parameter.name?.splitCamelCase()}>")
+                sb.append(" <${parameter.name?.splitCamelCase(" ")}>")
             }
 
             return sb.toString()
@@ -31,9 +31,9 @@ abstract class BaseCommand(name: String) : Command {
 }
 
 /**
- * Converts this string from camel case to separate lowercase words with spaces.
+ * Converts this string from camel case to separate lowercase words separated by the specified [separator].
  */
-internal fun String.splitCamelCase(): String =
-    StringUtils.join(StringUtils.splitByCharacterTypeCamelCase(this), StringUtils.SPACE)
+internal fun String.splitCamelCase(separator: String): String =
+    StringUtils.join(StringUtils.splitByCharacterTypeCamelCase(this), separator)
         .toLowerCase()
-        .replace(" +".toRegex(), " ")
+        .replace("$separator $separator", separator)
