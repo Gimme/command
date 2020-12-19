@@ -125,6 +125,17 @@ class BaseCommandTest {
         )
     }
 
+    @Test
+    fun `should get command usage`() {
+        val command = object : BaseCommand("c") {
+            @CommandExecutor
+            fun a(paramOne: Int, paramTwo: Int) {
+            }
+        }
+
+        assertEquals("c <param one> <param two>", command.getUsage())
+    }
+
     companion object {
         @JvmStatic
         fun commandExecutor() = listOf(
