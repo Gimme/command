@@ -1,12 +1,11 @@
 package com.github.gimme.gimmebot.core.command.manager
 
-import com.github.gimme.gimmebot.core.command.CommandSender
 import com.github.gimme.gimmebot.core.command.Command
+import com.github.gimme.gimmebot.core.command.CommandSender
 import com.github.gimme.gimmebot.core.command.HelpCommand
 import com.github.gimme.gimmebot.core.command.MessageReceiver
 import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandCollection
 import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandTree
-import kotlin.collections.drop
 
 
 /**
@@ -41,6 +40,8 @@ class SimpleCommandManager : CommandManager {
     override fun parseInput(commandSender: CommandSender, input: String): Boolean {
         var lowerCaseInput = input.toLowerCase()
 
+        outputListeners.forEach { it.sendMessage("${commandSender.name}: $input") }
+
         // Return if not a valid command
         val command = getCommand(lowerCaseInput) ?: return false
         // Remove command name, leaving only the arguments
@@ -52,10 +53,13 @@ class SimpleCommandManager : CommandManager {
 
         // Execute the command
         val response = command.execute(commandSender, args)
-        if (response != null) {
+
+        // Send back the response
+        response?.let {
             response.sendTo(commandSender)
             outputListeners.forEach { outputListener -> response.sendTo(outputListener) }
         }
+
         return true
     }
 }

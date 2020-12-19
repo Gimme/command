@@ -23,9 +23,10 @@ class ChannelCommandInputMedium(private val jda: JDA, private val config: Discor
         jda.addEventListener(object : ListenerAdapter() {
             override fun onMessageReceived(event: MessageReceivedEvent) {
                 val channel = event.channel
+                val user = event.author
                 val message = event.message.contentRaw
 
-                send(ChannelCommandSender(channel), message)
+                send(ChannelCommandSender(channel, user), message)
             }
         })
     }

@@ -1,6 +1,9 @@
 package com.github.gimme.gimmebot.core.command
 
 val DUMMY_COMMAND_SENDER = object : CommandSender {
+    override val name: String
+        get() = ""
+
     override fun sendMessage(message: String) {}
 }
 

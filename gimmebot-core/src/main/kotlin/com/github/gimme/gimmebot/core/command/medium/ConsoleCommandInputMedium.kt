@@ -15,6 +15,9 @@ class ConsoleCommandInputMedium : BaseCommandInputMedium() {
     override fun onInstall() {
         val sc = Scanner(System.`in`)
         val consoleSender: CommandSender = object : CommandSender {
+            override val name: String
+                get() = "#"
+
             override fun sendMessage(message: String) {}
         }
 

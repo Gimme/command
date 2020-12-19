@@ -314,6 +314,9 @@ class BaseCommandTest {
     }
 
     private class CommandSenderImpl() : CommandSender {
+        override val name: String
+            get() = ""
+
         override fun sendMessage(message: String) {}
 
         fun getInt(): Int {
