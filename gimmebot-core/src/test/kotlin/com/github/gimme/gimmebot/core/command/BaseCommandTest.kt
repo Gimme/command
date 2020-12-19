@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
-import org.junit.jupiter.api.function.Executable
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.CsvSource
@@ -42,16 +41,16 @@ class BaseCommandTest {
                 boolean2: Boolean?,
                 boolean3: Boolean?,
             ) {
-                Assertions.assertAll(
-                    Executable { assertEquals("string", string1) },
-                    Executable { assertEquals("", string2) },
-                    Executable { assertEquals(1, int1) },
-                    Executable { assertEquals(-999, int2) },
-                    Executable { assertEquals(0.5, double1) },
-                    Executable { assertEquals(36.0, double2) },
-                    Executable { assertEquals(true, boolean1) },
-                    Executable { assertEquals(false, boolean2) },
-                    Executable { Assertions.assertNull(boolean3) },
+                assertAll(
+                    { assertEquals("string", string1) },
+                    { assertEquals("", string2) },
+                    { assertEquals(1, int1) },
+                    { assertEquals(-999, int2) },
+                    { assertEquals(0.5, double1) },
+                    { assertEquals(36.0, double2) },
+                    { assertEquals(true, boolean1) },
+                    { assertEquals(false, boolean2) },
+                    { Assertions.assertNull(boolean3) },
                 )
 
                 called = true

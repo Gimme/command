@@ -3,7 +3,7 @@ package com.github.gimme.gimmebot.core.command.manager
 import com.github.gimme.gimmebot.core.command.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.function.Executable
+import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.CsvSource
@@ -23,8 +23,8 @@ class SimpleCommandManagerTest {
         commandManager.registerCommand(DUMMY_COMMAND)
 
         assertAll(
-            Executable { assertNull(commandManager.getCommand("test726")) },
-            Executable { assertEquals(DUMMY_COMMAND, commandManager.getCommand("test")) },
+            { assertNull(commandManager.getCommand("test726")) },
+            { assertEquals(DUMMY_COMMAND, commandManager.getCommand("test")) },
         )
     }
 
