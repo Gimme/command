@@ -21,20 +21,19 @@ internal fun String.splitCamelCase(): String =
 abstract class BaseCommand(name: String) : Command {
 
     override val name: String = name.toLowerCase()
+    override val usage: String
+        get() {
+            val function = getFirstCommandExecutorFunction()
+            val sb = StringBuilder(name)
+
+            for (parameter in function.parameters.drop(1)) {
+                sb.append(" <${parameter.name?.splitCamelCase()}>")
+            }
+
+            return sb.toString()
+        }
 
     override fun execute(commandSender: CommandSender, args: List<String>): CommandResponse? {
         return tryExecuteCommandByReflection(this, commandSender, args)
-    }
-
-    override fun getUsage(): String {
-        val function = getFirstCommandExecutorFunction()
-
-        val sb = StringBuilder(name)
-
-        for (parameter in function.parameters.drop(1)) {
-            sb.append(" <${parameter.name?.splitCamelCase()}>")
-        }
-
-        return sb.toString()
     }
 }

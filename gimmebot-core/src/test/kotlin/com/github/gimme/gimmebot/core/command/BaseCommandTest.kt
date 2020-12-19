@@ -133,7 +133,7 @@ class BaseCommandTest {
             }
         }
 
-        assertEquals("c <param one> <param two>", command.getUsage())
+        assertEquals("c <param one> <param two>", command.usage)
     }
 
     companion object {

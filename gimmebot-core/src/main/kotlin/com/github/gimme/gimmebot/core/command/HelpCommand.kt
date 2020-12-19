@@ -16,7 +16,7 @@ class HelpCommand(
         val sb = StringBuilder("Commands:")
 
         commandCollection.getCommands().forEach { command ->
-            sb.append("\n|  ${command.getUsage()}")
+            sb.append("\n|  ${command.usage}")
         }
 
         return CommandResponse(sb.toString())
