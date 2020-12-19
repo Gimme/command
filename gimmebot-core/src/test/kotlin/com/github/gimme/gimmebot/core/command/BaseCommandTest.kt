@@ -134,7 +134,7 @@ class BaseCommandTest {
             }
         }
 
-        assertEquals("c <param one> <param two>", command.usage)
+        assertEquals("c <param-one> <param-two>", command.usage)
     }
 
     companion object {

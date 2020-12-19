@@ -19,7 +19,7 @@ abstract class BaseCommand(name: String) : Command {
             val sb = StringBuilder(name)
 
             for (parameter in function.parameters.drop(1)) {
-                sb.append(" <${parameter.name?.splitCamelCase(" ")}>")
+                sb.append(" <${parameter.name?.splitCamelCase("-")}>")
             }
 
             return sb.toString()
