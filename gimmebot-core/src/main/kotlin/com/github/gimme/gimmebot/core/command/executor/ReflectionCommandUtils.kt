@@ -109,8 +109,7 @@ private fun attemptToCallFunction(
             argIndex += varargCollection.size
             typedArgsMap[param] = parameterType.castArray(varargCollection)
         } else {
-            val value = ParameterType.fromClass(param)?.castArg(arg)
-            if (value == null && !param.type.isMarkedNullable) return CommandResponse.INVALID_ARGUMENT
+            val value = ParameterType.fromClass(param)?.castArg(arg) ?: return CommandResponse.INVALID_ARGUMENT
             typedArgsMap[param] = value
             argIndex++
         }

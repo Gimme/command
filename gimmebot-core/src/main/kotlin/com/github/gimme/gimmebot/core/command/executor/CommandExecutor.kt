@@ -11,8 +11,7 @@ package com.github.gimme.gimmebot.core.command.executor
  * - Boolean
  *
  * The parameters can be vararg, nullable and have default values. But varargs and defaults have to come last and vararg
- * cannot be nullable. Nullable parameters mean that if the given argument for that parameter cannot be converted to the
- * correct type, it becomes null instead (except for vararg).
+ * cannot be nullable. The point of nullable types is to allow null default values.
  *
  * Only one function should be marked in the same class.
  *
