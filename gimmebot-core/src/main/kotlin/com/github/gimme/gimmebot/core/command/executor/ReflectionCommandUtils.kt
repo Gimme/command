@@ -155,7 +155,7 @@ private fun computeVarargs(param: ParameterType, args: List<String>, startIndex:
  *
  * Empty strings are treated as null (no default value).
  */
-fun getDefaultValue(commandExecutor: CommandExecutor, index: Int): String? {
+internal fun getDefaultValue(commandExecutor: CommandExecutor, index: Int): String? {
     val value = commandExecutor.defaultValues.getOrNull(index)
     return if (value.isNullOrEmpty()) null else value
 }
