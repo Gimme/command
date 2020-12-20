@@ -130,12 +130,12 @@ class BaseCommandTest {
     @Test
     fun `should get command usage`() {
         val command = object : BaseCommand("c") {
-            @CommandExecutor
-            fun a(paramOne: Int, paramTwo: Int) {
+            @CommandExecutor("", "2")
+            fun a(paramOne: Int, paramTwo: Int = 2) {
             }
         }
 
-        assertEquals("c <param-one> <param-two>", command.usage)
+        assertEquals("c <param-one> <param-two=2>", command.usage)
     }
 
     companion object {
