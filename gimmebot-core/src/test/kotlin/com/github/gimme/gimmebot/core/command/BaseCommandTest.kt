@@ -4,7 +4,6 @@ import com.github.gimme.gimmebot.core.command.executor.CommandExecutor
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertIterableEquals
-import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
@@ -41,7 +40,6 @@ class BaseCommandTest {
                 double2: Double,
                 boolean1: Boolean,
                 boolean2: Boolean?,
-                boolean3: Boolean?,
             ) {
                 assertAll(
                     { assertEquals("string", string1) },
@@ -52,7 +50,6 @@ class BaseCommandTest {
                     { assertEquals(36.0, double2) },
                     { assertEquals(true, boolean1) },
                     { assertEquals(false, boolean2) },
-                    { assertNull(boolean3) },
                 )
 
                 called = true
@@ -62,7 +59,7 @@ class BaseCommandTest {
         assertFalse(called)
 
         command.execute(DUMMY_COMMAND_SENDER,
-            listOf("string", "", "1", "-999", "0.5", "36", "trUE", "false", "aaa"))
+            listOf("string", "", "1", "-999", "0.5", "36", "trUE", "false"))
 
         assertTrue(called)
     }
@@ -109,7 +106,7 @@ class BaseCommandTest {
     ) {
         val command: Command = object : BaseCommand("c") {
             @CommandExecutor
-            fun c(sender: CommandSenderImpl, a: Int): CommandResponse {
+            fun c(sender: CommandSenderImpl, a: Int, b: Int? = null): CommandResponse {
                 assertEquals(1, sender.getInt())
                 return DUMMY_RESPONSE
             }
@@ -264,6 +261,7 @@ class BaseCommandTest {
                 object : BaseCommand("c") {
                     @CommandExecutor
                     fun c(a: String, b: String = "def"): CommandResponse {
+                        assertEquals("a", a)
                         assertEquals("def", b)
                         return DUMMY_RESPONSE
                     }
@@ -282,6 +280,36 @@ class BaseCommandTest {
                     }
                 },
                 true,
+            ),
+            Arguments.of(
+                null,
+                object : BaseCommand("c") {
+                    @CommandExecutor
+                    fun c(a: Int? = 4): CommandResponse {
+                        assertEquals(4, a)
+                        return DUMMY_RESPONSE
+                    }
+                },
+                true,
+            ),
+            Arguments.of(
+                null,
+                object : BaseCommand("c") {
+                    @CommandExecutor
+                    fun c(a: Int? = null): CommandResponse {
+                        assertEquals(null, a)
+                        return DUMMY_RESPONSE
+                    }
+                },
+                true,
+            ),
+            Arguments.of(
+                "abc",
+                object : BaseCommand("c") {
+                    @CommandExecutor
+                    fun c(a: Int? = null): CommandResponse = DUMMY_RESPONSE
+                },
+                false,
             ),
 
             // COMMAND SENDER TESTS
@@ -323,6 +351,11 @@ class BaseCommandTest {
                 CommandSenderImpl(),
             ),
             Arguments.of(
+                "1 a",
+                CommandResponse.INVALID_ARGUMENT,
+                CommandSenderImpl(),
+            ),
+            Arguments.of(
                 "1",
                 CommandResponse.INCOMPATIBLE_SENDER,
                 DUMMY_COMMAND_SENDER,
@@ -333,7 +366,7 @@ class BaseCommandTest {
                 CommandSenderImpl(),
             ),
             Arguments.of(
-                "1 2",
+                "1 2 3",
                 CommandResponse.TOO_MANY_ARGUMENTS,
                 CommandSenderImpl(),
             ),
