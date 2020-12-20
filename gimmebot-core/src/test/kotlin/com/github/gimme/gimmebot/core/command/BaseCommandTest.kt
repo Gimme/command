@@ -347,27 +347,27 @@ class BaseCommandTest {
             ),
             Arguments.of(
                 "a",
-                CommandResponse.INVALID_ARGUMENT,
+                INVALID_ARGUMENT_ERROR,
                 CommandSenderImpl(),
             ),
             Arguments.of(
                 "1 a",
-                CommandResponse.INVALID_ARGUMENT,
+                INVALID_ARGUMENT_ERROR,
                 CommandSenderImpl(),
             ),
             Arguments.of(
                 "1",
-                CommandResponse.INCOMPATIBLE_SENDER,
+                INCOMPATIBLE_SENDER_ERROR,
                 DUMMY_COMMAND_SENDER,
             ),
             Arguments.of(
                 null,
-                CommandResponse.TOO_FEW_ARGUMENTS,
+                TOO_FEW_ARGUMENTS_ERROR,
                 CommandSenderImpl(),
             ),
             Arguments.of(
                 "1 2 3",
-                CommandResponse.TOO_MANY_ARGUMENTS,
+                TOO_MANY_ARGUMENTS_ERROR,
                 CommandSenderImpl(),
             ),
         )

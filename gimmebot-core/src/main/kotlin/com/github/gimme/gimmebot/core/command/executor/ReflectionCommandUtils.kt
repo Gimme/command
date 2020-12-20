@@ -3,6 +3,10 @@ package com.github.gimme.gimmebot.core.command.executor
 import com.github.gimme.gimmebot.core.command.Command
 import com.github.gimme.gimmebot.core.command.CommandResponse
 import com.github.gimme.gimmebot.core.command.CommandSender
+import com.github.gimme.gimmebot.core.command.INCOMPATIBLE_SENDER_ERROR
+import com.github.gimme.gimmebot.core.command.INVALID_ARGUMENT_ERROR
+import com.github.gimme.gimmebot.core.command.TOO_FEW_ARGUMENTS_ERROR
+import com.github.gimme.gimmebot.core.command.TOO_MANY_ARGUMENTS_ERROR
 import java.security.InvalidParameterException
 import kotlin.reflect.KFunction
 import kotlin.reflect.KParameter
@@ -76,7 +80,7 @@ private fun attemptToCallFunction(
         val firstParam: KParameter = parameters[paramIndex]
         if (firstParam.type.isSubtypeOf(COMMAND_SENDER_TYPE)) {
             typedArgsMap[firstParam] =
-                firstParam.type.jvmErasure.safeCast(commandSender) ?: return CommandResponse.INCOMPATIBLE_SENDER
+                firstParam.type.jvmErasure.safeCast(commandSender) ?: return INCOMPATIBLE_SENDER_ERROR
             paramIndex++
         }
     }
@@ -90,11 +94,11 @@ private fun attemptToCallFunction(
     val hasVararg = parameters[parameters.size - 1].isVararg
     val minRequiredAmountOfArgs = amountOfInputParameters - (if (hasVararg) 1 else 0) - amountOfOptionalArgs
 
-    if (args.size < minRequiredAmountOfArgs) return CommandResponse.TOO_FEW_ARGUMENTS
-    if (!hasVararg && args.size > amountOfInputParameters) return CommandResponse.TOO_MANY_ARGUMENTS
+    if (args.size < minRequiredAmountOfArgs) return TOO_FEW_ARGUMENTS_ERROR
+    if (!hasVararg && args.size > amountOfInputParameters) return TOO_MANY_ARGUMENTS_ERROR
 
     while (argIndex < args.size) {
-        if (paramIndex >= parameters.size) return CommandResponse.TOO_MANY_ARGUMENTS
+        if (paramIndex >= parameters.size) return TOO_MANY_ARGUMENTS_ERROR
         val param = parameters[paramIndex]
         val arg = args[argIndex]
 
@@ -108,7 +112,7 @@ private fun attemptToCallFunction(
             argIndex += varargCollection.size
             typedArgsMap[param] = parameterType.castArray(varargCollection)
         } else {
-            val value = ParameterType.fromClass(param)?.castArg(arg) ?: return CommandResponse.INVALID_ARGUMENT
+            val value = ParameterType.fromClass(param)?.castArg(arg) ?: return INVALID_ARGUMENT_ERROR
             typedArgsMap[param] = value
             argIndex++
         }

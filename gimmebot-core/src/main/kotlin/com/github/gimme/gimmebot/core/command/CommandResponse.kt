@@ -17,22 +17,6 @@ data class CommandResponse(
 
     constructor(body: Any?) : this(null, Status.SUCCESS, body)
 
-    companion object {
-        /** An argument has the wrong format. */
-        val INVALID_ARGUMENT = error("Invalid argument")
-
-        /** The command does not accept the type of the current command sender. */
-        val INCOMPATIBLE_SENDER = error("You cannot use that command")
-
-        /** Too few arguments supplied with the command. */
-        val TOO_FEW_ARGUMENTS = error("Too few arguments")
-
-        /** Too many arguments supplied with the command. */
-        val TOO_MANY_ARGUMENTS = error("Too many arguments")
-
-        private fun error(message: String) = CommandResponse(message, Status.ERROR)
-    }
-
     /** The status of a command execution. */
     enum class Status {
         /** The command execution was successful. */
