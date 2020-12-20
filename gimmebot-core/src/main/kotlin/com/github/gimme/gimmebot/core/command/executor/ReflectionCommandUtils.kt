@@ -56,7 +56,6 @@ internal fun Command.getFirstCommandExecutorFunction(): KFunction<*> {
  * Attempts to call the specified [function] in the given [command] as the given [commandSender], and returns the
  * optional command response if the given [args] fit the parameters of the [function] and it was successfully called.
  */
-// TODO: return response with error message instead of null
 private fun attemptToCallFunction(
     function: KFunction<*>,
     command: Command,
