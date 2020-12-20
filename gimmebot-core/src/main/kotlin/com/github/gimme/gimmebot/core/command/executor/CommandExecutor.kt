@@ -19,4 +19,4 @@ package com.github.gimme.gimmebot.core.command.executor
  */
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FUNCTION)
-annotation class CommandExecutor()
+annotation class CommandExecutor(vararg val defaultValues: String = [])
