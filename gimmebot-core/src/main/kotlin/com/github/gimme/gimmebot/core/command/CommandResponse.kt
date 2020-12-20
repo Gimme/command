@@ -17,6 +17,11 @@ data class CommandResponse(
 
     constructor(body: Any?) : this(null, Status.SUCCESS, body)
 
+    /** Sends this response's message to the given [receiver]. */
+    fun sendTo(receiver: MessageReceiver) {
+        message?.let { receiver.sendMessage(it) }
+    }
+
     /** The status of a command execution. */
     enum class Status {
         /** The command execution was successful. */
@@ -24,10 +29,5 @@ data class CommandResponse(
 
         /** The command could not be called. */
         ERROR,
-    }
-
-    /** Sends this response's message to the given [receiver]. */
-    fun sendTo(receiver: MessageReceiver) {
-        message?.let { receiver.sendMessage(it) }
     }
 }
