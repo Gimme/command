@@ -1,8 +1,11 @@
 package com.github.gimme.gimmebot.core.command
 
+import com.github.gimme.gimmebot.core.command.executor.CommandExecutor
+import com.github.gimme.gimmebot.core.command.executor.getDefaultValue
 import com.github.gimme.gimmebot.core.command.executor.getFirstCommandExecutorFunction
 import com.github.gimme.gimmebot.core.command.executor.tryExecuteCommandByReflection
 import org.apache.commons.lang3.StringUtils
+import kotlin.reflect.full.findAnnotation
 
 /**
  * Represents a command with base functionality.
@@ -16,10 +19,12 @@ abstract class BaseCommand(name: String) : Command {
     override val usage: String
         get() {
             val function = getFirstCommandExecutorFunction()
+            val commandExecutor: CommandExecutor = function.findAnnotation()!!
             val sb = StringBuilder(name)
 
-            for (parameter in function.parameters.drop(1)) {
-                sb.append(" <${parameter.name?.splitCamelCase("-")}>")
+            function.parameters.drop(1).forEachIndexed { index, parameter ->
+                val defaultValue = getDefaultValue(commandExecutor, index)
+                sb.append(" <${parameter.name?.splitCamelCase("-")}${defaultValue?.let { "=$defaultValue" } ?: ""}>")
             }
 
             return sb.toString()

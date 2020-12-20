@@ -144,3 +144,14 @@ private fun computeVarargs(param: ParameterType, args: List<String>, startIndex:
 
     return list
 }
+
+/**
+ * Returns the default value for the parameter at the specified [index] as defined in the given [commandExecutor], or
+ * null if no default value for the specified [index].
+ *
+ * Empty strings are treated as null (no default value).
+ */
+fun getDefaultValue(commandExecutor: CommandExecutor, index: Int): String? {
+    val value = commandExecutor.defaultValues.getOrNull(index)
+    return if (value.isNullOrEmpty()) null else value
+}
