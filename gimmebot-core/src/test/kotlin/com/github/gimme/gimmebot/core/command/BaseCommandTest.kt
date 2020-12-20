@@ -1,9 +1,10 @@
 package com.github.gimme.gimmebot.core.command
 
 import com.github.gimme.gimmebot.core.command.executor.CommandExecutor
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertIterableEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
@@ -51,7 +52,7 @@ class BaseCommandTest {
                     { assertEquals(36.0, double2) },
                     { assertEquals(true, boolean1) },
                     { assertEquals(false, boolean2) },
-                    { Assertions.assertNull(boolean3) },
+                    { assertNull(boolean3) },
                 )
 
                 called = true
@@ -159,7 +160,7 @@ class BaseCommandTest {
                 object : BaseCommand("c") {
                     @CommandExecutor
                     fun c(vararg strings: String): CommandResponse {
-                        Assertions.assertIterableEquals(listOf<String>(), strings.asIterable())
+                        assertIterableEquals(listOf<String>(), strings.asIterable())
                         return DUMMY_RESPONSE
                     }
                 },
@@ -170,7 +171,7 @@ class BaseCommandTest {
                 object : BaseCommand("c") {
                     @CommandExecutor
                     fun c(vararg strings: String): CommandResponse {
-                        Assertions.assertIterableEquals(listOf("string1", "string2", "string3"), strings.asIterable())
+                        assertIterableEquals(listOf("string1", "string2", "string3"), strings.asIterable())
                         return DUMMY_RESPONSE
                     }
                 },
@@ -182,7 +183,7 @@ class BaseCommandTest {
                     @CommandExecutor
                     fun c(string: String, vararg ints: Int): CommandResponse {
                         assertEquals("a", string)
-                        Assertions.assertIterableEquals(listOf(1, 2, 3), ints.asIterable())
+                        assertIterableEquals(listOf(1, 2, 3), ints.asIterable())
                         return DUMMY_RESPONSE
                     }
                 },
