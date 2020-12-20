@@ -19,4 +19,9 @@ package com.github.gimme.gimmebot.core.command.executor
  */
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FUNCTION)
-annotation class CommandExecutor(vararg val defaultValues: String = [])
+annotation class CommandExecutor(
+    /**
+     * A list of default values to be shown in the command's usage info, where each value corresponds to the command
+     * parameter with the same index.
+     */
+    vararg val defaultValues: String = [])
