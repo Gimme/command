@@ -3,6 +3,7 @@ package com.github.gimme.gimmebot.core.command
 import com.github.gimme.gimmebot.core.command.executor.CommandExecutor
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
@@ -56,6 +57,8 @@ class BaseCommandTest {
                 called = true
             }
         }
+
+        assertFalse(called)
 
         command.execute(DUMMY_COMMAND_SENDER,
             listOf("string", "", "1", "-999", "0.5", "36", "trUE", "false", "aaa"))
