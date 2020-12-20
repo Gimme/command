@@ -336,7 +336,7 @@ class BaseCommandTest {
         )
     }
 
-    private class CommandSenderImpl() : CommandSender {
+    private class CommandSenderImpl : CommandSender {
         override val name: String
             get() = ""
 
