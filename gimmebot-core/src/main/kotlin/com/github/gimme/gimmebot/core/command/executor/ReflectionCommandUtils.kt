@@ -150,6 +150,26 @@ private fun computeVarargs(param: ParameterType, args: List<String>, startIndex:
 }
 
 /**
+ * Returns all data parameters from the given [function].
+ *
+ * This excludes the self reference and the CommandSender if present.
+ */
+internal fun getCommandDataParameters(function: KFunction<*>): List<KParameter> {
+    val parameters: List<KParameter> = function.parameters
+    val paramsToSkip = if (getCommandSenderParameter(parameters) != null) 2 else 1
+
+    return function.parameters.drop(paramsToSkip)
+}
+
+/**
+ * Returns the CommandSender parameter if present as the first declared parameter, else null.
+ */
+internal fun getCommandSenderParameter(parameters: List<KParameter>): KParameter? {
+    val param2 = parameters.getOrNull(1)
+    return if (param2 != null && param2.type.isSubtypeOf(COMMAND_SENDER_TYPE)) param2 else null
+}
+
+/**
  * Returns the default value for the parameter at the specified [index] as defined in the given [commandExecutor], or
  * null if no default value for the specified [index].
  *

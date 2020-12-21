@@ -1,6 +1,7 @@
 package com.github.gimme.gimmebot.core.command
 
 import com.github.gimme.gimmebot.core.command.executor.CommandExecutor
+import com.github.gimme.gimmebot.core.command.executor.getCommandDataParameters
 import com.github.gimme.gimmebot.core.command.executor.getDefaultValue
 import com.github.gimme.gimmebot.core.command.executor.getFirstCommandExecutorFunction
 import com.github.gimme.gimmebot.core.command.executor.tryExecuteCommandByReflection
@@ -22,7 +23,7 @@ abstract class BaseCommand(name: String) : Command {
             val commandExecutor: CommandExecutor = function.findAnnotation()!!
             val sb = StringBuilder(name)
 
-            function.parameters.drop(1).forEachIndexed { index, parameter ->
+            getCommandDataParameters(function).forEachIndexed { index, parameter ->
                 val defaultValue = getDefaultValue(commandExecutor, index)
                 sb.append(" <${parameter.name?.splitCamelCase("-")}${defaultValue?.let { "=$defaultValue" } ?: ""}>")
             }
