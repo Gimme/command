@@ -76,11 +76,9 @@ private fun attemptToCallFunction(
     var argIndex = 0 // Current argument index
 
     // If the first parameter has the command sender type, we inject it
-    if (parameters.size > paramIndex) {
-        val firstParam: KParameter = parameters[paramIndex]
-        if (firstParam.type.isSubtypeOf(COMMAND_SENDER_TYPE)) {
-            typedArgsMap[firstParam] =
-                firstParam.type.jvmErasure.safeCast(commandSender) ?: return INCOMPATIBLE_SENDER_ERROR
+    getCommandSenderParameter(parameters)?.let {
+        if (it.type.isSubtypeOf(COMMAND_SENDER_TYPE)) {
+            typedArgsMap[it] = it.type.jvmErasure.safeCast(commandSender) ?: return INCOMPATIBLE_SENDER_ERROR
             paramIndex++
         }
     }
