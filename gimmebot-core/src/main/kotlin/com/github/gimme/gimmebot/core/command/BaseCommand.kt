@@ -13,8 +13,10 @@ import kotlin.reflect.full.findAnnotation
  *
  * A public method marked with @[com.github.gimme.gimmebot.core.command.executor.CommandExecutor] is called when the
  * command is executed.
+ *
+ * @param T the response type
  */
-abstract class BaseCommand(name: String) : Command {
+abstract class BaseCommand<out T>(name: String) : Command<T> {
 
     override val name: String = name.toLowerCase()
     override val usage: String
@@ -31,7 +33,7 @@ abstract class BaseCommand(name: String) : Command {
             return sb.toString()
         }
 
-    override fun execute(commandSender: CommandSender, args: List<String>): CommandResponse? {
+    override fun execute(commandSender: CommandSender, args: List<String>): CommandResponse<T>? {
         return tryExecuteCommandByReflection(this, commandSender, args)
     }
 }

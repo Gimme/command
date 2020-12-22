@@ -4,20 +4,21 @@ package com.github.gimme.gimmebot.core.command
  * Represents a response after executing a command with a [message], [status] and [body] to be communicated back to the
  * sender.
  *
+ * @param T the type of the response body
  * @property message the message to be sent back to the command sender, or null if no message to be sent
  * @property status  shows if the command execution was successful or not
  * @property body    the response data containing the result of the command, or null if the command did not return any
  * data
  */
-data class CommandResponse(
+data class CommandResponse<out T>(
     val message: String? = null,
     val status: Status = Status.SUCCESS,
-    val body: Any? = null,
+    val body: T? = null,
 ) {
 
-    constructor(message: String?, body: Any?) : this(message, Status.SUCCESS, body)
+    constructor(message: String?, body: T?) : this(message, Status.SUCCESS, body)
 
-    constructor(body: Any?) : this(null, Status.SUCCESS, body)
+    constructor(body: T?) : this(null, Status.SUCCESS, body)
 
     /** Sends this response's message to the given [receiver]. */
     fun sendTo(receiver: MessageReceiver) {

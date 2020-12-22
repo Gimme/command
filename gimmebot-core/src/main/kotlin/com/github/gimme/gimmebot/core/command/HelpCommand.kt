@@ -8,11 +8,11 @@ import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandC
  */
 class HelpCommand(
     private val commandCollection: CommandCollection,
-) : BaseCommand("help") {
+) : BaseCommand<String>("help") {
 
     /** Prints available commands. */
     @CommandExecutor
-    fun printCommands(): CommandResponse {
+    fun printCommands(): CommandResponse<String> {
         val sb = StringBuilder("Commands:")
 
         commandCollection.getCommands().forEach { command ->
