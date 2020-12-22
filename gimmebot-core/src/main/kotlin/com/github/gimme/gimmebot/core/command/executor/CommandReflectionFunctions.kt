@@ -14,10 +14,10 @@ import kotlin.reflect.KType
 import kotlin.reflect.full.createType
 import kotlin.reflect.full.hasAnnotation
 import kotlin.reflect.full.isSubtypeOf
+import kotlin.reflect.full.memberFunctions
 import kotlin.reflect.full.safeCast
 import kotlin.reflect.jvm.jvmErasure
 import kotlin.reflect.jvm.jvmName
-import kotlin.reflect.jvm.kotlinFunction
 
 private val COMMAND_SENDER_TYPE: KType = CommandSender::class.createType()
 private val NULLABLE_COMMAND_RESPONSE_TYPE: KType = CommandResponse::class.createType(emptyList(), true)
@@ -44,8 +44,7 @@ internal fun tryExecuteCommandByReflection(
  */
 internal fun Command.getFirstCommandExecutorFunction(): KFunction<*> {
     // Look through the public methods in the command class
-    for (method in this.javaClass.methods) {
-        val function = method.kotlinFunction ?: continue
+    for (function in this::class.memberFunctions) {
         // Make sure it has the right annotation
         if (!function.hasAnnotation<CommandExecutor>()) continue
 
