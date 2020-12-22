@@ -21,7 +21,7 @@ class BaseCommandTest {
         "test, tESt",
     )
     fun `command names should become lower case`(expectedName: String, inputName: String) {
-        val command = object : BaseCommand(inputName) {}
+        val command = object : BaseCommand<Unit>(inputName) {}
         assertEquals(expectedName, command.name)
     }
 
@@ -29,7 +29,7 @@ class BaseCommandTest {
     fun `should execute reflection command with all types`() {
         var called = false
 
-        val command = object : BaseCommand("c") {
+        val command = object : BaseCommand<Unit>("c") {
             @CommandExecutor
             fun c(
                 string1: String,
@@ -40,7 +40,7 @@ class BaseCommandTest {
                 double2: Double,
                 boolean1: Boolean,
                 boolean2: Boolean?,
-            ) {
+            ): CommandResponse<Unit>? { // TODO: remove return type (when supported)
                 assertAll(
                     { assertEquals("string", string1) },
                     { assertEquals("", string2) },
@@ -53,13 +53,14 @@ class BaseCommandTest {
                 )
 
                 called = true
+
+                return null
             }
         }
 
         assertFalse(called)
 
-        command.execute(DUMMY_COMMAND_SENDER,
-            listOf("string", "", "1", "-999", "0.5", "36", "trUE", "false"))
+        command.execute(DUMMY_COMMAND_SENDER, listOf("string", "", "1", "-999", "0.5", "36", "trUE", "false"))
 
         assertTrue(called)
     }
@@ -68,7 +69,7 @@ class BaseCommandTest {
     @MethodSource("commandExecutor")
     fun `should execute reflection command`(
         args: String?,
-        command: Command,
+        command: Command<String>,
         shouldExecute: Boolean = true,
     ) {
         val expected = DUMMY_RESPONSE
@@ -82,9 +83,9 @@ class BaseCommandTest {
 
     @Test
     fun `should execute reflection command when using sender subtypes`() {
-        val command: Command = object : BaseCommand("c") {
+        val command = object : BaseCommand<String>("c") {
             @CommandExecutor
-            fun c(sender: CommandSenderImpl): CommandResponse {
+            fun c(sender: CommandSenderImpl): CommandResponse<String> {
                 assertEquals(1, sender.getInt())
                 return DUMMY_RESPONSE
             }
@@ -101,12 +102,12 @@ class BaseCommandTest {
     @MethodSource("commandError")
     fun `should return command error`(
         args: String?,
-        response: CommandResponse,
+        response: CommandResponse<String>,
         sender: CommandSender,
     ) {
-        val command: Command = object : BaseCommand("c") {
+        val command = object : BaseCommand<String>("c") {
             @CommandExecutor
-            fun c(sender: CommandSenderImpl, a: Int, b: Int? = null): CommandResponse {
+            fun c(sender: CommandSenderImpl, a: Int, b: Int? = null): CommandResponse<String> {
                 assertEquals(1, sender.getInt())
                 return DUMMY_RESPONSE
             }
@@ -129,7 +130,7 @@ class BaseCommandTest {
 
     @Test
     fun `should get command usage`() {
-        val command = object : BaseCommand("c") {
+        val command = object : BaseCommand<Unit>("c") {
             @CommandExecutor("", "2")
             fun a(paramOne: Int, paramTwo: Int = 2) {
             }
@@ -140,7 +141,7 @@ class BaseCommandTest {
 
     @Test
     fun `should get command usage with command sender`() {
-        val command = object : BaseCommand("c") {
+        val command = object : BaseCommand<Unit>("c") {
             @CommandExecutor("", "2")
             fun a(sender: CommandSender, paramOne: Int, paramTwo: Int = 2) {
             }
@@ -155,9 +156,9 @@ class BaseCommandTest {
             // BASIC TESTS
             Arguments.of(
                 null,
-                object : BaseCommand("c") {
+                object : BaseCommand<String>("c") {
                     @CommandExecutor
-                    fun c(): CommandResponse = DUMMY_RESPONSE
+                    fun c(): CommandResponse<String> = DUMMY_RESPONSE
                 },
                 true,
             ),
@@ -165,9 +166,9 @@ class BaseCommandTest {
             // VARARG TESTS
             Arguments.of(
                 null,
-                object : BaseCommand("c") {
+                object : BaseCommand<String>("c") {
                     @CommandExecutor
-                    fun c(vararg strings: String): CommandResponse {
+                    fun c(vararg strings: String): CommandResponse<String> {
                         assertIterableEquals(listOf<String>(), strings.asIterable())
                         return DUMMY_RESPONSE
                     }
@@ -176,9 +177,9 @@ class BaseCommandTest {
             ),
             Arguments.of(
                 "string1 string2 string3",
-                object : BaseCommand("c") {
+                object : BaseCommand<String>("c") {
                     @CommandExecutor
-                    fun c(vararg strings: String): CommandResponse {
+                    fun c(vararg strings: String): CommandResponse<String> {
                         assertIterableEquals(listOf("string1", "string2", "string3"), strings.asIterable())
                         return DUMMY_RESPONSE
                     }
@@ -187,9 +188,9 @@ class BaseCommandTest {
             ),
             Arguments.of(
                 "a 1 2 3",
-                object : BaseCommand("c") {
+                object : BaseCommand<String>("c") {
                     @CommandExecutor
-                    fun c(string: String, vararg ints: Int): CommandResponse {
+                    fun c(string: String, vararg ints: Int): CommandResponse<String> {
                         assertEquals("a", string)
                         assertIterableEquals(listOf(1, 2, 3), ints.asIterable())
                         return DUMMY_RESPONSE
@@ -199,58 +200,58 @@ class BaseCommandTest {
             ),
             Arguments.of(
                 "1",
-                object : BaseCommand("c") {
+                object : BaseCommand<String>("c") {
                     @CommandExecutor
-                    fun c(vararg a: Double): CommandResponse = DUMMY_RESPONSE
+                    fun c(vararg a: Double): CommandResponse<String> = DUMMY_RESPONSE
                 },
                 true,
             ),
             Arguments.of(
                 "true",
-                object : BaseCommand("c") {
+                object : BaseCommand<String>("c") {
                     @CommandExecutor
-                    fun c(vararg a: Boolean): CommandResponse = DUMMY_RESPONSE
+                    fun c(vararg a: Boolean): CommandResponse<String> = DUMMY_RESPONSE
                 },
                 true,
             ),
 
             Arguments.of(
                 null,
-                object : BaseCommand("c") {
+                object : BaseCommand<String>("c") {
                     @CommandExecutor
-                    fun c(a: String): CommandResponse = DUMMY_RESPONSE
+                    fun c(a: String): CommandResponse<String> = DUMMY_RESPONSE
                 },
                 false,
             ),
             Arguments.of(
                 "a b",
-                object : BaseCommand("c") {
+                object : BaseCommand<String>("c") {
                     @CommandExecutor
-                    fun c(a: String): CommandResponse = DUMMY_RESPONSE
+                    fun c(a: String): CommandResponse<String> = DUMMY_RESPONSE
                 },
                 false,
             ),
             Arguments.of(
                 "a",
-                object : BaseCommand("c") {
+                object : BaseCommand<String>("c") {
                     @CommandExecutor
-                    fun c(a: Int): CommandResponse = DUMMY_RESPONSE
+                    fun c(a: Int): CommandResponse<String> = DUMMY_RESPONSE
                 },
                 false,
             ),
             Arguments.of(
                 "1.0",
-                object : BaseCommand("c") {
+                object : BaseCommand<String>("c") {
                     @CommandExecutor
-                    fun c(vararg a: Int): CommandResponse = DUMMY_RESPONSE
+                    fun c(vararg a: Int): CommandResponse<String> = DUMMY_RESPONSE
                 },
                 false,
             ),
             Arguments.of(
                 "a",
-                object : BaseCommand("c") {
+                object : BaseCommand<String>("c") {
                     @CommandExecutor
-                    fun c(a: Boolean): CommandResponse = DUMMY_RESPONSE
+                    fun c(a: Boolean): CommandResponse<String> = DUMMY_RESPONSE
                 },
                 false,
             ),
@@ -258,9 +259,9 @@ class BaseCommandTest {
             // DEFAULTS TESTS
             Arguments.of(
                 "a",
-                object : BaseCommand("c") {
+                object : BaseCommand<String>("c") {
                     @CommandExecutor
-                    fun c(a: String = "def"): CommandResponse {
+                    fun c(a: String = "def"): CommandResponse<String> {
                         assertEquals("a", a)
                         return DUMMY_RESPONSE
                     }
@@ -269,9 +270,9 @@ class BaseCommandTest {
             ),
             Arguments.of(
                 "a",
-                object : BaseCommand("c") {
+                object : BaseCommand<String>("c") {
                     @CommandExecutor
-                    fun c(a: String, b: String = "def"): CommandResponse {
+                    fun c(a: String, b: String = "def"): CommandResponse<String> {
                         assertEquals("a", a)
                         assertEquals("def", b)
                         return DUMMY_RESPONSE
@@ -281,9 +282,9 @@ class BaseCommandTest {
             ),
             Arguments.of(
                 "1",
-                object : BaseCommand("c") {
+                object : BaseCommand<String>("c") {
                     @CommandExecutor
-                    fun c(a: Int = 0, b: Int = 3, c: Int = 44): CommandResponse {
+                    fun c(a: Int = 0, b: Int = 3, c: Int = 44): CommandResponse<String> {
                         assertEquals(1, a)
                         assertEquals(3, b)
                         assertEquals(44, c)
@@ -294,9 +295,9 @@ class BaseCommandTest {
             ),
             Arguments.of(
                 null,
-                object : BaseCommand("c") {
+                object : BaseCommand<String>("c") {
                     @CommandExecutor
-                    fun c(a: Int? = 4): CommandResponse {
+                    fun c(a: Int? = 4): CommandResponse<String> {
                         assertEquals(4, a)
                         return DUMMY_RESPONSE
                     }
@@ -305,9 +306,9 @@ class BaseCommandTest {
             ),
             Arguments.of(
                 null,
-                object : BaseCommand("c") {
+                object : BaseCommand<String>("c") {
                     @CommandExecutor
-                    fun c(a: Int? = null): CommandResponse {
+                    fun c(a: Int? = null): CommandResponse<String> {
                         assertEquals(null, a)
                         return DUMMY_RESPONSE
                     }
@@ -316,9 +317,9 @@ class BaseCommandTest {
             ),
             Arguments.of(
                 "abc",
-                object : BaseCommand("c") {
+                object : BaseCommand<String>("c") {
                     @CommandExecutor
-                    fun c(a: Int? = null): CommandResponse = DUMMY_RESPONSE
+                    fun c(a: Int? = null): CommandResponse<String> = DUMMY_RESPONSE
                 },
                 false,
             ),
@@ -326,9 +327,9 @@ class BaseCommandTest {
             // COMMAND SENDER TESTS
             Arguments.of(
                 null,
-                object : BaseCommand("c") {
+                object : BaseCommand<String>("c") {
                     @CommandExecutor
-                    fun c(sender: CommandSender): CommandResponse {
+                    fun c(sender: CommandSender): CommandResponse<String> {
                         assertEquals(DUMMY_COMMAND_SENDER, sender)
                         return DUMMY_RESPONSE
                     }
@@ -337,9 +338,9 @@ class BaseCommandTest {
             ),
             Arguments.of(
                 "1",
-                object : BaseCommand("c") {
+                object : BaseCommand<String>("c") {
                     @CommandExecutor
-                    fun c(sender: CommandSender, a: Int = 0): CommandResponse {
+                    fun c(sender: CommandSender, a: Int = 0): CommandResponse<String> {
                         assertEquals(DUMMY_COMMAND_SENDER, sender)
                         assertEquals(1, a)
                         return DUMMY_RESPONSE
@@ -358,27 +359,27 @@ class BaseCommandTest {
             ),
             Arguments.of(
                 "a",
-                INVALID_ARGUMENT_ERROR,
+                INVALID_ARGUMENT_ERROR<Any>(),
                 CommandSenderImpl(),
             ),
             Arguments.of(
                 "1 a",
-                INVALID_ARGUMENT_ERROR,
+                INVALID_ARGUMENT_ERROR<Any>(),
                 CommandSenderImpl(),
             ),
             Arguments.of(
                 "1",
-                INCOMPATIBLE_SENDER_ERROR,
+                INCOMPATIBLE_SENDER_ERROR<Any>(),
                 DUMMY_COMMAND_SENDER,
             ),
             Arguments.of(
                 null,
-                TOO_FEW_ARGUMENTS_ERROR,
+                TOO_FEW_ARGUMENTS_ERROR<Any>(),
                 CommandSenderImpl(),
             ),
             Arguments.of(
                 "1 2 3",
-                TOO_MANY_ARGUMENTS_ERROR,
+                TOO_MANY_ARGUMENTS_ERROR<Any>(),
                 CommandSenderImpl(),
             ),
         )

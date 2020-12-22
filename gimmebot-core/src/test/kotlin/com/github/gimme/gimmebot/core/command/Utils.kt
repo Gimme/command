@@ -7,10 +7,10 @@ val DUMMY_COMMAND_SENDER = object : CommandSender {
     override fun sendMessage(message: String) {}
 }
 
-val DUMMY_COMMAND: Command = object : BaseCommand("test") {
-    override fun execute(commandSender: CommandSender, args: List<String>): CommandResponse? {
+val DUMMY_COMMAND: Command<Any> = object : BaseCommand<Any>("test") {
+    override fun execute(commandSender: CommandSender, args: List<String>): CommandResponse<Any>? {
         return null
     }
 }
 
-val DUMMY_RESPONSE = CommandResponse("")
+val DUMMY_RESPONSE = CommandResponse<String>("")

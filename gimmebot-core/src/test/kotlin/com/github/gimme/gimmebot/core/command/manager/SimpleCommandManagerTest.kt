@@ -1,7 +1,6 @@
 package com.github.gimme.gimmebot.core.command.manager
 
 import com.github.gimme.gimmebot.core.command.BaseCommand
-import com.github.gimme.gimmebot.core.command.Command
 import com.github.gimme.gimmebot.core.command.CommandResponse
 import com.github.gimme.gimmebot.core.command.CommandSender
 import com.github.gimme.gimmebot.core.command.DUMMY_COMMAND
@@ -39,7 +38,7 @@ class SimpleCommandManagerTest {
 
     @Test
     fun `register command with same name should overwrite`() {
-        commandManager.registerCommand(object : BaseCommand("test") {})
+        commandManager.registerCommand(object : BaseCommand<Unit>("test") {})
         commandManager.registerCommand(DUMMY_COMMAND)
 
         assertEquals(DUMMY_COMMAND, commandManager.getCommand("test"))
@@ -56,8 +55,8 @@ class SimpleCommandManagerTest {
     fun `should execute command`(commandName: String, inputCommand: String) {
         var executed = false
 
-        val command: Command = object : BaseCommand(commandName) {
-            override fun execute(commandSender: CommandSender, args: List<String>): CommandResponse? {
+        val command = object : BaseCommand<Any>(commandName) {
+            override fun execute(commandSender: CommandSender, args: List<String>): CommandResponse<Any>? {
                 executed = true
                 return null
             }
@@ -74,15 +73,15 @@ class SimpleCommandManagerTest {
         var parentExecuted = false
         var childExecuted = false
 
-        val parentCommand: Command = object : BaseCommand("parent") {
-            override fun execute(commandSender: CommandSender, args: List<String>): CommandResponse? {
+        val parentCommand = object : BaseCommand<Any>("parent") {
+            override fun execute(commandSender: CommandSender, args: List<String>): CommandResponse<Any>? {
                 assertIterableEquals(listOf("a", "b"), args)
                 parentExecuted = true
                 return null
             }
         }
-        val childCommand: Command = object : BaseCommand("parent child") {
-            override fun execute(commandSender: CommandSender, args: List<String>): CommandResponse? {
+        val childCommand = object : BaseCommand<Any>("parent child") {
+            override fun execute(commandSender: CommandSender, args: List<String>): CommandResponse<Any>? {
                 assertIterableEquals(listOf("x", "y"), args)
                 childExecuted = true
                 return null
@@ -112,8 +111,8 @@ class SimpleCommandManagerTest {
     fun `should pass arguments`(input: String, expectedArgs: List<String>) {
         var actualArgs: List<String>? = null
 
-        val command: Command = object : BaseCommand("c") {
-            override fun execute(commandSender: CommandSender, args: List<String>): CommandResponse? {
+        val command = object : BaseCommand<Any>("c") {
+            override fun execute(commandSender: CommandSender, args: List<String>): CommandResponse<Any>? {
                 actualArgs = args
                 return null
             }

@@ -16,7 +16,7 @@ class HelpCommandTest {
         commandCollection.addCommand(DummyCommand("two"))
         commandCollection.addCommand(DummyCommand("three"))
 
-        val response: CommandResponse? = HelpCommand(commandCollection).execute(DUMMY_COMMAND_SENDER, listOf())
+        val response: CommandResponse<String>? = HelpCommand(commandCollection).execute(DUMMY_COMMAND_SENDER, listOf())
 
         assertNotNull(response)
 
@@ -27,7 +27,7 @@ class HelpCommandTest {
         assertTrue(message.contains("three"))
     }
 
-    private class DummyCommand(name: String) : BaseCommand(name) {
+    private class DummyCommand(name: String) : BaseCommand<Unit>(name) {
         @CommandExecutor
         fun execute() {}
     }
