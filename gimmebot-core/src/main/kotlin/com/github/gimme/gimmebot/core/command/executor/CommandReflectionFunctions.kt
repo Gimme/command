@@ -44,14 +44,13 @@ internal fun <T> tryExecuteCommandByReflection(
  * @param T the command response type
  * @throws IllegalStateException if there is no method annotated with @[CommandExecutor]
  */
-internal fun <T> Command<T>.getFirstCommandExecutorFunction(): KFunction<CommandResponse<T>> {
+internal fun <T> Command<T>.getFirstCommandExecutorFunction(): KFunction<*> {
     // Look through the public methods in the command class
     for (function in this::class.memberFunctions) {
         // Make sure it has the right annotation
         if (!function.hasAnnotation<CommandExecutor>()) continue
 
-        // TODO return whichever cast works: <Unit> or <CommandResponse<T>>
-        return function as KFunction<CommandResponse<T>>
+        return function
     }
 
     throw IllegalStateException("No function marked with @" + CommandExecutor::class.simpleName + " in the command \""
@@ -65,7 +64,7 @@ internal fun <T> Command<T>.getFirstCommandExecutorFunction(): KFunction<Command
  * @param T the command response type
  */
 private fun <T> attemptToCallFunction(
-    function: KFunction<CommandResponse<T>>,
+    function: KFunction<*>,
     command: Command<T>,
     commandSender: CommandSender,
     args: List<String>,
@@ -127,15 +126,9 @@ private fun <T> attemptToCallFunction(
             ParameterType.fromArrayClass(parameters[paramIndex])!!.castArray(mutableListOf<String>())
     }
 
-    return function.callBy(typedArgsMap)
-
-    // TODO
-    //return if (function.returnType.isSubtypeOf(NULLABLE_COMMAND_RESPONSE_TYPE)) {
-    //    function.callBy(typedArgsMap) as CommandResponse?
-    //} else {
-    //    function.callBy(typedArgsMap)
-    //    null
-    //}
+    // This is intentional, because functions without return type should be supported and just return null instead
+    @Suppress("UNCHECKED_CAST")
+    return function.callBy(typedArgsMap) as? CommandResponse<T>
 }
 
 /**
