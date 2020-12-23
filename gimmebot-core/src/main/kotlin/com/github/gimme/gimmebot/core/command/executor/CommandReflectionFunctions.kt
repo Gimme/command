@@ -45,16 +45,20 @@ internal fun <T> tryExecuteCommandByReflection(
  * Returns the first found method that is annotated with @[CommandExecutor].
  *
  * @param T the command response type
- * @throws IllegalStateException if there is no method annotated with @[CommandExecutor]
+ * @throws IllegalStateException if there is no method annotated with @[CommandExecutor] or if it has the wrong return
+ * type
  */
 @Throws(CommandException::class)
-internal fun <T> Command<T>.getFirstCommandExecutorFunction(): KFunction<*> {
+internal fun <T> Command<T>.getFirstCommandExecutorFunction(): KFunction<T> {
     // Look through the public methods in the command class
     for (function in this::class.memberFunctions) {
         // Make sure it has the right annotation
         if (!function.hasAnnotation<CommandExecutor>()) continue
 
-        return function
+        // The function should have the correct return type, otherwise throw an exception
+        @Suppress("UNCHECKED_CAST")
+        return function as? KFunction<T>
+            ?: throw IllegalStateException("Wrong return type of @" + CommandExecutor::class.simpleName + " function")
     }
 
     throw IllegalStateException("No function marked with @" + CommandExecutor::class.simpleName + " in the command \""
@@ -70,7 +74,7 @@ internal fun <T> Command<T>.getFirstCommandExecutorFunction(): KFunction<*> {
  */
 @Throws(CommandException::class)
 private fun <T> attemptToCallFunction(
-    function: KFunction<*>,
+    function: KFunction<T>,
     command: Command<T>,
     commandSender: CommandSender,
     args: List<String>,
@@ -132,9 +136,7 @@ private fun <T> attemptToCallFunction(
             ParameterType.fromArrayClass(parameters[paramIndex])!!.castArray(mutableListOf<String>())
     }
 
-    // This is intentional, because functions without return type should be supported and just return null instead
-    @Suppress("UNCHECKED_CAST")
-    return function.callBy(typedArgsMap) as T
+    return function.callBy(typedArgsMap)
 }
 
 /**
