@@ -13,4 +13,4 @@ val DUMMY_COMMAND: Command<Any> = object : BaseCommand<Any>("test") {
     }
 }
 
-val DUMMY_RESPONSE = CommandResponse<String>("")
+const val DUMMY_RESPONSE = ""

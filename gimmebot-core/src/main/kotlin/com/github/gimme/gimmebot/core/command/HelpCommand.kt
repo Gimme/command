@@ -12,13 +12,13 @@ class HelpCommand(
 
     /** Prints available commands. */
     @CommandExecutor
-    fun printCommands(): CommandResponse<String> {
+    fun printCommands(): String {
         val sb = StringBuilder("Commands:")
 
         commandCollection.getCommands().forEach { command ->
             sb.append("\n|  ${command.usage}")
         }
 
-        return CommandResponse(sb.toString())
+        return sb.toString()
     }
 }

@@ -16,11 +16,11 @@ class HelpCommandTest {
         commandCollection.addCommand(DummyCommand("two"))
         commandCollection.addCommand(DummyCommand("three"))
 
-        val response: CommandResponse<String>? = HelpCommand(commandCollection).execute(DUMMY_COMMAND_SENDER, listOf())
+        val response: String? = HelpCommand(commandCollection).execute(DUMMY_COMMAND_SENDER, listOf())
 
         assertNotNull(response!!)
 
-        val message = response.body.toString()
+        val message = response.toString()
 
         assertTrue(message.contains("one"))
         assertTrue(message.contains("two"))

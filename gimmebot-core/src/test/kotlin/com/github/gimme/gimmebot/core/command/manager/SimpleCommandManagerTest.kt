@@ -112,9 +112,8 @@ class SimpleCommandManagerTest {
         var actualArgs: List<String>? = null
 
         val command = object : BaseCommand<Any>("c") {
-            override fun execute(commandSender: CommandSender, args: List<String>): CommandResponse<Any>? {
+            override fun execute(commandSender: CommandSender, args: List<String>) {
                 actualArgs = args
-                return null
             }
         }
 
