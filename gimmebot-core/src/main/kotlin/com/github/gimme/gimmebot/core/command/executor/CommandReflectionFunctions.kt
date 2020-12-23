@@ -55,10 +55,8 @@ internal fun <T> Command<T>.getFirstCommandExecutorFunction(): KFunction<T> {
         // Make sure it has the right annotation
         if (!function.hasAnnotation<CommandExecutor>()) continue
 
-        // The function should have the correct return type, otherwise throw an exception
         @Suppress("UNCHECKED_CAST")
-        return function as? KFunction<T>
-            ?: throw IllegalStateException("Wrong return type of @" + CommandExecutor::class.simpleName + " function")
+        return function as KFunction<T>
     }
 
     throw IllegalStateException("No function marked with @" + CommandExecutor::class.simpleName + " in the command \""
