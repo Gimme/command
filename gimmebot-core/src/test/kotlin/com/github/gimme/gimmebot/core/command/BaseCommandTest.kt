@@ -23,7 +23,7 @@ class BaseCommandTest {
         "test, tESt",
     )
     fun `command names should become lower case`(expectedName: String, inputName: String) {
-        val command = object : BaseCommand<Unit>(inputName) {}
+        val command = object : DefaultBaseCommand(inputName) {}
         assertEquals(expectedName, command.name)
     }
 
@@ -31,7 +31,7 @@ class BaseCommandTest {
     fun `should execute reflection command with all types`() {
         var called = false
 
-        val command = object : BaseCommand<Unit>("c") {
+        val command = object : DefaultBaseCommand("c") {
             @CommandExecutor
             fun c(
                 string1: String,
@@ -67,7 +67,7 @@ class BaseCommandTest {
     fun `command without return type should execute`() {
         var called = false
 
-        val command = object : BaseCommand<Unit>("c") {
+        val command = object : DefaultBaseCommand("c") {
             @CommandExecutor
             fun c(string1: String) {
                 called = true
@@ -154,7 +154,7 @@ class BaseCommandTest {
 
     @Test
     fun `should get command usage`() {
-        val command = object : BaseCommand<Unit>("c") {
+        val command = object : DefaultBaseCommand("c") {
             @CommandExecutor("", "2")
             fun a(paramOne: Int, paramTwo: Int = 2) {
             }
@@ -165,7 +165,7 @@ class BaseCommandTest {
 
     @Test
     fun `should get command usage with command sender`() {
-        val command = object : BaseCommand<Unit>("c") {
+        val command = object : DefaultBaseCommand("c") {
             @CommandExecutor("", "2")
             fun a(sender: CommandSender, paramOne: Int, paramTwo: Int = 2) {
             }

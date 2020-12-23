@@ -27,7 +27,7 @@ class HelpCommandTest {
         assertTrue(message.contains("three"))
     }
 
-    private class DummyCommand(name: String) : BaseCommand<Unit>(name) {
+    private class DummyCommand(name: String) : DefaultBaseCommand(name) {
         @CommandExecutor
         fun execute() {}
     }
