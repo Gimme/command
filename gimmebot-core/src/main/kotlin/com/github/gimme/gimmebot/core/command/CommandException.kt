@@ -14,7 +14,7 @@ class CommandException(
     /**
      * Creates a new empty [CommandResponse] with this error.
      */
-    fun <T> response(): CommandResponse<T> {
+    fun response(): CommandResponse<Any> {
         return CommandResponse(error = this)
     }
 }

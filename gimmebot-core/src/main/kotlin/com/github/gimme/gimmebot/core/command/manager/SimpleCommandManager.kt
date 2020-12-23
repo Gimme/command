@@ -53,23 +53,16 @@ class SimpleCommandManager : CommandManager {
         val args = lowerCaseInput.split("\\s(?=(?:[^\"]*\"[^\"]*\")*[^\"]*\$)".toRegex())
             .map { s -> s.replace("\"", "") }.drop(1)
 
-        var body: Any? = null
-        var error: CommandException? = null
-
-        try {
-            // Execute the command
-            body = command.execute(commandSender, args)
-        } catch (e: CommandException) {
-            // The command returned with an error
-            error = e
+        val response = try { // Execute the command
+            CommandResponse(command.execute(commandSender, args))
+        } catch (e: CommandException) { // The command returned with an error
+            e.response()
         }
 
-        val commandResponse = CommandResponse(body, error)
-
         // Send back the response
-        commandResponse.sendTo(commandSender)
-        outputListeners.forEach { outputListener -> commandResponse.sendTo(outputListener) }
+        response.sendTo(commandSender)
+        outputListeners.forEach { outputListener -> response.sendTo(outputListener) }
 
-        return error == null
+        return response.error == null
     }
 }
