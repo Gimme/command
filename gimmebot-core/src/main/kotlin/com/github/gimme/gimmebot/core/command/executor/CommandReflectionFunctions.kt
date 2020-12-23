@@ -35,7 +35,7 @@ internal fun <T> tryExecuteCommandByReflection(
     command: Command<T>,
     commandSender: CommandSender,
     args: List<String>,
-): CommandResponse<T>? {
+): T? {
     val function = command.getFirstCommandExecutorFunction()
 
     return attemptToCallFunction(function, command, commandSender, args)
@@ -74,7 +74,7 @@ private fun <T> attemptToCallFunction(
     command: Command<T>,
     commandSender: CommandSender,
     args: List<String>,
-): CommandResponse<T>? {
+): T? {
     val parameters: List<KParameter> = function.parameters
 
     // First argument has to be the instance (command)
@@ -134,7 +134,7 @@ private fun <T> attemptToCallFunction(
 
     // This is intentional, because functions without return type should be supported and just return null instead
     @Suppress("UNCHECKED_CAST")
-    return function.callBy(typedArgsMap) as? CommandResponse<T>
+    return function.callBy(typedArgsMap) as? T
 }
 
 /**

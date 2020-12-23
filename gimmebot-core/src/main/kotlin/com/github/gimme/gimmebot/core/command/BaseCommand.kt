@@ -33,7 +33,7 @@ abstract class BaseCommand<out T>(name: String) : Command<T> {
             return sb.toString()
         }
 
-    override fun execute(commandSender: CommandSender, args: List<String>): CommandResponse<T>? {
+    override fun execute(commandSender: CommandSender, args: List<String>): T? {
         return tryExecuteCommandByReflection(this, commandSender, args)
     }
 }
