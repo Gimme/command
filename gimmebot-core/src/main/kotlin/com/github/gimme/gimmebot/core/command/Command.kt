@@ -12,10 +12,10 @@ interface Command<out T> {
     val usage: String
 
     /**
-     * Executes this command as the given [commandSender] with the given [args] and returns an optional response.
+     * Executes this command as the given [commandSender] with the given [args] and returns the response.
      *
      * @throws CommandException if the command execution was unsuccessful
      */
     @Throws(CommandException::class)
-    fun execute(commandSender: CommandSender, args: List<String>): T?
+    fun execute(commandSender: CommandSender, args: List<String>): T
 }
