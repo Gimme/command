@@ -4,6 +4,7 @@ import com.github.gimme.gimmebot.core.command.executor.CommandExecutor
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertIterableEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
@@ -88,9 +89,7 @@ class BaseCommandTest {
         val actual = command.execute(DUMMY_COMMAND_SENDER, args?.split(" ") ?: listOf())
 
         if (shouldExecute) assertEquals(expected, actual, "Command was not executed when it should have been")
-        else assertEquals(CommandResponse.Status.ERROR,
-            actual!!.status,
-            "Command did not return an error message when it should have")
+        else assertNotNull(actual!!.error, "Command did not return with an error when it should have")
     }
 
     @Test
@@ -114,7 +113,7 @@ class BaseCommandTest {
     @MethodSource("commandError")
     fun `should return command error`(
         args: String?,
-        response: CommandResponse<String>,
+        response: CommandException?,
         sender: CommandSender,
     ) {
         val command = object : BaseCommand<String>("c") {
@@ -125,7 +124,7 @@ class BaseCommandTest {
             }
         }
 
-        assertEquals(response, command.execute(sender, args?.split(" ") ?: listOf()))
+        assertEquals(response, command.execute(sender, args?.split(" ") ?: listOf())?.error)
     }
 
     @Test
@@ -366,32 +365,32 @@ class BaseCommandTest {
         fun commandError() = listOf(
             Arguments.of(
                 "1",
-                DUMMY_RESPONSE,
+                null,
                 CommandSenderImpl(),
             ),
             Arguments.of(
                 "a",
-                INVALID_ARGUMENT_ERROR<Any>(),
+                INVALID_ARGUMENT_ERROR,
                 CommandSenderImpl(),
             ),
             Arguments.of(
                 "1 a",
-                INVALID_ARGUMENT_ERROR<Any>(),
+                INVALID_ARGUMENT_ERROR,
                 CommandSenderImpl(),
             ),
             Arguments.of(
                 "1",
-                INCOMPATIBLE_SENDER_ERROR<Any>(),
+                INCOMPATIBLE_SENDER_ERROR,
                 DUMMY_COMMAND_SENDER,
             ),
             Arguments.of(
                 null,
-                TOO_FEW_ARGUMENTS_ERROR<Any>(),
+                TOO_FEW_ARGUMENTS_ERROR,
                 CommandSenderImpl(),
             ),
             Arguments.of(
                 "1 2 3",
-                TOO_MANY_ARGUMENTS_ERROR<Any>(),
+                TOO_MANY_ARGUMENTS_ERROR,
                 CommandSenderImpl(),
             ),
         )
