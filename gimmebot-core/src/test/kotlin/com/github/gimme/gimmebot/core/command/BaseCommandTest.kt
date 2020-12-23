@@ -118,7 +118,7 @@ class BaseCommandTest {
     @MethodSource("commandError")
     fun `should throw command exception`(
         args: String?,
-        commandException: CommandException?,
+        errorCode: ErrorCode?,
         sender: CommandSender,
     ) {
         val command = object : BaseCommand<String>("c") {
@@ -131,13 +131,13 @@ class BaseCommandTest {
 
         val executeCommand = { command.execute(sender, args?.split(" ") ?: listOf()) }
 
-        if (commandException == null) {
+        if (errorCode == null) {
             assertDoesNotThrow { executeCommand() }
             return
         }
 
         val exception = assertThrows<CommandException> { executeCommand() }
-        assertEquals(commandException, exception)
+        assertEquals(errorCode.code(), exception.code)
     }
 
     @Test
@@ -383,27 +383,27 @@ class BaseCommandTest {
             ),
             Arguments.of(
                 "a",
-                INVALID_ARGUMENT_ERROR,
+                ErrorCode.INVALID_ARGUMENT,
                 CommandSenderImpl(),
             ),
             Arguments.of(
                 "1 a",
-                INVALID_ARGUMENT_ERROR,
+                ErrorCode.INVALID_ARGUMENT,
                 CommandSenderImpl(),
             ),
             Arguments.of(
                 "1",
-                INCOMPATIBLE_SENDER_ERROR,
+                ErrorCode.INCOMPATIBLE_SENDER,
                 DUMMY_COMMAND_SENDER,
             ),
             Arguments.of(
                 null,
-                TOO_FEW_ARGUMENTS_ERROR,
+                ErrorCode.TOO_FEW_ARGUMENTS,
                 CommandSenderImpl(),
             ),
             Arguments.of(
                 "1 2 3",
-                TOO_MANY_ARGUMENTS_ERROR,
+                ErrorCode.TOO_MANY_ARGUMENTS,
                 CommandSenderImpl(),
             ),
         )
