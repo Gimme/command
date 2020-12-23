@@ -16,5 +16,6 @@ interface Command<out T> {
      *
      * @throws CommandException if the command execution was unsuccessful
      */
+    @Throws(CommandException::class)
     fun execute(commandSender: CommandSender, args: List<String>): CommandResponse<T>?
 }

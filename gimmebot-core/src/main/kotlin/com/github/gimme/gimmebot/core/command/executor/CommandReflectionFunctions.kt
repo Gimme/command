@@ -30,6 +30,7 @@ private val COMMAND_SENDER_TYPE: KType = CommandSender::class.createType()
  * @param T the command response type
  * @throws CommandException if the command execution was unsuccessful
  */
+@Throws(CommandException::class)
 internal fun <T> tryExecuteCommandByReflection(
     command: Command<T>,
     commandSender: CommandSender,
@@ -46,6 +47,7 @@ internal fun <T> tryExecuteCommandByReflection(
  * @param T the command response type
  * @throws IllegalStateException if there is no method annotated with @[CommandExecutor]
  */
+@Throws(CommandException::class)
 internal fun <T> Command<T>.getFirstCommandExecutorFunction(): KFunction<*> {
     // Look through the public methods in the command class
     for (function in this::class.memberFunctions) {
@@ -66,6 +68,7 @@ internal fun <T> Command<T>.getFirstCommandExecutorFunction(): KFunction<*> {
  * @param T the command response type
  * @throws CommandException if the command execution was unsuccessful
  */
+@Throws(CommandException::class)
 private fun <T> attemptToCallFunction(
     function: KFunction<*>,
     command: Command<T>,
