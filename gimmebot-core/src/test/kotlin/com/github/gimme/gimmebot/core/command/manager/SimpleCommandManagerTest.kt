@@ -1,7 +1,6 @@
 package com.github.gimme.gimmebot.core.command.manager
 
 import com.github.gimme.gimmebot.core.command.BaseCommand
-import com.github.gimme.gimmebot.core.command.CommandResponse
 import com.github.gimme.gimmebot.core.command.CommandSender
 import com.github.gimme.gimmebot.core.command.DUMMY_COMMAND
 import com.github.gimme.gimmebot.core.command.DUMMY_COMMAND_SENDER
@@ -56,9 +55,8 @@ class SimpleCommandManagerTest {
         var executed = false
 
         val command = object : BaseCommand<Any>(commandName) {
-            override fun execute(commandSender: CommandSender, args: List<String>): CommandResponse<Any>? {
+            override fun execute(commandSender: CommandSender, args: List<String>) {
                 executed = true
-                return null
             }
         }
 
@@ -74,17 +72,15 @@ class SimpleCommandManagerTest {
         var childExecuted = false
 
         val parentCommand = object : BaseCommand<Any>("parent") {
-            override fun execute(commandSender: CommandSender, args: List<String>): CommandResponse<Any>? {
+            override fun execute(commandSender: CommandSender, args: List<String>) {
                 assertIterableEquals(listOf("a", "b"), args)
                 parentExecuted = true
-                return null
             }
         }
         val childCommand = object : BaseCommand<Any>("parent child") {
-            override fun execute(commandSender: CommandSender, args: List<String>): CommandResponse<Any>? {
+            override fun execute(commandSender: CommandSender, args: List<String>) {
                 assertIterableEquals(listOf("x", "y"), args)
                 childExecuted = true
-                return null
             }
         }
 
