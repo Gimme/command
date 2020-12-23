@@ -81,7 +81,7 @@ private fun <T> attemptToCallFunction(
     // If the first parameter has the command sender type, we inject it
     getCommandSenderParameter(parameters)?.let {
         if (it.type.isSubtypeOf(COMMAND_SENDER_TYPE)) {
-            typedArgsMap[it] = it.type.jvmErasure.safeCast(commandSender) ?: return INCOMPATIBLE_SENDER_ERROR()
+            typedArgsMap[it] = it.type.jvmErasure.safeCast(commandSender) ?: return INCOMPATIBLE_SENDER_ERROR.response()
             paramIndex++
         }
     }
@@ -95,11 +95,11 @@ private fun <T> attemptToCallFunction(
     val hasVararg = parameters[parameters.size - 1].isVararg
     val minRequiredAmountOfArgs = amountOfInputParameters - (if (hasVararg) 1 else 0) - amountOfOptionalArgs
 
-    if (args.size < minRequiredAmountOfArgs) return TOO_FEW_ARGUMENTS_ERROR()
-    if (!hasVararg && args.size > amountOfInputParameters) return TOO_MANY_ARGUMENTS_ERROR()
+    if (args.size < minRequiredAmountOfArgs) return TOO_FEW_ARGUMENTS_ERROR.response()
+    if (!hasVararg && args.size > amountOfInputParameters) return TOO_MANY_ARGUMENTS_ERROR.response()
 
     while (argIndex < args.size) {
-        if (paramIndex >= parameters.size) return TOO_MANY_ARGUMENTS_ERROR()
+        if (paramIndex >= parameters.size) return TOO_MANY_ARGUMENTS_ERROR.response()
         val param = parameters[paramIndex]
         val arg = args[argIndex]
 
@@ -113,7 +113,7 @@ private fun <T> attemptToCallFunction(
             argIndex += varargCollection.size
             typedArgsMap[param] = parameterType.castArray(varargCollection)
         } else {
-            val value = ParameterType.fromClass(param)?.castArg(arg) ?: return INVALID_ARGUMENT_ERROR()
+            val value = ParameterType.fromClass(param)?.castArg(arg) ?: return INVALID_ARGUMENT_ERROR.response()
             typedArgsMap[param] = value
             argIndex++
         }
