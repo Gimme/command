@@ -40,7 +40,7 @@ class BaseCommandTest {
                 double2: Double,
                 boolean1: Boolean,
                 boolean2: Boolean?,
-            ): CommandResponse<Unit>? { // TODO: remove return type (when supported)
+            ) {
                 assertAll(
                     { assertEquals("string", string1) },
                     { assertEquals("", string2) },
@@ -53,15 +53,27 @@ class BaseCommandTest {
                 )
 
                 called = true
-
-                return null
             }
         }
 
         assertFalse(called)
-
         command.execute(DUMMY_COMMAND_SENDER, listOf("string", "", "1", "-999", "0.5", "36", "trUE", "false"))
+        assertTrue(called)
+    }
 
+    @Test
+    fun `command without return type should execute`() {
+        var called = false
+
+        val command = object : BaseCommand<Unit>("c") {
+            @CommandExecutor
+            fun c(string1: String) {
+                called = true
+            }
+        }
+
+        assertFalse(called)
+        command.execute(DUMMY_COMMAND_SENDER, listOf("abc"))
         assertTrue(called)
     }
 
