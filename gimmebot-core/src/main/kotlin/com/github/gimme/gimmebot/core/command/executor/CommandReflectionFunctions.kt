@@ -1,6 +1,7 @@
 package com.github.gimme.gimmebot.core.command.executor
 
 import com.github.gimme.gimmebot.core.command.Command
+import com.github.gimme.gimmebot.core.command.CommandException
 import com.github.gimme.gimmebot.core.command.CommandResponse
 import com.github.gimme.gimmebot.core.command.CommandSender
 import com.github.gimme.gimmebot.core.command.INCOMPATIBLE_SENDER_ERROR
@@ -27,6 +28,7 @@ private val COMMAND_SENDER_TYPE: KType = CommandSender::class.createType()
  * successfully called.
  *
  * @param T the command response type
+ * @throws CommandException if the command execution was unsuccessful
  */
 internal fun <T> tryExecuteCommandByReflection(
     command: Command<T>,
@@ -62,6 +64,7 @@ internal fun <T> Command<T>.getFirstCommandExecutorFunction(): KFunction<*> {
  * optional command response if the given [args] fit the parameters of the [function] and it was successfully called.
  *
  * @param T the command response type
+ * @throws CommandException if the command execution was unsuccessful
  */
 private fun <T> attemptToCallFunction(
     function: KFunction<*>,
@@ -81,7 +84,7 @@ private fun <T> attemptToCallFunction(
     // If the first parameter has the command sender type, we inject it
     getCommandSenderParameter(parameters)?.let {
         if (it.type.isSubtypeOf(COMMAND_SENDER_TYPE)) {
-            typedArgsMap[it] = it.type.jvmErasure.safeCast(commandSender) ?: return INCOMPATIBLE_SENDER_ERROR.response()
+            typedArgsMap[it] = it.type.jvmErasure.safeCast(commandSender) ?: throw INCOMPATIBLE_SENDER_ERROR
             paramIndex++
         }
     }
@@ -95,11 +98,11 @@ private fun <T> attemptToCallFunction(
     val hasVararg = parameters[parameters.size - 1].isVararg
     val minRequiredAmountOfArgs = amountOfInputParameters - (if (hasVararg) 1 else 0) - amountOfOptionalArgs
 
-    if (args.size < minRequiredAmountOfArgs) return TOO_FEW_ARGUMENTS_ERROR.response()
-    if (!hasVararg && args.size > amountOfInputParameters) return TOO_MANY_ARGUMENTS_ERROR.response()
+    if (args.size < minRequiredAmountOfArgs) throw TOO_FEW_ARGUMENTS_ERROR
+    if (!hasVararg && args.size > amountOfInputParameters) throw TOO_MANY_ARGUMENTS_ERROR
 
     while (argIndex < args.size) {
-        if (paramIndex >= parameters.size) return TOO_MANY_ARGUMENTS_ERROR.response()
+        if (paramIndex >= parameters.size) throw TOO_MANY_ARGUMENTS_ERROR
         val param = parameters[paramIndex]
         val arg = args[argIndex]
 
@@ -113,7 +116,7 @@ private fun <T> attemptToCallFunction(
             argIndex += varargCollection.size
             typedArgsMap[param] = parameterType.castArray(varargCollection)
         } else {
-            val value = ParameterType.fromClass(param)?.castArg(arg) ?: return INVALID_ARGUMENT_ERROR.response()
+            val value = ParameterType.fromClass(param)?.castArg(arg) ?: throw INVALID_ARGUMENT_ERROR
             typedArgsMap[param] = value
             argIndex++
         }

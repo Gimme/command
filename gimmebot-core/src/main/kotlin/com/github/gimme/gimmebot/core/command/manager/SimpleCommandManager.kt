@@ -1,6 +1,7 @@
 package com.github.gimme.gimmebot.core.command.manager
 
 import com.github.gimme.gimmebot.core.command.Command
+import com.github.gimme.gimmebot.core.command.CommandException
 import com.github.gimme.gimmebot.core.command.CommandSender
 import com.github.gimme.gimmebot.core.command.HelpCommand
 import com.github.gimme.gimmebot.core.command.MessageReceiver
@@ -51,15 +52,23 @@ class SimpleCommandManager : CommandManager {
         val args = lowerCaseInput.split("\\s(?=(?:[^\"]*\"[^\"]*\")*[^\"]*\$)".toRegex())
             .map { s -> s.replace("\"", "") }.drop(1)
 
-        // Execute the command
-        val response = command.execute(commandSender, args)
+        return try {
+            // Execute the command
+            val response = command.execute(commandSender, args)
 
-        // Send back the response
-        response?.let {
-            response.sendTo(commandSender)
-            outputListeners.forEach { outputListener -> response.sendTo(outputListener) }
+            // Send back the response
+            response?.let {
+                response.sendTo(commandSender)
+                outputListeners.forEach { outputListener -> response.sendTo(outputListener) }
+            }
+
+            true
+        } catch (e: CommandException) {
+            // The command returned with an error
+            commandSender.sendMessage(e.message)
+            outputListeners.forEach { outputListener -> outputListener.sendMessage(e.message) }
+
+            false
         }
-
-        return true
     }
 }
