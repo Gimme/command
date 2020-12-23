@@ -24,8 +24,8 @@ interface CommandManager {
     fun addOutputListener(messageReceiver: MessageReceiver)
 
     /**
-     * Checks the given [input] if a valid command and then executes it as the given [commandSender]. Returns if a valid
-     * command and it was successfully executed.
+     * Checks the given [input] if a valid command call and then executes it as the given [commandSender]. Returns if a
+     * valid command call and the command was successfully executed.
      */
     fun parseInput(commandSender: CommandSender, input: String): Boolean
 
