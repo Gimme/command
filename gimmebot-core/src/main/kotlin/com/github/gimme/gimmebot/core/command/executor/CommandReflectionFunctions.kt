@@ -4,10 +4,7 @@ import com.github.gimme.gimmebot.core.command.Command
 import com.github.gimme.gimmebot.core.command.CommandException
 import com.github.gimme.gimmebot.core.command.CommandResponse
 import com.github.gimme.gimmebot.core.command.CommandSender
-import com.github.gimme.gimmebot.core.command.INCOMPATIBLE_SENDER_ERROR
-import com.github.gimme.gimmebot.core.command.INVALID_ARGUMENT_ERROR
-import com.github.gimme.gimmebot.core.command.TOO_FEW_ARGUMENTS_ERROR
-import com.github.gimme.gimmebot.core.command.TOO_MANY_ARGUMENTS_ERROR
+import com.github.gimme.gimmebot.core.command.ErrorCode
 import java.security.InvalidParameterException
 import kotlin.reflect.KFunction
 import kotlin.reflect.KParameter
@@ -89,7 +86,8 @@ private fun <T> attemptToCallFunction(
     // If the first parameter has the command sender type, we inject it
     getCommandSenderParameter(parameters)?.let {
         if (it.type.isSubtypeOf(COMMAND_SENDER_TYPE)) {
-            typedArgsMap[it] = it.type.jvmErasure.safeCast(commandSender) ?: throw INCOMPATIBLE_SENDER_ERROR
+            typedArgsMap[it] =
+                it.type.jvmErasure.safeCast(commandSender) ?: throw ErrorCode.INCOMPATIBLE_SENDER.createException()
             paramIndex++
         }
     }
@@ -103,11 +101,11 @@ private fun <T> attemptToCallFunction(
     val hasVararg = parameters[parameters.size - 1].isVararg
     val minRequiredAmountOfArgs = amountOfInputParameters - (if (hasVararg) 1 else 0) - amountOfOptionalArgs
 
-    if (args.size < minRequiredAmountOfArgs) throw TOO_FEW_ARGUMENTS_ERROR
-    if (!hasVararg && args.size > amountOfInputParameters) throw TOO_MANY_ARGUMENTS_ERROR
+    if (args.size < minRequiredAmountOfArgs) throw ErrorCode.TOO_FEW_ARGUMENTS.createException()
+    if (!hasVararg && args.size > amountOfInputParameters) throw ErrorCode.TOO_MANY_ARGUMENTS.createException()
 
     while (argIndex < args.size) {
-        if (paramIndex >= parameters.size) throw TOO_MANY_ARGUMENTS_ERROR
+        if (paramIndex >= parameters.size) throw ErrorCode.TOO_MANY_ARGUMENTS.createException()
         val param = parameters[paramIndex]
         val arg = args[argIndex]
 
@@ -121,7 +119,8 @@ private fun <T> attemptToCallFunction(
             argIndex += varargCollection.size
             typedArgsMap[param] = parameterType.castArray(varargCollection)
         } else {
-            val value = ParameterType.fromClass(param)?.castArg(arg) ?: throw INVALID_ARGUMENT_ERROR
+            val value =
+                ParameterType.fromClass(param)?.castArg(arg) ?: throw ErrorCode.INVALID_ARGUMENT.createException(arg)
             typedArgsMap[param] = value
             argIndex++
         }
