@@ -1,5 +1,10 @@
 package com.github.gimme.gimmebot.core.command
 
+/**
+ * An identifier for a type of command error.
+ *
+ * @property message a message explaining the error
+ */
 enum class ErrorCode(val message: String) {
 
     /** An argument has the wrong format. */
@@ -19,6 +24,8 @@ enum class ErrorCode(val message: String) {
 
     /**
      * Creates a [CommandException] with this error code and an optional [context] object to be included in the message.
+     *
+     * For example: the message "Invalid argument" or "Invalid argument: 43" with 43 being the context in this case.
      */
     fun createException(context: Any? = null): CommandException =
         CommandException(code(), message + (context?.let { ": $it" } ?: ""))
