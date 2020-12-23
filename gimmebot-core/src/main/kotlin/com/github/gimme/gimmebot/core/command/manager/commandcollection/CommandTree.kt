@@ -9,7 +9,7 @@ class CommandTree : CommandCollection {
 
     private val root: Node = Node("", null)
 
-    override fun addCommand(command: Command) {
+    override fun addCommand(command: Command<*>) {
         val words = command.name.split(" ")
 
         var currentNode = root
@@ -19,10 +19,10 @@ class CommandTree : CommandCollection {
         currentNode.command = command
     }
 
-    override fun getCommand(input: String): Command? {
+    override fun getCommand(input: String): Command<*>? {
         val words = input.split(" ")
 
-        var lastFoundCommand: Command? = null
+        var lastFoundCommand: Command<*>? = null
 
         var currentNode = root
         for (word in words) {
@@ -32,19 +32,19 @@ class CommandTree : CommandCollection {
         return lastFoundCommand
     }
 
-    override fun getCommands(): List<Command> {
-        val list = mutableListOf<Command>()
+    override fun getCommands(): List<Command<*>> {
+        val list = mutableListOf<Command<*>>()
         root.fetchCommands(list)
         return list
     }
 
     private data class Node(
         val name: String,
-        var command: Command?,
+        var command: Command<*>?,
     ) {
         val children: MutableMap<String, Node> = mutableMapOf()
 
-        fun fetchCommands(list: MutableList<Command>) {
+        fun fetchCommands(list: MutableList<Command<*>>) {
             command?.let { list.add(it) }
             children.values.forEach { child -> child.fetchCommands(list) }
         }

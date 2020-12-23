@@ -21,11 +21,11 @@ class SimpleCommandManager : CommandManager {
         registerCommand(HelpCommand(commandCollection))
     }
 
-    override fun registerCommand(command: Command) {
+    override fun registerCommand(command: Command<*>) {
         commandCollection.addCommand(command)
     }
 
-    override fun getCommand(name: String): Command? {
+    override fun getCommand(name: String): Command<*>? {
         return commandCollection.getCommand(name)
     }
 

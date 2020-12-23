@@ -7,15 +7,15 @@ import com.github.gimme.gimmebot.core.command.Command
  */
 interface CommandCollection {
     /** Adds the given [command] to this collection. */
-    fun addCommand(command: Command)
+    fun addCommand(command: Command<*>)
 
     /**
      * Returns the command from this collection that matches the given [input], or null if no command found.
      *
      * The input can include arguments, after the name of the command, that will be ignored.
      */
-    fun getCommand(input: String): Command?
+    fun getCommand(input: String): Command<*>?
 
     /** Returns all commands in this collection. */
-    fun getCommands(): List<Command>
+    fun getCommands(): List<Command<*>>
 }

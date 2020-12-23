@@ -20,18 +20,19 @@ import kotlin.reflect.jvm.jvmErasure
 import kotlin.reflect.jvm.jvmName
 
 private val COMMAND_SENDER_TYPE: KType = CommandSender::class.createType()
-private val NULLABLE_COMMAND_RESPONSE_TYPE: KType = CommandResponse::class.createType(emptyList(), true)
 
 /**
- * Attempts to execute the given [command] as the given [commandSender], and returns the optional command response if
+ * Attempts to execute the given [command] as the given [commandSender], and returns the optional [CommandResponse] if
  * the given [args] fit the parameters of a function in the [command] annotated with @[CommandExecutor] and it was
  * successfully called.
+ *
+ * @param T the command response type
  */
-internal fun tryExecuteCommandByReflection(
-    command: Command,
+internal fun <T> tryExecuteCommandByReflection(
+    command: Command<T>,
     commandSender: CommandSender,
     args: List<String>,
-): CommandResponse? {
+): CommandResponse<T>? {
     val function = command.getFirstCommandExecutorFunction()
 
     return attemptToCallFunction(function, command, commandSender, args)
@@ -40,15 +41,17 @@ internal fun tryExecuteCommandByReflection(
 /**
  * Returns the first found method that is annotated with @[CommandExecutor].
  *
+ * @param T the command response type
  * @throws IllegalStateException if there is no method annotated with @[CommandExecutor]
  */
-internal fun Command.getFirstCommandExecutorFunction(): KFunction<*> {
+internal fun <T> Command<T>.getFirstCommandExecutorFunction(): KFunction<CommandResponse<T>> {
     // Look through the public methods in the command class
     for (function in this::class.memberFunctions) {
         // Make sure it has the right annotation
         if (!function.hasAnnotation<CommandExecutor>()) continue
 
-        return function
+        // TODO return whichever cast works: <Unit> or <CommandResponse<T>>
+        return function as KFunction<CommandResponse<T>>
     }
 
     throw IllegalStateException("No function marked with @" + CommandExecutor::class.simpleName + " in the command \""
@@ -58,13 +61,15 @@ internal fun Command.getFirstCommandExecutorFunction(): KFunction<*> {
 /**
  * Attempts to call the specified [function] in the given [command] as the given [commandSender], and returns the
  * optional command response if the given [args] fit the parameters of the [function] and it was successfully called.
+ *
+ * @param T the command response type
  */
-private fun attemptToCallFunction(
-    function: KFunction<*>,
-    command: Command,
+private fun <T> attemptToCallFunction(
+    function: KFunction<CommandResponse<T>>,
+    command: Command<T>,
     commandSender: CommandSender,
     args: List<String>,
-): CommandResponse? {
+): CommandResponse<T>? {
     val parameters: List<KParameter> = function.parameters
 
     // First argument has to be the instance (command)
@@ -77,7 +82,7 @@ private fun attemptToCallFunction(
     // If the first parameter has the command sender type, we inject it
     getCommandSenderParameter(parameters)?.let {
         if (it.type.isSubtypeOf(COMMAND_SENDER_TYPE)) {
-            typedArgsMap[it] = it.type.jvmErasure.safeCast(commandSender) ?: return INCOMPATIBLE_SENDER_ERROR
+            typedArgsMap[it] = it.type.jvmErasure.safeCast(commandSender) ?: return INCOMPATIBLE_SENDER_ERROR()
             paramIndex++
         }
     }
@@ -91,11 +96,11 @@ private fun attemptToCallFunction(
     val hasVararg = parameters[parameters.size - 1].isVararg
     val minRequiredAmountOfArgs = amountOfInputParameters - (if (hasVararg) 1 else 0) - amountOfOptionalArgs
 
-    if (args.size < minRequiredAmountOfArgs) return TOO_FEW_ARGUMENTS_ERROR
-    if (!hasVararg && args.size > amountOfInputParameters) return TOO_MANY_ARGUMENTS_ERROR
+    if (args.size < minRequiredAmountOfArgs) return TOO_FEW_ARGUMENTS_ERROR()
+    if (!hasVararg && args.size > amountOfInputParameters) return TOO_MANY_ARGUMENTS_ERROR()
 
     while (argIndex < args.size) {
-        if (paramIndex >= parameters.size) return TOO_MANY_ARGUMENTS_ERROR
+        if (paramIndex >= parameters.size) return TOO_MANY_ARGUMENTS_ERROR()
         val param = parameters[paramIndex]
         val arg = args[argIndex]
 
@@ -109,7 +114,7 @@ private fun attemptToCallFunction(
             argIndex += varargCollection.size
             typedArgsMap[param] = parameterType.castArray(varargCollection)
         } else {
-            val value = ParameterType.fromClass(param)?.castArg(arg) ?: return INVALID_ARGUMENT_ERROR
+            val value = ParameterType.fromClass(param)?.castArg(arg) ?: return INVALID_ARGUMENT_ERROR()
             typedArgsMap[param] = value
             argIndex++
         }
@@ -122,12 +127,15 @@ private fun attemptToCallFunction(
             ParameterType.fromArrayClass(parameters[paramIndex])!!.castArray(mutableListOf<String>())
     }
 
-    return if (function.returnType.isSubtypeOf(NULLABLE_COMMAND_RESPONSE_TYPE)) {
-        function.callBy(typedArgsMap) as CommandResponse?
-    } else {
-        function.callBy(typedArgsMap)
-        null
-    }
+    return function.callBy(typedArgsMap)
+
+    // TODO
+    //return if (function.returnType.isSubtypeOf(NULLABLE_COMMAND_RESPONSE_TYPE)) {
+    //    function.callBy(typedArgsMap) as CommandResponse?
+    //} else {
+    //    function.callBy(typedArgsMap)
+    //    null
+    //}
 }
 
 /**

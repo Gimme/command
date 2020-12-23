@@ -1,21 +1,21 @@
 package com.github.gimme.gimmebot.core.command.manager
 
 import com.github.gimme.gimmebot.core.command.Command
-import com.github.gimme.gimmebot.core.command.medium.CommandInputMedium
 import com.github.gimme.gimmebot.core.command.CommandSender
 import com.github.gimme.gimmebot.core.command.MessageReceiver
 import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandCollection
+import com.github.gimme.gimmebot.core.command.medium.CommandInputMedium
 
 /**
  * Represents a command manager that handles the registration and execution of commands.
  */
 interface CommandManager {
 
-    /** Registers the given [command] the be executable by this command manager. */
-    fun registerCommand(command: Command)
+    /** Registers the given [command] to be executable by this command manager. */
+    fun registerCommand(command: Command<*>)
 
     /** Returns the command with the specified [name] if it has been registered. */
-    fun getCommand(name: String): Command?
+    fun getCommand(name: String): Command<*>?
 
     /** Returns the mutable collection of all registered commands. */
     fun getCommandCollection(): CommandCollection
