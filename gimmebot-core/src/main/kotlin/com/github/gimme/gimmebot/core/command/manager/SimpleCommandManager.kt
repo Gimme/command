@@ -39,22 +39,12 @@ class SimpleCommandManager : CommandManager {
         outputListeners.add(messageReceiver)
     }
 
-    override fun parseInput(commandSender: CommandSender, input: String): Boolean {
-        var lowerCaseInput = input.toLowerCase()
-
-        outputListeners.forEach { it.sendMessage("${commandSender.name}: $input") }
-
+    override fun parseInput(commandSender: CommandSender, commandName: String, arguments: List<String>): Boolean {
         // Return if not a valid command
-        val command = getCommand(lowerCaseInput) ?: return false
-        // Remove command name, leaving only the arguments
-        lowerCaseInput = lowerCaseInput.removePrefix(command.name)
-
-        // Split into words on spaces, ignoring spaces between two quotation marks
-        val args = lowerCaseInput.split("\\s(?=(?:[^\"]*\"[^\"]*\")*[^\"]*\$)".toRegex())
-            .map { s -> s.replace("\"", "") }.drop(1)
+        val command = getCommand(commandName.toLowerCase()) ?: return false
 
         val response = try { // Execute the command
-            CommandResponse(command.execute(commandSender, args))
+            CommandResponse(command.execute(commandSender, arguments))
         } catch (e: CommandException) { // The command returned with an error
             e.response()
         }

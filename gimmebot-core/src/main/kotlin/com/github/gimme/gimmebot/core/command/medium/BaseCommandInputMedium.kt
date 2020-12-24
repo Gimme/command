@@ -23,16 +23,34 @@ abstract class BaseCommandInputMedium : CommandInputMedium {
 
     /** Sends the specified command [input] as the given [sender]. */
     protected fun send(sender: CommandSender, input: String) {
-        var commandInput = input
+        var commandInput = validatePrefix(input) ?: return
+
+        //TODO outputListeners.forEach { it.sendMessage("${commandSender.name}: $input") }
+
+        // Return if not a valid command
+        val command = commandManager.getCommand(commandInput) ?: return // TODO: should return error message
+        // Remove command name, leaving only the arguments
+        commandInput = commandInput.removePrefix(command.name)
+
+        // Split into words on spaces, ignoring spaces between two quotation marks
+        val args = commandInput.split("\\s(?=(?:[^\"]*\"[^\"]*\")*[^\"]*\$)".toRegex())
+            .map { s -> s.replace("\"", "") }.drop(1)
+
+        commandManager.parseInput(sender, command.name, args)
+    }
+
+    /**
+     * If the given input starts with the [commandPrefix], returns a copy of the input with the prefix removed.
+     * Otherwise, returns null.
+     */
+    private fun validatePrefix(input: String): String? {
         val prefix = commandPrefix
 
-        if (!prefix.isNullOrEmpty()) {
-            // Has to start with the command prefix
-            if (!input.startsWith(prefix)) return
-            // Remove prefix
-            commandInput = input.removePrefix(prefix)
-        }
+        if (prefix.isNullOrEmpty()) return input
 
-        commandManager.parseInput(sender, commandInput)
+        // Has to start with the command prefix
+        if (!input.startsWith(prefix)) return null
+        // Remove prefix
+        return input.removePrefix(prefix)
     }
 }

@@ -12,9 +12,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.CsvSource
-import org.junit.jupiter.params.provider.MethodSource
 
 class SimpleCommandManagerTest {
 
@@ -51,7 +49,7 @@ class SimpleCommandManagerTest {
         "Test, Test",
         "test1 test2, test1 test2",
     )
-    fun `should execute command`(commandName: String, inputCommand: String) {
+    fun `should execute command`(commandName: String, inputCommandName: String) {
         var executed = false
 
         val command = object : DefaultBaseCommand(commandName) {
@@ -61,7 +59,7 @@ class SimpleCommandManagerTest {
         }
 
         commandManager.registerCommand(command)
-        commandManager.parseInput(DUMMY_COMMAND_SENDER, inputCommand)
+        commandManager.parseInput(DUMMY_COMMAND_SENDER, inputCommandName)
 
         assertTrue(executed)
     }
@@ -86,8 +84,8 @@ class SimpleCommandManagerTest {
 
         commandManager.registerCommand(parentCommand)
         commandManager.registerCommand(childCommand)
-        commandManager.parseInput(DUMMY_COMMAND_SENDER, "parent a b")
-        commandManager.parseInput(DUMMY_COMMAND_SENDER, "parent child x y")
+        commandManager.parseInput(DUMMY_COMMAND_SENDER, "parent", listOf("a", "b"))
+        commandManager.parseInput(DUMMY_COMMAND_SENDER, "parent child", listOf("x", "y"))
 
         assertTrue(parentExecuted)
         assertTrue(childExecuted)
@@ -95,41 +93,10 @@ class SimpleCommandManagerTest {
         val commandManager2 = SimpleCommandManager()
         commandManager2.registerCommand(childCommand)
         commandManager2.registerCommand(parentCommand)
-        commandManager2.parseInput(DUMMY_COMMAND_SENDER, "parent child x y")
-        commandManager2.parseInput(DUMMY_COMMAND_SENDER, "parent a b")
+        commandManager.parseInput(DUMMY_COMMAND_SENDER, "parent child", listOf("x", "y"))
+        commandManager.parseInput(DUMMY_COMMAND_SENDER, "parent", listOf("a", "b"))
 
         assertTrue(childExecuted)
         assertTrue(parentExecuted)
-    }
-
-    @ParameterizedTest
-    @MethodSource("args")
-    fun `should pass arguments`(input: String, expectedArgs: List<String>) {
-        var actualArgs: List<String>? = null
-
-        val command = object : DefaultBaseCommand("c") {
-            override fun execute(commandSender: CommandSender, args: List<String>) {
-                actualArgs = args
-            }
-        }
-
-        commandManager.registerCommand(command)
-        commandManager.parseInput(DUMMY_COMMAND_SENDER, input)
-
-        assertNotNull(actualArgs)
-        assertIterableEquals(expectedArgs, actualArgs)
-    }
-
-    companion object {
-        @JvmStatic
-        fun args() = listOf(
-            Arguments.of("c", emptyList<String>()),
-            Arguments.of("c ", listOf("")),
-            Arguments.of("c   one", listOf("", "", "one")),
-            Arguments.of("c one", listOf("one")),
-            Arguments.of("c one two", listOf("one", "two")),
-            Arguments.of("c one two three", listOf("one", "two", "three")),
-            Arguments.of("c \"one two\" three", listOf("one two", "three")),
-        )
     }
 }
