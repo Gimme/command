@@ -10,11 +10,10 @@ interface CommandCollection {
     fun addCommand(command: Command<*>)
 
     /**
-     * Returns the command from this collection that matches the given [input], or null if no command found.
-     *
-     * The input can include arguments, after the name of the command, that will be ignored.
+     * Returns the command from this collection with the specified [name], or null if no command with that name is
+     * registered.
      */
-    fun getCommand(input: String): Command<*>?
+    fun getCommand(name: String): Command<*>?
 
     /** Returns all commands in this collection. */
     fun getCommands(): List<Command<*>>
