@@ -47,12 +47,18 @@ abstract class BaseCommandInputMedium(override var commandCollection: CommandCol
             .map { s -> s.replace("\"", "") }.drop(1)
 
         val message = try { // Execute the command
-            command.execute(sender, args)?.toString() ?: ""
+            command.execute(sender, args)?.toString()
         } catch (e: CommandException) { // The command returned with an error
             e.message
         }
 
         // Send back the response
+        respond(sender, message)
+    }
+
+    private fun respond(sender: CommandSender, message: String?) {
+        if (message == null) return
+
         sender.sendMessage(message)
         ioListeners.forEach { it.sendMessage(message) }
     }
