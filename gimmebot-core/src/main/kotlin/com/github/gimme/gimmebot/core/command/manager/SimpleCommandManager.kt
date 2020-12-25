@@ -34,7 +34,7 @@ class SimpleCommandManager : CommandManager {
         outputListeners.add(messageReceiver)
     }
 
-    override fun parseInput(commandSender: CommandSender, commandName: String, arguments: List<String>): Boolean {
+    override fun executeCommand(commandSender: CommandSender, commandName: String, arguments: List<String>): Boolean {
         // Return if not a valid command
         val command = getCommand(commandName.toLowerCase()) ?: return false
 

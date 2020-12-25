@@ -59,7 +59,7 @@ class SimpleCommandManagerTest {
         }
 
         commandManager.registerCommand(command)
-        commandManager.parseInput(DUMMY_COMMAND_SENDER, inputCommandName)
+        commandManager.executeCommand(DUMMY_COMMAND_SENDER, inputCommandName)
 
         assertTrue(executed)
     }
@@ -84,8 +84,8 @@ class SimpleCommandManagerTest {
 
         commandManager.registerCommand(parentCommand)
         commandManager.registerCommand(childCommand)
-        commandManager.parseInput(DUMMY_COMMAND_SENDER, "parent", listOf("a", "b"))
-        commandManager.parseInput(DUMMY_COMMAND_SENDER, "parent child", listOf("x", "y"))
+        commandManager.executeCommand(DUMMY_COMMAND_SENDER, "parent", listOf("a", "b"))
+        commandManager.executeCommand(DUMMY_COMMAND_SENDER, "parent child", listOf("x", "y"))
 
         assertTrue(parentExecuted)
         assertTrue(childExecuted)
@@ -93,8 +93,8 @@ class SimpleCommandManagerTest {
         val commandManager2 = SimpleCommandManager()
         commandManager2.registerCommand(childCommand)
         commandManager2.registerCommand(parentCommand)
-        commandManager.parseInput(DUMMY_COMMAND_SENDER, "parent child", listOf("x", "y"))
-        commandManager.parseInput(DUMMY_COMMAND_SENDER, "parent", listOf("a", "b"))
+        commandManager.executeCommand(DUMMY_COMMAND_SENDER, "parent child", listOf("x", "y"))
+        commandManager.executeCommand(DUMMY_COMMAND_SENDER, "parent", listOf("a", "b"))
 
         assertTrue(childExecuted)
         assertTrue(parentExecuted)

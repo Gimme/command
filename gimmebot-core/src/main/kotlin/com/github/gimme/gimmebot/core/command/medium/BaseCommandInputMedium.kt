@@ -37,7 +37,7 @@ abstract class BaseCommandInputMedium : CommandInputMedium {
         val args = commandInput.split("\\s(?=(?:[^\"]*\"[^\"]*\")*[^\"]*\$)".toRegex())
             .map { s -> s.replace("\"", "") }.drop(1)
 
-        commandManager.parseInput(sender, command.name, args)
+        commandManager.executeCommand(sender, command.name, args)
     }
 
     /**
