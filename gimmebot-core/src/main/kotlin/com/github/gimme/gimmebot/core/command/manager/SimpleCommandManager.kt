@@ -1,11 +1,8 @@
 package com.github.gimme.gimmebot.core.command.manager
 
 import com.github.gimme.gimmebot.core.command.Command
-import com.github.gimme.gimmebot.core.command.CommandException
-import com.github.gimme.gimmebot.core.command.CommandResponse
 import com.github.gimme.gimmebot.core.command.CommandSender
 import com.github.gimme.gimmebot.core.command.HelpCommand
-import com.github.gimme.gimmebot.core.command.MessageReceiver
 import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandTree
 
 
@@ -15,10 +12,8 @@ import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandT
 class SimpleCommandManager : CommandManager {
 
     override val commandCollection: CommandTree = CommandTree()
-    private val outputListeners: MutableList<MessageReceiver> = mutableListOf()
 
     init {
-        addOutputListener { message -> println(message) }
         registerCommand(HelpCommand(commandCollection))
     }
 
@@ -30,24 +25,10 @@ class SimpleCommandManager : CommandManager {
         return commandCollection.getCommand(name)
     }
 
-    override fun addOutputListener(messageReceiver: MessageReceiver) {
-        outputListeners.add(messageReceiver)
-    }
-
-    override fun executeCommand(commandSender: CommandSender, commandName: String, arguments: List<String>): Boolean {
+    override fun executeCommand(commandSender: CommandSender, commandName: String, arguments: List<String>): Any? {
         // Return if not a valid command
-        val command = getCommand(commandName.toLowerCase()) ?: return false
+        val command = getCommand(commandName.toLowerCase()) ?: return false // TODO: command error: not a command
 
-        val response = try { // Execute the command
-            CommandResponse(command.execute(commandSender, arguments))
-        } catch (e: CommandException) { // The command returned with an error
-            e.response()
-        }
-
-        // Send back the response
-        response.sendTo(commandSender)
-        outputListeners.forEach { outputListener -> response.sendTo(outputListener) }
-
-        return response.error == null
+        return command.execute(commandSender, arguments)
     }
 }

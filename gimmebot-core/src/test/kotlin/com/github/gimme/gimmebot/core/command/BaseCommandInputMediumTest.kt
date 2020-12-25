@@ -1,7 +1,6 @@
 package com.github.gimme.gimmebot.core.command
 
-import com.github.gimme.gimmebot.core.command.manager.CommandManager
-import com.github.gimme.gimmebot.core.command.manager.SimpleCommandManager
+import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandTree
 import com.github.gimme.gimmebot.core.command.medium.BaseCommandInputMedium
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.params.ParameterizedTest
@@ -13,7 +12,7 @@ class BaseCommandInputMediumTest {
     @ParameterizedTest
     @MethodSource("args")
     fun `should pass arguments`(input: String, expectedArgs: List<String>) {
-        val commandManager: CommandManager = SimpleCommandManager()
+        val commands = CommandTree()
 
         var actualArgs: List<String>? = null
 
@@ -23,9 +22,9 @@ class BaseCommandInputMediumTest {
             }
         }
 
-        commandManager.registerCommand(command)
+        commands.addCommand(command)
 
-        val commandInputMedium = object : BaseCommandInputMedium() {
+        val commandInputMedium = object : BaseCommandInputMedium(commands) {
             override val commandPrefix: String?
                 get() = null
 
@@ -33,7 +32,7 @@ class BaseCommandInputMediumTest {
                 send(DUMMY_COMMAND_SENDER, input)
             }
         }
-        commandInputMedium.install(commandManager)
+        commandInputMedium.install()
 
         Assertions.assertNotNull(actualArgs)
         Assertions.assertIterableEquals(expectedArgs, actualArgs)

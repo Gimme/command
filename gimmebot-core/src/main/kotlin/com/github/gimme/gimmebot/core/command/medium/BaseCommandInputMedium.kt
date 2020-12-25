@@ -1,20 +1,29 @@
 package com.github.gimme.gimmebot.core.command.medium
 
+import com.github.gimme.gimmebot.core.command.CommandException
 import com.github.gimme.gimmebot.core.command.CommandSender
-import com.github.gimme.gimmebot.core.command.manager.CommandManager
+import com.github.gimme.gimmebot.core.command.MessageReceiver
+import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandCollection
 
 /**
  * Represents a command input medium with base functionality.
  *
  * @property commandPrefix prefix required for the input to be recognized as a command
  */
-abstract class BaseCommandInputMedium : CommandInputMedium {
+abstract class BaseCommandInputMedium(override var commandCollection: CommandCollection) : CommandInputMedium {
 
     protected abstract val commandPrefix: String?
-    private lateinit var commandManager: CommandManager
+    private val ioListeners: MutableList<MessageReceiver> = mutableListOf()
 
-    override fun install(commandManager: CommandManager) {
-        this.commandManager = commandManager
+    init {
+        addIOListener { message -> println(message) }
+    }
+
+    final override fun addIOListener(messageReceiver: MessageReceiver) {
+        ioListeners.add(messageReceiver)
+    }
+
+    override fun install() {
         onInstall()
     }
 
@@ -25,11 +34,11 @@ abstract class BaseCommandInputMedium : CommandInputMedium {
     protected fun send(sender: CommandSender, input: String) {
         var commandInput = validatePrefix(input) ?: return
 
-        //TODO outputListeners.forEach { it.sendMessage("${commandSender.name}: $input") }
+        ioListeners.forEach { it.sendMessage("${sender.name}: $input") }
 
         // Return if not a valid command
-        val command = commandManager.commandCollection.findCommand(commandInput.split(" "))
-            ?: return // TODO: should return error message
+        val command = commandCollection.findCommand(commandInput.split(" "))
+            ?: return // TODO: command error: not a command
         // Remove command name, leaving only the arguments
         commandInput = commandInput.removePrefix(command.name)
 
@@ -37,7 +46,15 @@ abstract class BaseCommandInputMedium : CommandInputMedium {
         val args = commandInput.split("\\s(?=(?:[^\"]*\"[^\"]*\")*[^\"]*\$)".toRegex())
             .map { s -> s.replace("\"", "") }.drop(1)
 
-        commandManager.executeCommand(sender, command.name, args)
+        val message = try { // Execute the command
+            command.execute(sender, args)?.toString() ?: ""
+        } catch (e: CommandException) { // The command returned with an error
+            e.message
+        }
+
+        // Send back the response
+        sender.sendMessage(message)
+        ioListeners.forEach { it.sendMessage(message) }
     }
 
     /**

@@ -36,10 +36,7 @@ class CommandTree : CommandCollection {
         return list
     }
 
-    /**
-     * Returns the command that best matches the start of the given [path], or null if no match.
-     */
-    fun findCommand(path: List<String>): Command<*>? {
+    override fun findCommand(path: List<String>): Command<*>? {
         var lastFoundCommand: Command<*>? = null
 
         var currentNode = root

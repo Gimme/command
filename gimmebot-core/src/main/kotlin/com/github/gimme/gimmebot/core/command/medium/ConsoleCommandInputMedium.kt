@@ -1,6 +1,7 @@
 package com.github.gimme.gimmebot.core.command.medium
 
 import com.github.gimme.gimmebot.core.command.CommandSender
+import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandCollection
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.Scanner
@@ -8,7 +9,7 @@ import java.util.Scanner
 /**
  * Accepts input from the main console.
  */
-class ConsoleCommandInputMedium : BaseCommandInputMedium() {
+class ConsoleCommandInputMedium(commandCollection: CommandCollection) : BaseCommandInputMedium(commandCollection) {
 
     override val commandPrefix: String?
         get() = null
