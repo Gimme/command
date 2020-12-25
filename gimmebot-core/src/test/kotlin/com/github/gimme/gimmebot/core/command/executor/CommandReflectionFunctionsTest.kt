@@ -10,7 +10,7 @@ class CommandReflectionFunctionsTest {
 
     @Test
     fun `should get first command executor function`() {
-        val commandExecutorFunction = object : BaseCommand<String>("") {
+        val commandExecutorFunction = object : BaseCommand<String>("c") {
             fun c1(): String {
                 return ""
             }
@@ -32,7 +32,7 @@ class CommandReflectionFunctionsTest {
     @Test
     fun `getting non-existing command executor should throw exception`() {
         assertThrows<IllegalStateException> {
-            object : BaseCommand<String>("") {
+            object : BaseCommand<String>("c") {
                 fun c(): String {
                     return ""
                 }
@@ -42,7 +42,7 @@ class CommandReflectionFunctionsTest {
 
     @Test
     fun `should execute command`() {
-        val command = object : BaseCommand<String>("") {
+        val command = object : BaseCommand<String>("c") {
             @CommandExecutor
             fun c(): String {
                 return "abc"
@@ -54,7 +54,7 @@ class CommandReflectionFunctionsTest {
 
     @Test
     fun `executing command with wrong return type should throw exception`() {
-        val command = object : BaseCommand<String>("") {
+        val command = object : BaseCommand<String>("c") {
             @CommandExecutor
             fun c(): Int {
                 return 1

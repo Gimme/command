@@ -6,6 +6,7 @@ import com.github.gimme.gimmebot.core.command.Command
  * Represents a collection of commands.
  */
 interface CommandCollection {
+
     /** Adds the given [command] to this collection. */
     fun addCommand(command: Command<*>)
 

@@ -7,10 +7,11 @@ import com.github.gimme.gimmebot.core.command.Command
  */
 class CommandTree : CommandCollection {
 
+    private val delimiter = "."
     private val root: Node = Node("", null)
 
     override fun addCommand(command: Command<*>) {
-        val words = command.name.split(" ")
+        val words = command.name.split(delimiter)
 
         var currentNode = root
         for (word in words) {
@@ -20,10 +21,9 @@ class CommandTree : CommandCollection {
     }
 
     override fun getCommand(name: String): Command<*>? {
-        String::class.java.canonicalName
         var currentNode = root
 
-        for (word in name.split(" ")) {
+        for (word in name.split(delimiter)) {
             currentNode = currentNode.children[word] ?: return null
         }
 
@@ -37,15 +37,13 @@ class CommandTree : CommandCollection {
     }
 
     /**
-     * Returns the command that best matches the start of the given [input], or null if no match.
+     * Returns the command that best matches the start of the given [path], or null if no match.
      */
-    fun findCommand(input: String): Command<*>? {
-        val words = input.split(" ")
-
+    fun findCommand(path: List<String>): Command<*>? {
         var lastFoundCommand: Command<*>? = null
 
         var currentNode = root
-        for (word in words) {
+        for (word in path) {
             currentNode = currentNode.children[word] ?: break
             lastFoundCommand = currentNode.command
         }

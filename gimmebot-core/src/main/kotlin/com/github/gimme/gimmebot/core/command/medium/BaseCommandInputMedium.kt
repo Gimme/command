@@ -28,7 +28,8 @@ abstract class BaseCommandInputMedium : CommandInputMedium {
         //TODO outputListeners.forEach { it.sendMessage("${commandSender.name}: $input") }
 
         // Return if not a valid command
-        val command = commandManager.getCommand(commandInput) ?: return // TODO: should return error message
+        val command = commandManager.commandCollection.findCommand(commandInput.split(" "))
+            ?: return // TODO: should return error message
         // Remove command name, leaving only the arguments
         commandInput = commandInput.removePrefix(command.name)
 

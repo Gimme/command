@@ -3,7 +3,7 @@ package com.github.gimme.gimmebot.core.command.manager
 import com.github.gimme.gimmebot.core.command.Command
 import com.github.gimme.gimmebot.core.command.CommandSender
 import com.github.gimme.gimmebot.core.command.MessageReceiver
-import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandCollection
+import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandTree
 import com.github.gimme.gimmebot.core.command.medium.CommandInputMedium
 
 /**
@@ -11,14 +11,14 @@ import com.github.gimme.gimmebot.core.command.medium.CommandInputMedium
  */
 interface CommandManager {
 
+    /** The mutable collection of all registered commands. */
+    val commandCollection: CommandTree
+
     /** Registers the given [command] to be executable by this command manager. */
     fun registerCommand(command: Command<*>)
 
     /** Returns the command with the specified [name] if it has been registered. */
     fun getCommand(name: String): Command<*>?
-
-    /** Returns the mutable collection of all registered commands. */
-    fun getCommandCollection(): CommandCollection
 
     /** Adds the given [messageReceiver] to be sent all command output. */
     fun addOutputListener(messageReceiver: MessageReceiver)

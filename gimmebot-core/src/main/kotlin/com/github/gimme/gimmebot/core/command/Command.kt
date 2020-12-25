@@ -4,7 +4,7 @@ package com.github.gimme.gimmebot.core.command
  * Represents an executable command.
  *
  * @param T the response type
- * @property name the name of this command. Used as the main identifier. Can be multiple words.
+ * @property name the name of this command. Used as the main identifier.
  * @property usage information of how to use the command
  */
 interface Command<out T> {

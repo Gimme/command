@@ -6,7 +6,6 @@ import com.github.gimme.gimmebot.core.command.CommandResponse
 import com.github.gimme.gimmebot.core.command.CommandSender
 import com.github.gimme.gimmebot.core.command.HelpCommand
 import com.github.gimme.gimmebot.core.command.MessageReceiver
-import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandCollection
 import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandTree
 
 
@@ -15,7 +14,7 @@ import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandT
  */
 class SimpleCommandManager : CommandManager {
 
-    private val commandCollection: CommandCollection = CommandTree()
+    override val commandCollection: CommandTree = CommandTree()
     private val outputListeners: MutableList<MessageReceiver> = mutableListOf()
 
     init {
@@ -29,10 +28,6 @@ class SimpleCommandManager : CommandManager {
 
     override fun getCommand(name: String): Command<*>? {
         return commandCollection.getCommand(name)
-    }
-
-    override fun getCommandCollection(): CommandCollection {
-        return commandCollection
     }
 
     override fun addOutputListener(messageReceiver: MessageReceiver) {
