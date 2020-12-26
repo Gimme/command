@@ -2,6 +2,7 @@ package com.github.gimme.gimmebot.core.command.medium
 
 import com.github.gimme.gimmebot.core.command.CommandException
 import com.github.gimme.gimmebot.core.command.CommandSender
+import com.github.gimme.gimmebot.core.command.ErrorCode
 import com.github.gimme.gimmebot.core.command.MessageReceiver
 import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandCollection
 
@@ -45,7 +46,7 @@ abstract class BaseCommandInputMedium(override var commandCollection: CommandCol
 
         // Return if not a valid command
         val command = commandCollection.findCommand(commandInput.split(" "))
-            ?: return null // TODO: command error: not a command
+            ?: return ErrorCode.NOT_A_COMMAND.message
         // Remove command name, leaving only the arguments
         commandInput = commandInput.removePrefix(command.name)
 

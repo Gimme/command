@@ -7,6 +7,9 @@ package com.github.gimme.gimmebot.core.command
  */
 enum class ErrorCode(val message: String) {
 
+    /** The fetched command does not exist */
+    NOT_A_COMMAND("Not a command"),
+
     /** An argument has the wrong format. */
     INVALID_ARGUMENT("Invalid argument"),
 
