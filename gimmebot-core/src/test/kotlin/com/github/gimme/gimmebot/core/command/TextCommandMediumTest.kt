@@ -1,13 +1,13 @@
 package com.github.gimme.gimmebot.core.command
 
 import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandTree
-import com.github.gimme.gimmebot.core.command.medium.BaseCommandInputMedium
+import com.github.gimme.gimmebot.core.command.medium.TextCommandMedium
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 
-class BaseCommandInputMediumTest {
+class TextCommandMediumTest {
 
     @ParameterizedTest
     @MethodSource("args")
@@ -24,7 +24,7 @@ class BaseCommandInputMediumTest {
 
         commands.addCommand(command)
 
-        val commandInputMedium = object : BaseCommandInputMedium(commands) {
+        val commandInputMedium = object : TextCommandMedium(commands) {
             override val commandPrefix: String?
                 get() = null
 

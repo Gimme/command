@@ -8,7 +8,7 @@ import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandC
  *
  * For example a chat box or a command line interface.
  */
-interface CommandInputMedium {
+interface CommandMedium {
 
     /** The collection of commands that this medium handles. */
     var commandCollection: CommandCollection

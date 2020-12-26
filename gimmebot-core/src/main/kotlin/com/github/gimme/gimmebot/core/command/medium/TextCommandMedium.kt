@@ -11,7 +11,7 @@ import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandC
  *
  * @property commandPrefix prefix required for the input to be recognized as a command
  */
-abstract class BaseCommandInputMedium(override var commandCollection: CommandCollection) : CommandInputMedium {
+abstract class TextCommandMedium(override var commandCollection: CommandCollection) : CommandMedium {
 
     protected abstract val commandPrefix: String?
     private val ioListeners: MutableList<MessageReceiver> = mutableListOf()
