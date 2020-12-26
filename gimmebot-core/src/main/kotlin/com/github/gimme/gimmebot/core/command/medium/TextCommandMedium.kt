@@ -55,7 +55,7 @@ abstract class TextCommandMedium(commandCollection: CommandCollection) : BaseCom
     }
 
     private fun respond(sender: CommandSender, message: String?) {
-        if (message == null) return
+        if (message.isNullOrEmpty()) return
 
         sender.sendMessage(message)
         ioListeners.forEach { it.sendMessage(message) }
