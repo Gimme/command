@@ -8,7 +8,7 @@ import com.github.gimme.gimmebot.core.command.Command
 interface CommandCollection {
 
     /** Adds the given [command] to this collection. */
-    fun addCommand(command: Command<*>)
+    fun <T> addCommand(command: Command<T>, responseParser: (T) -> Any? = { it.toString() })
 
     /**
      * Returns the command from this collection with the specified [name], or null if no command with that name is

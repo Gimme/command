@@ -10,14 +10,14 @@ class CommandTree : CommandCollection {
     private val delimiter = "."
     private val root: Node = Node("", null)
 
-    override fun addCommand(command: Command<*>) {
+    override fun <T> addCommand(command: Command<T>, responseParser: (T) -> Any?) {
         val words = command.name.split(delimiter)
 
         var currentNode = root
         for (word in words) {
             currentNode = currentNode.children.computeIfAbsent(word) { k -> Node(k, null) }
         }
-        currentNode.command = command
+        currentNode.data = Data(command, responseParser)
     }
 
     override fun getCommand(name: String): Command<*>? {
@@ -27,7 +27,7 @@ class CommandTree : CommandCollection {
             currentNode = currentNode.children[word] ?: return null
         }
 
-        return currentNode.command
+        return currentNode.data?.command
     }
 
     override fun getCommands(): List<Command<*>> {
@@ -42,20 +42,25 @@ class CommandTree : CommandCollection {
         var currentNode = root
         for (word in path) {
             currentNode = currentNode.children[word] ?: break
-            lastFoundCommand = currentNode.command
+            lastFoundCommand = currentNode.data?.command
         }
         return lastFoundCommand
     }
 
     private data class Node(
         val name: String,
-        var command: Command<*>?,
+        var data: Data<*>?,
     ) {
         val children: MutableMap<String, Node> = mutableMapOf()
 
         fun fetchCommands(list: MutableList<Command<*>>) {
-            command?.let { list.add(it) }
+            data?.let { list.add(it.command) }
             children.values.forEach { child -> child.fetchCommands(list) }
         }
     }
+
+    private data class Data<T>(
+        val command: Command<T>,
+        val responseParser: (T) -> Any?
+    )
 }
