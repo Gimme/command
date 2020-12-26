@@ -26,7 +26,7 @@ class ChannelCommandInputMedium(private val jda: JDA, private val config: Discor
                 val user = event.author
                 val message = event.message.contentRaw
 
-                send(ChannelCommandSender(channel, user), message)
+                parseInput(ChannelCommandSender(channel, user), message)
             }
         })
     }

@@ -23,6 +23,6 @@ class ConsoleCommandInputMedium(commandCollection: CommandCollection) : BaseComm
             override fun sendMessage(message: String) {}
         }
 
-        GlobalScope.launch { while (true) send(consoleSender, sc.nextLine()) }
+        GlobalScope.launch { while (true) parseInput(consoleSender, sc.nextLine()) }
     }
 }

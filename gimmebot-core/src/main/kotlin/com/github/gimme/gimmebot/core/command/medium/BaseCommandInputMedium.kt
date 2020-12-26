@@ -31,14 +31,21 @@ abstract class BaseCommandInputMedium(override var commandCollection: CommandCol
     protected abstract fun onInstall()
 
     /** Sends the specified command [input] as the given [sender]. */
-    protected fun send(sender: CommandSender, input: String) {
-        var commandInput = validatePrefix(input) ?: return
+    protected fun parseInput(sender: CommandSender, input: String) {
+        val message = send(sender, input)
+
+        // Send back the response
+        respond(sender, message)
+    }
+
+    private fun send(sender: CommandSender, input: String): String? {
+        var commandInput = validatePrefix(input) ?: return null
 
         ioListeners.forEach { it.sendMessage("${sender.name}: $input") }
 
         // Return if not a valid command
         val command = commandCollection.findCommand(commandInput.split(" "))
-            ?: return // TODO: command error: not a command
+            ?: return null // TODO: command error: not a command
         // Remove command name, leaving only the arguments
         commandInput = commandInput.removePrefix(command.name)
 
@@ -46,14 +53,11 @@ abstract class BaseCommandInputMedium(override var commandCollection: CommandCol
         val args = commandInput.split("\\s(?=(?:[^\"]*\"[^\"]*\")*[^\"]*\$)".toRegex())
             .map { s -> s.replace("\"", "") }.drop(1)
 
-        val message = try { // Execute the command
+        return try { // Execute the command
             command.execute(sender, args)?.toString()
         } catch (e: CommandException) { // The command returned with an error
             e.message
         }
-
-        // Send back the response
-        respond(sender, message)
     }
 
     private fun respond(sender: CommandSender, message: String?) {

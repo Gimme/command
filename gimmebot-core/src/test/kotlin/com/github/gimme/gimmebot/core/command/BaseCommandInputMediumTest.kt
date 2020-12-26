@@ -29,7 +29,7 @@ class BaseCommandInputMediumTest {
                 get() = null
 
             override fun onInstall() {
-                send(DUMMY_COMMAND_SENDER, input)
+                parseInput(DUMMY_COMMAND_SENDER, input)
             }
         }
         commandInputMedium.install()
