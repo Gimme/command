@@ -10,7 +10,7 @@ import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandT
 interface CommandManager {
 
     /** The mutable collection of all registered commands. */
-    val commandCollection: CommandTree
+    val commandCollection: CommandTree<*>
 
     /** Registers the given [command] to be executable by this command manager. */
     fun registerCommand(command: Command<*>)

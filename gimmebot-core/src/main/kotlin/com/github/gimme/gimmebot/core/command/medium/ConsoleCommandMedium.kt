@@ -9,7 +9,7 @@ import java.util.Scanner
 /**
  * Accepts input from the main console.
  */
-class ConsoleCommandMedium(commandCollection: CommandCollection) : TextCommandMedium(commandCollection) {
+class ConsoleCommandMedium(commandCollection: CommandCollection<String?>) : TextCommandMedium(commandCollection) {
 
     override val commandPrefix: String?
         get() = null

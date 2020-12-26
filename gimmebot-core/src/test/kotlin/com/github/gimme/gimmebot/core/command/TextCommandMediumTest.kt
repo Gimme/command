@@ -12,7 +12,7 @@ class TextCommandMediumTest {
     @ParameterizedTest
     @MethodSource("args")
     fun `should pass arguments`(input: String, expectedArgs: List<String>) {
-        val commands = CommandTree()
+        val commands = CommandTree<String?>()
 
         var actualArgs: List<String>? = null
 

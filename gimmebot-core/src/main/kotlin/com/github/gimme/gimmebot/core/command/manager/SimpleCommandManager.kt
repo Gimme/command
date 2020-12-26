@@ -11,7 +11,7 @@ import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandT
  */
 class SimpleCommandManager : CommandManager {
 
-    override val commandCollection: CommandTree = CommandTree()
+    override val commandCollection: CommandTree<Any?> = CommandTree()
 
     init {
         registerCommand(HelpCommand(commandCollection))
@@ -22,7 +22,7 @@ class SimpleCommandManager : CommandManager {
     }
 
     override fun getCommand(name: String): Command<*>? {
-        return commandCollection.getCommand(name)
+        return commandCollection.getCommand(name)?.command
     }
 
     override fun executeCommand(commandSender: CommandSender, commandName: String, arguments: List<String>): Any? {

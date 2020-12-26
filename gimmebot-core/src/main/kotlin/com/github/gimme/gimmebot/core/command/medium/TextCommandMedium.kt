@@ -11,7 +11,7 @@ import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandC
  *
  * @property commandPrefix prefix required for the input to be recognized as a command
  */
-abstract class TextCommandMedium(commandCollection: CommandCollection) : BaseCommandMedium(commandCollection) {
+abstract class TextCommandMedium(commandCollection: CommandCollection<String?>) : BaseCommandMedium<String?>(commandCollection) {
 
     protected abstract val commandPrefix: String?
     private val ioListeners: MutableList<MessageReceiver> = mutableListOf()
@@ -38,17 +38,17 @@ abstract class TextCommandMedium(commandCollection: CommandCollection) : BaseCom
         ioListeners.forEach { it.sendMessage("${sender.name}: $input") }
 
         // Return if not a valid command
-        val command = commandCollection.findCommand(commandInput.split(" "))
+        val commandNode = commandCollection.findCommand(commandInput.split(" "))
             ?: return ErrorCode.NOT_A_COMMAND.message
         // Remove command name, leaving only the arguments
-        commandInput = commandInput.removePrefix(command.name)
+        commandInput = commandInput.removePrefix(commandNode.command.name)
 
         // Split into words on spaces, ignoring spaces between two quotation marks
         val args = commandInput.split("\\s(?=(?:[^\"]*\"[^\"]*\")*[^\"]*\$)".toRegex())
             .map { s -> s.replace("\"", "") }.drop(1)
 
         return try { // Execute the command
-            command.execute(sender, args)?.toString()
+            commandNode.execute(sender, args) { it?.toString() }
         } catch (e: CommandException) { // The command returned with an error
             e.message
         }

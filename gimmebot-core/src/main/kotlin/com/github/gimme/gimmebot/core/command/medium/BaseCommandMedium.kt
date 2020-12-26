@@ -4,8 +4,10 @@ import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandC
 
 /**
  * Represents a command input medium with base functionality.
+ *
+ * @param R the response type
  */
-abstract class BaseCommandMedium(override var commandCollection: CommandCollection) : CommandMedium {
+abstract class BaseCommandMedium<R>(override var commandCollection: CommandCollection<R>) : CommandMedium<R> {
 
     override fun install() {
         onInstall()
