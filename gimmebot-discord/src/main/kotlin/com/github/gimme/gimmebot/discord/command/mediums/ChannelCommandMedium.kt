@@ -22,11 +22,10 @@ class ChannelCommandMedium(private val jda: JDA, private val config: DiscordConf
     override fun onInstall() {
         jda.addEventListener(object : ListenerAdapter() {
             override fun onMessageReceived(event: MessageReceivedEvent) {
-                val channel = event.channel
-                val user = event.author
+                val sender = ChannelCommandSender(event.channel, event.author)
                 val message = event.message.contentRaw
 
-                parseInput(ChannelCommandSender(channel, user), message)
+                parseInput(sender, message)
             }
         })
     }
