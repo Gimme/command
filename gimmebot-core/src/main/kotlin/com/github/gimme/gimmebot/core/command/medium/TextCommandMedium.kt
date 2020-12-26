@@ -7,11 +7,11 @@ import com.github.gimme.gimmebot.core.command.MessageReceiver
 import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandCollection
 
 /**
- * Represents a command input medium with base functionality.
+ * Represents a text-based command medium with, for example a chat box or a command line interface.
  *
  * @property commandPrefix prefix required for the input to be recognized as a command
  */
-abstract class TextCommandMedium(override var commandCollection: CommandCollection) : CommandMedium {
+abstract class TextCommandMedium(commandCollection: CommandCollection) : BaseCommandMedium(commandCollection) {
 
     protected abstract val commandPrefix: String?
     private val ioListeners: MutableList<MessageReceiver> = mutableListOf()
@@ -23,13 +23,6 @@ abstract class TextCommandMedium(override var commandCollection: CommandCollecti
     final override fun addIOListener(messageReceiver: MessageReceiver) {
         ioListeners.add(messageReceiver)
     }
-
-    override fun install() {
-        onInstall()
-    }
-
-    /** Performs logic when installed. */
-    protected abstract fun onInstall()
 
     /** Sends the specified command [input] as the given [sender]. */
     protected fun parseInput(sender: CommandSender, input: String) {

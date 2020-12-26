@@ -5,8 +5,6 @@ import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandC
 
 /**
  * Represents a medium through which commands can be sent.
- *
- * For example a chat box or a command line interface.
  */
 interface CommandMedium {
 
