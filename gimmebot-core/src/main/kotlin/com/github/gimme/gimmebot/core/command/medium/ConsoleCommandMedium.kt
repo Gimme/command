@@ -16,13 +16,22 @@ class ConsoleCommandMedium(commandManager: CommandManager<String?>) : TextComman
 
     override fun onInstall() {
         val sc = Scanner(System.`in`)
-        val consoleSender: CommandSender = object : CommandSender {
-            override val name: String
-                get() = "#"
+        val sender = ConsoleCommandSender
 
-            override fun sendMessage(message: String) {}
+        GlobalScope.launch {
+            while (true) {
+                val message = sc.nextLine()
+
+                parseInput(sender, message)
+            }
         }
+    }
 
-        GlobalScope.launch { while (true) parseInput(consoleSender, sc.nextLine()) }
+    private object ConsoleCommandSender : CommandSender {
+
+        override val name: String
+            get() = "#"
+
+        override fun sendMessage(message: String) {}
     }
 }
