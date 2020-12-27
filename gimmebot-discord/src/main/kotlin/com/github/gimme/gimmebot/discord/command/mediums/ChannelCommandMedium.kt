@@ -18,11 +18,15 @@ class ChannelCommandMedium(
     includeConsoleListener: Boolean = true,
 ) : TextCommandMedium(commandManager, includeConsoleListener) {
 
-    override val commandPrefix: String
+    override var commandPrefix: String?
         get() {
             val prefix = config.prefix
             if (prefix.isEmpty()) throw IllegalStateException("No command prefix defined in the Discord config")
             return prefix
+        }
+        set(value) {
+            requireNotNull(value)
+            config.prefix = value
         }
 
     override fun onInstall() {

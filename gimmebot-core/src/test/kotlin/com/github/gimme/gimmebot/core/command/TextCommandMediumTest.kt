@@ -25,9 +25,6 @@ class TextCommandMediumTest {
         commandManager.registerCommand(command)
 
         val commandInputMedium = object : TextCommandMedium(commandManager) {
-            override val commandPrefix: String?
-                get() = null
-
             override fun onInstall() {
                 parseInput(DUMMY_COMMAND_SENDER, input)
             }
