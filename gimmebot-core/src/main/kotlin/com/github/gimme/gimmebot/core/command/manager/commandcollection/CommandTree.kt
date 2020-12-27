@@ -4,60 +4,58 @@ import com.github.gimme.gimmebot.core.command.Command
 
 /**
  * Represents a tree structure of commands.
- *
- * @param R the response type
  */
-class CommandTree<R> : CommandCollection<R> {
+class CommandTree : CommandCollection {
 
     private val delimiter = "."
-    private val root: Node<R> = Node("", null)
+    private val root: Node<Command<*>> = Node("", null)
 
-    override fun <T> addCommand(command: Command<T>, responseParser: ((T) -> R)?) {
-        val words = command.name.split(delimiter)
+    override fun addCommand(command: Command<*>) {
+        val words = command.group.split(delimiter)
 
         var currentNode = root
         for (word in words) {
             currentNode = currentNode.children.computeIfAbsent(word) { k -> Node(k, null) }
         }
-        currentNode.commandNode = CommandCollection.CommandNode(command, responseParser)
+        currentNode.data = command
     }
 
-    override fun getCommand(name: String): CommandCollection.CommandNode<*, R>? {
+    override fun getCommand(name: String): Command<*>? {
         var currentNode = root
 
         for (word in name.split(delimiter)) {
             currentNode = currentNode.children[word] ?: return null
         }
 
-        return currentNode.commandNode
+        return currentNode.data
     }
 
     override fun getCommands(): List<Command<*>> {
         val list = mutableListOf<Command<*>>()
-        root.fetchCommands(list)
+        root.fetchAllData(list)
         return list
     }
 
-    override fun findCommand(path: List<String>): CommandCollection.CommandNode<*, R>? {
-        var lastFound: CommandCollection.CommandNode<*, R>? = null
+    override fun findCommand(path: List<String>): Command<*>? {
+        var lastFound: Command<*>? = null
 
         var currentNode = root
         for (word in path) {
             currentNode = currentNode.children[word] ?: break
-            lastFound = currentNode.commandNode
+            lastFound = currentNode.data
         }
         return lastFound
     }
 
-    private data class Node<R>(
+    private data class Node<T>(
         val name: String,
-        var commandNode: CommandCollection.CommandNode<*, R>?,
+        var data: T?,
     ) {
-        val children: MutableMap<String, Node<R>> = mutableMapOf()
+        val children: MutableMap<String, Node<T>> = mutableMapOf()
 
-        fun fetchCommands(list: MutableList<Command<*>>) {
-            commandNode?.let { list.add(it.command) }
-            children.values.forEach { child -> child.fetchCommands(list) }
+        fun fetchAllData(list: MutableList<T>) {
+            data?.let { list.add(it) }
+            children.values.forEach { child -> child.fetchAllData(list) }
         }
     }
 }

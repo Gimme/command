@@ -1,6 +1,6 @@
 package com.github.gimme.gimmebot.core.command
 
-import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandTree
+import com.github.gimme.gimmebot.core.command.manager.TextCommandManager
 import com.github.gimme.gimmebot.core.command.medium.TextCommandMedium
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.params.ParameterizedTest
@@ -12,7 +12,7 @@ class TextCommandMediumTest {
     @ParameterizedTest
     @MethodSource("args")
     fun `should pass arguments`(input: String, expectedArgs: List<String>) {
-        val commands = CommandTree<String?>()
+        val commandManager = TextCommandManager()
 
         var actualArgs: List<String>? = null
 
@@ -22,9 +22,9 @@ class TextCommandMediumTest {
             }
         }
 
-        commands.addCommand(command)
+        commandManager.registerCommand(command)
 
-        val commandInputMedium = object : TextCommandMedium(commands) {
+        val commandInputMedium = object : TextCommandMedium(commandManager) {
             override val commandPrefix: String?
                 get() = null
 

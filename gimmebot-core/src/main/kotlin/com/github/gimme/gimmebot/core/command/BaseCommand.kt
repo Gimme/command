@@ -39,10 +39,22 @@ abstract class BaseCommand<out T>(name: String, parent: String? = null) : Comman
         this.name = (parent?.let { "$parent." } ?: "") + name.toLowerCase()
     }
 
-    constructor(name: String, parent: Command<T>) : this(name, parent.name)
+    protected constructor(name: String, parent: Command<T>) : this(name, parent.name)
 
     override fun execute(commandSender: CommandSender, args: List<String>): T {
         return tryExecuteCommandByReflection(this, commandSender, args)
+    }
+
+    override fun hashCode(): Int = group.hashCode()
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as BaseCommand<*>
+
+        if (name != other.name) return false
+
+        return true
     }
 }
 

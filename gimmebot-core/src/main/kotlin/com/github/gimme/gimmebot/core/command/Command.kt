@@ -7,7 +7,7 @@ package com.github.gimme.gimmebot.core.command
  * @property name the name of this command. Used as the main identifier.
  * @property usage information of how to use the command
  */
-interface Command<out T> {
+interface Command<out T>: Grouped {
     val name: String
     val usage: String
 
@@ -18,4 +18,7 @@ interface Command<out T> {
      */
     @Throws(CommandException::class)
     fun execute(commandSender: CommandSender, args: List<String>): T
+
+    override val group: String
+        get() = name
 }

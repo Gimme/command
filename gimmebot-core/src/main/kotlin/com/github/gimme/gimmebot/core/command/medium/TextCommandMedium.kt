@@ -4,14 +4,14 @@ import com.github.gimme.gimmebot.core.command.CommandException
 import com.github.gimme.gimmebot.core.command.CommandSender
 import com.github.gimme.gimmebot.core.command.ErrorCode
 import com.github.gimme.gimmebot.core.command.MessageReceiver
-import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandCollection
+import com.github.gimme.gimmebot.core.command.manager.CommandManager
 
 /**
  * Represents a text-based command medium with, for example a chat box or a command line interface.
  *
  * @property commandPrefix prefix required for the input to be recognized as a command
  */
-abstract class TextCommandMedium(commandCollection: CommandCollection<String?>) : BaseCommandMedium<String?>(commandCollection) {
+abstract class TextCommandMedium(commandManager: CommandManager<String?>) : BaseCommandMedium<String?>(commandManager) {
 
     protected abstract val commandPrefix: String?
     private val ioListeners: MutableList<MessageReceiver> = mutableListOf()
@@ -33,25 +33,29 @@ abstract class TextCommandMedium(commandCollection: CommandCollection<String?>) 
     }
 
     private fun send(sender: CommandSender, input: String): String? {
-        var commandInput = validatePrefix(input) ?: return null
+        val commandInput = validatePrefix(input) ?: return null
 
         ioListeners.forEach { it.sendMessage("${sender.name}: $input") }
 
-        // Return if not a valid command
-        val commandNode = commandCollection.findCommand(commandInput.split(" "))
-            ?: return ErrorCode.NOT_A_COMMAND.message
-        // Remove command name, leaving only the arguments
-        commandInput = commandInput.removePrefix(commandNode.command.name)
-
-        // Split into words on spaces, ignoring spaces between two quotation marks
-        val args = commandInput.split("\\s(?=(?:[^\"]*\"[^\"]*\")*[^\"]*\$)".toRegex())
-            .map { s -> s.replace("\"", "") }.drop(1)
-
         return try { // Execute the command
-            commandNode.execute(sender, args) { it?.toString() }
+            executeCommand(sender, commandInput)
         } catch (e: CommandException) { // The command returned with an error
             e.message
         }
+    }
+
+    @Throws(CommandException::class)
+    private fun executeCommand(commandSender: CommandSender, input: String): String? {
+        val command = commandManager.commandCollection.findCommand(input.split(" ")) ?: throw ErrorCode.NOT_A_COMMAND.createException()
+
+        // Remove command name, leaving only the arguments
+        val argsInput = input.removePrefix(command.name)
+
+        // Split into words on spaces, ignoring spaces between two quotation marks
+        val args = argsInput.split("\\s(?=(?:[^\"]*\"[^\"]*\")*[^\"]*\$)".toRegex())
+            .map { s -> s.replace("\"", "") }.drop(1)
+
+        return commandManager.executeCommand(commandSender, command.name, args)
     }
 
     private fun respond(sender: CommandSender, message: String?) {

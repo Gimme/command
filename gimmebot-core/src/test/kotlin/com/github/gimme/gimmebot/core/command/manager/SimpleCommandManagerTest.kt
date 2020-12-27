@@ -16,7 +16,7 @@ import org.junit.jupiter.params.provider.CsvSource
 
 class SimpleCommandManagerTest {
 
-    private val commandManager: CommandManager = SimpleCommandManager()
+    private val commandManager: CommandManager<Any?> = SimpleCommandManager { it }
 
     @Test
     fun `should have a help command by default`() {
@@ -90,7 +90,7 @@ class SimpleCommandManagerTest {
         assertTrue(parentExecuted)
         assertTrue(childExecuted)
 
-        val commandManager2 = SimpleCommandManager()
+        val commandManager2 = SimpleCommandManager { it }
         commandManager2.registerCommand(childCommand)
         commandManager2.registerCommand(parentCommand)
         commandManager.executeCommand(DUMMY_COMMAND_SENDER, "parent child", listOf("x", "y"))

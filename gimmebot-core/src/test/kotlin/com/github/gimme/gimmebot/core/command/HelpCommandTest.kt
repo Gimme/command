@@ -9,7 +9,7 @@ class HelpCommandTest {
 
     @Test
     fun `should return list of commands`() {
-        val commandCollection = CommandTree<Any?>()
+        val commandCollection = CommandTree()
 
         commandCollection.addCommand(DummyCommand("one"))
         commandCollection.addCommand(DummyCommand("two"))

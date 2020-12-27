@@ -7,7 +7,7 @@ import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandC
  * Displays a list of available commands.
  */
 class HelpCommand(
-    private val commandCollection: CommandCollection<*>,
+    private val commandCollection: CommandCollection,
 ) : BaseCommand<String>("help") {
 
     /** Prints available commands. */

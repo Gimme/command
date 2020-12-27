@@ -1,6 +1,6 @@
 package com.github.gimme.gimmebot.core
 
-import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandTree
+import com.github.gimme.gimmebot.core.command.manager.TextCommandManager
 import com.github.gimme.gimmebot.core.command.medium.ConsoleCommandMedium
 import com.github.gimme.gimmebot.core.data.DataManager
 import com.github.gimme.gimmebot.core.data.config.BotConfig
@@ -38,7 +38,7 @@ open class GimmeBot : Bot {
         dataManager = DataManager(File(name))
 
         // This starts a new thread and keeps the bot running
-        ConsoleCommandMedium(CommandTree()).install()
+        ConsoleCommandMedium(TextCommandManager()).install()
 
         onStart()
 
