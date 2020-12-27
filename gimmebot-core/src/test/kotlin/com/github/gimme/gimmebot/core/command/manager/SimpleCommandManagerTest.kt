@@ -6,7 +6,6 @@ import com.github.gimme.gimmebot.core.command.DUMMY_COMMAND_SENDER
 import com.github.gimme.gimmebot.core.command.DefaultBaseCommand
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertIterableEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -17,11 +16,6 @@ import org.junit.jupiter.params.provider.CsvSource
 class SimpleCommandManagerTest {
 
     private val commandManager: CommandManager<Any?> = SimpleCommandManager { it }
-
-    @Test
-    fun `should have a help command by default`() {
-        assertNotNull(commandManager.getCommand("help"))
-    }
 
     @Test
     fun `should register command`() {

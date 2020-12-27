@@ -3,7 +3,6 @@ package com.github.gimme.gimmebot.core.command.manager
 import com.github.gimme.gimmebot.core.command.Command
 import com.github.gimme.gimmebot.core.command.CommandSender
 import com.github.gimme.gimmebot.core.command.ErrorCode
-import com.github.gimme.gimmebot.core.command.HelpCommand
 import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandTree
 
 
@@ -17,10 +16,6 @@ open class SimpleCommandManager<R>(private val defaultResponseParser: (Any?) -> 
     private val executorByCommand: MutableMap<Command<*>, CommandNode<*, R>> = mutableMapOf()
 
     final override val commandCollection = CommandTree()
-
-    init {
-        registerCommand(HelpCommand(commandCollection))
-    }
 
     final override fun <T> registerCommand(command: Command<T>, responseConverter: ((T) -> R)?) {
         commandCollection.addCommand(command)
