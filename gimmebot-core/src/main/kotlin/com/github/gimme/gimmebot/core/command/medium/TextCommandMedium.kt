@@ -38,12 +38,12 @@ abstract class TextCommandMedium(commandManager: CommandManager<String?>) : Base
     }
 
     @Throws(CommandException::class)
-    private fun executeCommand(commandSender: CommandSender, input: String): String? {
-        val command = commandManager.commandCollection.findCommand(input.split(" "))
+    private fun executeCommand(commandSender: CommandSender, commandInput: String): String? {
+        val command = commandManager.commandCollection.findCommand(commandInput.split(" "))
             ?: throw ErrorCode.NOT_A_COMMAND.createException()
 
         // Remove command name, leaving only the arguments
-        val argsInput = input.removePrefix(command.name)
+        val argsInput = commandInput.removePrefix(command.name)
 
         // Split into words on spaces, ignoring spaces between two quotation marks
         val args = argsInput.split("\\s(?=(?:[^\"]*\"[^\"]*\")*[^\"]*\$)".toRegex())
