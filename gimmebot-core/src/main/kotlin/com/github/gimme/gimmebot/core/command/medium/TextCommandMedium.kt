@@ -10,7 +10,8 @@ import com.github.gimme.gimmebot.core.command.manager.CommandManager
  *
  * @property commandPrefix prefix required for the input to be recognized as a command
  */
-abstract class TextCommandMedium(commandManager: CommandManager<String?>) : BaseCommandMedium<String?>(commandManager) {
+abstract class TextCommandMedium(commandManager: CommandManager<String?>, includeConsoleListener: Boolean = true) :
+    BaseCommandMedium<String?>(commandManager, includeConsoleListener) {
 
     protected abstract val commandPrefix: String?
 

@@ -1,6 +1,7 @@
 package com.github.gimme.gimmebot.core.command.medium
 
 import com.github.gimme.gimmebot.core.command.CommandSender
+import com.github.gimme.gimmebot.core.command.ConsoleCommandSender
 import com.github.gimme.gimmebot.core.command.MessageReceiver
 import com.github.gimme.gimmebot.core.command.manager.CommandManager
 
@@ -9,12 +10,17 @@ import com.github.gimme.gimmebot.core.command.manager.CommandManager
  *
  * @param R the response type
  */
-abstract class BaseCommandMedium<R>(override var commandManager: CommandManager<R>) : CommandMedium<R> {
+abstract class BaseCommandMedium<R>(
+    override var commandManager: CommandManager<R>,
+    includeConsoleListener: Boolean = false,
+) : CommandMedium<R> {
 
     private val ioListeners: MutableList<MessageReceiver> = mutableListOf()
 
     init {
-        addIOListener { ConsoleCommandSender }
+        if (includeConsoleListener) {
+            addIOListener { ConsoleCommandSender }
+        }
     }
 
     override fun parseInput(sender: CommandSender, input: String) {

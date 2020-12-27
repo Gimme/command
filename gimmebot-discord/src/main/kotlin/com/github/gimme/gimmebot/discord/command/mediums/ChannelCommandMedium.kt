@@ -11,9 +11,12 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter
 /**
  * Accepts input from Discord channels.
  */
-class ChannelCommandMedium(private val jda: JDA, private val config: DiscordConfig,
-                           commandManager: CommandManager<String?>
-) : TextCommandMedium(commandManager) {
+class ChannelCommandMedium(
+    private val jda: JDA,
+    private val config: DiscordConfig,
+    commandManager: CommandManager<String?>,
+    includeConsoleListener: Boolean = true,
+) : TextCommandMedium(commandManager, includeConsoleListener) {
 
     override val commandPrefix: String
         get() {
