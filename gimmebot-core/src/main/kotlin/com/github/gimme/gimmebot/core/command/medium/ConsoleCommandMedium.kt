@@ -32,6 +32,6 @@ class ConsoleCommandMedium(commandManager: CommandManager<String?>) : TextComman
         override val name: String
             get() = "#"
 
-        override fun sendMessage(message: String) {}
+        override fun sendMessage(message: String) = println(message)
     }
 }
