@@ -8,7 +8,7 @@ import com.github.gimme.gimmebot.core.command.manager.CommandManager
  *
  * @param R the response type
  */
-interface CommandMedium<R> {
+interface CommandMedium<R> : CommandInputHandler, CommandOutputHandler<R> {
 
     /** The command manager that handles this medium's available commands. */
     var commandManager: CommandManager<R>
