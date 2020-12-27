@@ -14,7 +14,7 @@ abstract class BaseCommandMedium<R>(override var commandManager: CommandManager<
     private val ioListeners: MutableList<MessageReceiver> = mutableListOf()
 
     init {
-        addIOListener { message -> println(message) }
+        addIOListener { ConsoleCommandSender }
     }
 
     override fun parseInput(sender: CommandSender, input: String) {

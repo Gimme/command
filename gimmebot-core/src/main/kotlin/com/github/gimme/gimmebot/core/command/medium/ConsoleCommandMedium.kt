@@ -1,6 +1,6 @@
 package com.github.gimme.gimmebot.core.command.medium
 
-import com.github.gimme.gimmebot.core.command.CommandSender
+import com.github.gimme.gimmebot.core.command.ConsoleCommandSender
 import com.github.gimme.gimmebot.core.command.manager.CommandManager
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -27,11 +27,4 @@ class ConsoleCommandMedium(commandManager: CommandManager<String?>) : TextComman
         }
     }
 
-    private object ConsoleCommandSender : CommandSender {
-
-        override val name: String
-            get() = "#"
-
-        override fun sendMessage(message: String) = println(message)
-    }
 }
