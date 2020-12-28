@@ -13,21 +13,10 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter
  */
 class ChannelCommandMedium(
     private val jda: JDA,
-    private val config: DiscordConfig,
+    commandPrefix: String?,
     commandManager: CommandManager<String?>,
     includeConsoleListener: Boolean = true,
-) : TextCommandMedium(commandManager, includeConsoleListener) {
-
-    override var commandPrefix: String?
-        get() {
-            val prefix = config.prefix
-            if (prefix.isEmpty()) throw IllegalStateException("No command prefix defined in the Discord config")
-            return prefix
-        }
-        set(value) {
-            requireNotNull(value)
-            config.prefix = value
-        }
+) : TextCommandMedium(commandManager, includeConsoleListener, commandPrefix) {
 
     override fun onInstall() {
         jda.addEventListener(object : ListenerAdapter() {
