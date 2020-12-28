@@ -6,12 +6,13 @@ import com.github.gimme.gimmebot.core.command.manager.CommandManager
 /**
  * Represents a medium through which commands can be sent and responses received.
  *
- * @param R the response type
+ * @param T the command manager's response type
+ * @param R the output response type
  */
-interface CommandMedium<R> : CommandInputHandler, CommandOutputHandler<R> {
+interface CommandMedium<T, R> : CommandInputHandler, CommandOutputHandler<R> {
 
     /** The command manager that handles this medium's available commands. */
-    var commandManager: CommandManager<R>
+    var commandManager: CommandManager<T>
 
     /** Installs this command input medium. */
     fun install()

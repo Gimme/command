@@ -8,13 +8,15 @@ import com.github.gimme.gimmebot.core.command.manager.CommandManager
 /**
  * Represents a text-based command medium with, for example a chat box or a command line interface.
  *
+ * @param T the command manager's response type
  * @property commandPrefix prefix required for the input to be recognized as a command
  */
-abstract class TextCommandMedium(
-    commandManager: CommandManager<Any?>,
+abstract class TextCommandMedium<T>(
+    commandManager: CommandManager<T>,
+    converter: (T) -> String? = { it?.toString() },
     includeConsoleListener: Boolean = true,
     open var commandPrefix: String? = null,
-) : BaseCommandMedium<Any?>(commandManager, includeConsoleListener) {
+) : BaseCommandMedium<T, String?>(commandManager, converter, includeConsoleListener) {
 
     override fun parseInput(sender: CommandSender, input: String) {
         val commandInput = validatePrefix(input) ?: return
@@ -31,13 +33,12 @@ abstract class TextCommandMedium(
         respond(sender, message)
     }
 
-    override fun respond(commandSender: CommandSender, response: Any?) {
-        val responseString = response?.toString()
-        if (responseString.isNullOrEmpty()) return
+    override fun respond(commandSender: CommandSender, response: String?) {
+        if (response.isNullOrEmpty()) return
 
-        super.respond(commandSender, responseString)
+        super.respond(commandSender, response)
 
-        commandSender.sendMessage(responseString)
+        commandSender.sendMessage(response)
     }
 
     @Throws(CommandException::class)
@@ -52,7 +53,7 @@ abstract class TextCommandMedium(
         val args = argsInput.split("\\s(?=(?:[^\"]*\"[^\"]*\")*[^\"]*\$)".toRegex())
             .map { s -> s.replace("\"", "") }.drop(1)
 
-        return commandManager.executeCommand(commandSender, command.name, args)?.toString()
+        return executeCommand(commandSender, command.name, args)
     }
 
     /**

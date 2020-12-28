@@ -1,5 +1,6 @@
 package com.github.gimme.gimmebot.core.command.medium
 
+import com.github.gimme.gimmebot.core.command.CommandException
 import com.github.gimme.gimmebot.core.command.CommandSender
 import com.github.gimme.gimmebot.core.command.ConsoleCommandSender
 import com.github.gimme.gimmebot.core.command.MessageReceiver
@@ -8,12 +9,15 @@ import com.github.gimme.gimmebot.core.command.manager.CommandManager
 /**
  * Represents a command input medium with base functionality.
  *
- * @param R the response type
+ * @param T the command manager's response type
+ * @param R the output response type
+ * @property responseWrapper a wrapper to convert the command response
  */
-abstract class BaseCommandMedium<R>(
-    override var commandManager: CommandManager<R>,
+abstract class BaseCommandMedium<T, R>(
+    override var commandManager: CommandManager<T>,
+    var responseWrapper: (T) -> R,
     includeConsoleListener: Boolean = false,
-) : CommandMedium<R> {
+) : CommandMedium<T, R> {
 
     private val ioListeners: MutableList<MessageReceiver> = mutableListOf()
 
@@ -29,6 +33,16 @@ abstract class BaseCommandMedium<R>(
 
     override fun respond(commandSender: CommandSender, response: R) {
         ioListeners.forEach { it.sendMessage(response.toString()) }
+    }
+
+    /**
+     * Executes a command through the [commandManager] and wraps the response with this medium's [responseWrapper].
+     *
+     * @throws CommandException if the command execution was unsuccessful
+     */
+    @Throws(CommandException::class)
+    protected fun executeCommand(commandSender: CommandSender, commandName: String, arguments: List<String>): R {
+        return responseWrapper(commandManager.executeCommand(commandSender, commandName, arguments))
     }
 
     final override fun addIOListener(messageReceiver: MessageReceiver) {

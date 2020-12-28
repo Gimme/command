@@ -8,8 +8,11 @@ import java.util.Scanner
 
 /**
  * Accepts input from the main console.
+ *
+ * @param T the command manager's response type
  */
-class ConsoleCommandMedium(commandManager: CommandManager<Any?>) : TextCommandMedium(commandManager, false) {
+class ConsoleCommandMedium<T>(commandManager: CommandManager<T>) :
+    TextCommandMedium<T>(commandManager, includeConsoleListener = false) {
 
     override fun onInstall() {
         val sc = Scanner(System.`in`)
