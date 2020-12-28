@@ -1,6 +1,7 @@
 package com.github.gimme.gimmebot.core
 
-import com.github.gimme.gimmebot.core.command.manager.TextCommandManager
+import com.github.gimme.gimmebot.core.command.manager.CommandManager
+import com.github.gimme.gimmebot.core.command.manager.SimpleCommandManager
 import com.github.gimme.gimmebot.core.command.medium.ConsoleCommandMedium
 import com.github.gimme.gimmebot.core.data.DataManager
 import com.github.gimme.gimmebot.core.data.config.BotConfig
@@ -28,6 +29,9 @@ open class GimmeBot : Bot {
     /** The data manager. */
     lateinit var dataManager: DataManager
 
+    /** The main command manager */
+    var commandManager: CommandManager<Any?> = SimpleCommandManager { it?.toString() }
+
     override fun start() {
         if (started) return
         started = true
@@ -38,7 +42,7 @@ open class GimmeBot : Bot {
         dataManager = DataManager(File(name))
 
         // This starts a new thread and keeps the bot running
-        ConsoleCommandMedium(TextCommandManager()).install()
+        ConsoleCommandMedium(commandManager).install()
 
         onStart()
 
