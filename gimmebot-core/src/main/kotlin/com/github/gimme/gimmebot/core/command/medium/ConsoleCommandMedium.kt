@@ -9,7 +9,7 @@ import java.util.Scanner
 /**
  * Accepts input from the main console.
  */
-class ConsoleCommandMedium(commandManager: CommandManager<String?>) : TextCommandMedium(commandManager, false) {
+class ConsoleCommandMedium(commandManager: CommandManager<Any?>) : TextCommandMedium(commandManager, false) {
 
     override fun onInstall() {
         val sc = Scanner(System.`in`)

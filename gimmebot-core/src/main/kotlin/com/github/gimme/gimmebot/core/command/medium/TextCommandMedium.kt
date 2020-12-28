@@ -11,10 +11,10 @@ import com.github.gimme.gimmebot.core.command.manager.CommandManager
  * @property commandPrefix prefix required for the input to be recognized as a command
  */
 abstract class TextCommandMedium(
-    commandManager: CommandManager<String?>,
+    commandManager: CommandManager<Any?>,
     includeConsoleListener: Boolean = true,
     open var commandPrefix: String? = null,
-) : BaseCommandMedium<String?>(commandManager, includeConsoleListener) {
+) : BaseCommandMedium<Any?>(commandManager, includeConsoleListener) {
 
     override fun parseInput(sender: CommandSender, input: String) {
         val commandInput = validatePrefix(input) ?: return
@@ -31,12 +31,13 @@ abstract class TextCommandMedium(
         respond(sender, message)
     }
 
-    override fun respond(commandSender: CommandSender, response: String?) {
-        if (response.isNullOrEmpty()) return
+    override fun respond(commandSender: CommandSender, response: Any?) {
+        val responseString = response?.toString()
+        if (responseString.isNullOrEmpty()) return
 
-        super.respond(commandSender, response)
+        super.respond(commandSender, responseString)
 
-        commandSender.sendMessage(response)
+        commandSender.sendMessage(responseString)
     }
 
     @Throws(CommandException::class)
@@ -51,7 +52,7 @@ abstract class TextCommandMedium(
         val args = argsInput.split("\\s(?=(?:[^\"]*\"[^\"]*\")*[^\"]*\$)".toRegex())
             .map { s -> s.replace("\"", "") }.drop(1)
 
-        return commandManager.executeCommand(commandSender, command.name, args)
+        return commandManager.executeCommand(commandSender, command.name, args)?.toString()
     }
 
     /**
