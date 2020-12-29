@@ -52,7 +52,7 @@ open class SimpleCommandManager<R>(private val defaultResponseParser: (Any?) -> 
         /** The wrapped command. */
         val command: Command<T>,
         /** The response converter. */
-        val responseParser: ((T) -> R),
+        val responseParser: (T) -> R,
     ) {
         /**
          * Executes the wrapped [command] converting the response through the optional [responseParser] or else the
