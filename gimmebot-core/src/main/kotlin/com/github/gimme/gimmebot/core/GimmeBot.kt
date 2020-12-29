@@ -30,7 +30,7 @@ open class GimmeBot : Bot {
     lateinit var dataManager: DataManager
 
     /** The main command manager */
-    var commandManager: CommandManager<Any?> = SimpleCommandManager { it?.toString() }
+    var commandManager: CommandManager<Any?> = SimpleCommandManager { it }
 
     override fun start() {
         if (started) return
