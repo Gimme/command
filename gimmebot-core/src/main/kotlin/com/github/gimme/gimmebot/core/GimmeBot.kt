@@ -29,8 +29,8 @@ open class GimmeBot : Bot {
     /** The data manager. */
     lateinit var dataManager: DataManager
 
-    /** The main command manager */
-    var commandManager: CommandManager<Any?> = SimpleCommandManager { it }
+    /** This bot's main command manager */
+    val commandManager: CommandManager<Any?> = SimpleCommandManager { it }
 
     override fun start() {
         if (started) return
