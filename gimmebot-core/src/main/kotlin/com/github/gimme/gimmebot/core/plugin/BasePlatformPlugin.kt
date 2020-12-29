@@ -28,8 +28,8 @@ abstract class BasePlatformPlugin {
     }
 
     /** Performs logic when enabled. */
-    abstract fun onEnable()
+    protected abstract fun onEnable()
 
     /** Performs logic when disabled. */
-    open fun onDisable() {}
+    protected open fun onDisable() {}
 }
