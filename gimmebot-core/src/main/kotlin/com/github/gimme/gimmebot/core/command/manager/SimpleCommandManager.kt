@@ -1,6 +1,7 @@
 package com.github.gimme.gimmebot.core.command.manager
 
 import com.github.gimme.gimmebot.core.command.Command
+import com.github.gimme.gimmebot.core.command.CommandException
 import com.github.gimme.gimmebot.core.command.CommandSender
 import com.github.gimme.gimmebot.core.command.ErrorCode
 import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandTree
@@ -57,7 +58,10 @@ open class SimpleCommandManager<R>(private val defaultResponseParser: (Any?) -> 
         /**
          * Executes the wrapped [command] converting the response through the optional [responseParser] or else the
          * [defaultResponseParser].
+         *
+         * @throws CommandException if the command execution was unsuccessful
          */
+        @Throws(CommandException::class)
         fun execute(commandSender: CommandSender, args: List<String>): R {
             val response = command.execute(commandSender, args)
             return responseParser(response)
