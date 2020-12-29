@@ -24,6 +24,9 @@ interface CommandManager<R> {
     /** Returns the command with the specified [name] if it has been registered, else null. */
     fun getCommand(name: String): Command<*>?
 
+    /** Returns if the command with the specified [name] has been registered. */
+    fun hasCommand(name: String): Boolean
+
     /**
      * Executes the registered command with the specified [commandName] with the specified [arguments] as the given
      * [commandSender] and returns the response.

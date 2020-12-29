@@ -21,4 +21,7 @@ interface CommandCollection {
 
     /** Returns the command that best matches the start of the given [path], or null if no match. */
     fun findCommand(path: List<String>): Command<*>?
+
+    /** Returns if this collection contains the command with the specified [name]. */
+    fun containsCommand(name: String): Boolean
 }

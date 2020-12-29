@@ -47,6 +47,8 @@ class CommandTree : CommandCollection {
         return lastFound
     }
 
+    override fun containsCommand(name: String): Boolean = getCommand(name) != null
+
     private data class Node<T>(
         val name: String,
         var data: T?,
