@@ -41,7 +41,11 @@ open class DiscordPlugin : GimmeBotPlugin() {
             return
         }
 
-        bot.commandManager.install(ChannelCommandMedium(jda, config))
+        ChannelCommandMedium(jda, config.prefix).also {
+            it.registerCommandManager(bot.commandManager)
+            it.registerCommandManager(commandManager)
+            it.install()
+        }
     }
 
     override fun onDisable() {
