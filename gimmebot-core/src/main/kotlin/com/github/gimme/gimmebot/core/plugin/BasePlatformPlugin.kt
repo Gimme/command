@@ -4,7 +4,7 @@ import com.github.gimme.gimmebot.core.GimmeBot
 import com.github.gimme.gimmebot.core.command.manager.CommandManager
 
 /**
- * Represents a plugin that can be installed in a [GimmeBot].
+ * Represents a plugin that can be installed in a [GimmeBot] to support a new platform.
  */
 abstract class BasePlatformPlugin {
     /** The bot that this plugin is installed in. */
