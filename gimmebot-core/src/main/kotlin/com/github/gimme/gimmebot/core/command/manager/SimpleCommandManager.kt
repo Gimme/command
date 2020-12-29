@@ -26,13 +26,9 @@ open class SimpleCommandManager<R>(private val defaultResponseParser: (Any?) -> 
         }
     }
 
-    override fun getCommand(name: String): Command<*>? {
-        return commandCollection.getCommand(name)
-    }
+    override fun getCommand(name: String): Command<*>? = commandCollection.getCommand(name)
 
-    override fun hasCommand(name: String): Boolean {
-        return commandCollection.containsCommand(name)
-    }
+    override fun hasCommand(name: String): Boolean = commandCollection.containsCommand(name)
 
     override fun executeCommand(
         commandSender: CommandSender,
