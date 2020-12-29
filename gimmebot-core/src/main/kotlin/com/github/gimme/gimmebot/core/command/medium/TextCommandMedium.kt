@@ -8,15 +8,12 @@ import com.github.gimme.gimmebot.core.command.manager.CommandManager
 /**
  * Represents a text-based command medium with, for example a chat box or a command line interface.
  *
- * @param T the command manager's response type
  * @property commandPrefix prefix required for the input to be recognized as a command
  */
-abstract class TextCommandMedium<T>(
-    commandManager: CommandManager<T>,
-    responseWrapper: (T) -> String? = { it?.toString() },
+abstract class TextCommandMedium(
     includeConsoleListener: Boolean = true,
     open var commandPrefix: String? = null,
-) : BaseCommandMedium<T, String?>(commandManager, responseWrapper, includeConsoleListener) {
+) : BaseCommandMedium<String?>(includeConsoleListener) {
 
     override fun parseInput(sender: CommandSender, input: String) {
         val commandInput = validatePrefix(input) ?: return
@@ -43,17 +40,36 @@ abstract class TextCommandMedium<T>(
 
     @Throws(CommandException::class)
     private fun executeCommand(commandSender: CommandSender, commandInput: String): String? {
-        val command = commandManager.commandCollection.findCommand(commandInput.split(" "))
-            ?: throw ErrorCode.NOT_A_COMMAND.createException()
+        var bestMatchCommandName: String? = null
+
+        registeredCommandManagers.forEach {
+            val foundCommand = it.commandManager.commandCollection.findCommand(commandInput.split(" "))
+
+            foundCommand?.name?.let { name ->
+                if (name.length > bestMatchCommandName?.length ?: -1) {
+                    bestMatchCommandName = foundCommand.name
+                }
+            }
+        }
+
+        val commandName = bestMatchCommandName ?: throw ErrorCode.NOT_A_COMMAND.createException()
 
         // Remove command name, leaving only the arguments
-        val argsInput = commandInput.removePrefix(command.name)
+        val argsInput = commandInput.removePrefix(commandName)
 
         // Split into words on spaces, ignoring spaces between two quotation marks
         val args = argsInput.split("\\s(?=(?:[^\"]*\"[^\"]*\")*[^\"]*\$)".toRegex())
             .map { s -> s.replace("\"", "") }.drop(1)
 
-        return executeCommand(commandSender, command.name, args)
+        return executeCommand(commandSender, commandName, args)
+    }
+
+    /**
+     * Registers the given [commandManager] making the contained commands executable through this medium with the
+     * results converted to strings.
+     */
+    fun <T> registerCommandManager(commandManager: CommandManager<T>) {
+        super.registerCommandManager(commandManager) { it?.toString() }
     }
 
     /**

@@ -42,7 +42,10 @@ open class GimmeBot : Bot {
         dataManager = DataManager(File(name))
 
         // This starts a new thread and keeps the bot running
-        ConsoleCommandMedium(commandManager).install()
+        ConsoleCommandMedium().also {
+            it.registerCommandManager(commandManager)
+            it.install()
+        }
 
         onStart()
 

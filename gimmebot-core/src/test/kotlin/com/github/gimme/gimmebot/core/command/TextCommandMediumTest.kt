@@ -24,12 +24,14 @@ class TextCommandMediumTest {
 
         commandManager.registerCommand(command)
 
-        val commandInputMedium = object : TextCommandMedium<String?>(commandManager) {
+        object : TextCommandMedium() {
             override fun onInstall() {
                 parseInput(DUMMY_COMMAND_SENDER, input)
             }
+        }.also {
+            it.registerCommandManager(commandManager)
+            it.install()
         }
-        commandInputMedium.install()
 
         Assertions.assertNotNull(actualArgs)
         Assertions.assertIterableEquals(expectedArgs, actualArgs)

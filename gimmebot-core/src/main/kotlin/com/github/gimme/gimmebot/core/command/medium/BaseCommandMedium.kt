@@ -3,22 +3,21 @@ package com.github.gimme.gimmebot.core.command.medium
 import com.github.gimme.gimmebot.core.command.CommandException
 import com.github.gimme.gimmebot.core.command.CommandSender
 import com.github.gimme.gimmebot.core.command.ConsoleCommandSender
+import com.github.gimme.gimmebot.core.command.ErrorCode
 import com.github.gimme.gimmebot.core.command.MessageReceiver
 import com.github.gimme.gimmebot.core.command.manager.CommandManager
 
 /**
  * Represents a command input medium with base functionality.
  *
- * @param T the command manager's response type
  * @param R the output response type
- * @property responseWrapper a wrapper to convert the command response
  */
-abstract class BaseCommandMedium<T, R>(
-    override var commandManager: CommandManager<T>,
-    var responseWrapper: (T) -> R,
+abstract class BaseCommandMedium<R>(
     includeConsoleListener: Boolean = false,
-) : CommandMedium<T, R> {
+) : CommandMedium<R> {
 
+    /** This medium's registered command managers. */
+    protected val registeredCommandManagers: MutableList<CommandManagerRegistration<*, R>> = mutableListOf()
     private val ioListeners: MutableList<MessageReceiver> = mutableListOf()
 
     init {
@@ -36,13 +35,23 @@ abstract class BaseCommandMedium<T, R>(
     }
 
     /**
-     * Executes a command through the [commandManager] and wraps the response with this medium's [responseWrapper].
+     * Executes a command through one of the [registeredCommandManagers].
      *
      * @throws CommandException if the command execution was unsuccessful
      */
     @Throws(CommandException::class)
     protected fun executeCommand(commandSender: CommandSender, commandName: String, arguments: List<String>): R {
-        return responseWrapper(commandManager.executeCommand(commandSender, commandName, arguments))
+        registeredCommandManagers.forEach {
+            if (!it.commandManager.hasCommand(commandName)) return@forEach
+
+            return it.executeCommand(commandSender, commandName, arguments)
+        }
+
+        throw ErrorCode.NOT_A_COMMAND.createException()
+    }
+
+    override fun <T> registerCommandManager(commandManager: CommandManager<T>, responseWrapper: (T) -> R) {
+        registeredCommandManagers.add(CommandManagerRegistration(commandManager, responseWrapper))
     }
 
     final override fun addIOListener(messageReceiver: MessageReceiver) {
@@ -55,4 +64,30 @@ abstract class BaseCommandMedium<T, R>(
 
     /** Performs logic when installed. */
     protected abstract fun onInstall()
+
+    /**
+     * Represents a registered [commandManager] that can be used to execute commands with its responses converted to a
+     * specific type, [R], through the specified [responseWrapper]
+     *
+     * @param T the response type of the command manager
+     * @param R the converted response output type
+     */
+    protected data class CommandManagerRegistration<T, R>(
+        /** The wrapped command manager. */
+        val commandManager: CommandManager<T>,
+        /** The response wrapper. */
+        val responseWrapper: (T) -> R,
+    ) {
+        /**
+         * Executes the command with the specified [commandName] through this registered [commandManager] converting the
+         * response through the [responseWrapper].
+         *
+         * @throws CommandException if the command execution was unsuccessful
+         */
+        @Throws(CommandException::class)
+        fun executeCommand(commandSender: CommandSender, commandName: String, arguments: List<String> = listOf()): R {
+            val response = commandManager.executeCommand(commandSender, commandName, arguments)
+            return responseWrapper(response)
+        }
+    }
 }
