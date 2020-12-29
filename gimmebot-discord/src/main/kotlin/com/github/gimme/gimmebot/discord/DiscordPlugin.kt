@@ -1,5 +1,7 @@
 package com.github.gimme.gimmebot.discord
 
+import com.github.gimme.gimmebot.core.command.manager.CommandManager
+import com.github.gimme.gimmebot.core.command.manager.TextCommandManager
 import com.github.gimme.gimmebot.core.data.requireResource
 import com.github.gimme.gimmebot.core.data.yaml.loadYamlFromResource
 import com.github.gimme.gimmebot.core.plugin.GimmeBotPlugin
@@ -23,6 +25,10 @@ open class DiscordPlugin : GimmeBotPlugin() {
     /** The Discord-related config. */
     protected lateinit var config: DiscordConfig
         private set
+
+    private val _commandManager = TextCommandManager()
+    override val commandManager: CommandManager<String?>
+        get() = _commandManager
 
     override fun onEnable() {
         config =
