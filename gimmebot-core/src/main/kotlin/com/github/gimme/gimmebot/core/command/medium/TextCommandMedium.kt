@@ -13,10 +13,10 @@ import com.github.gimme.gimmebot.core.command.manager.CommandManager
  */
 abstract class TextCommandMedium<T>(
     commandManager: CommandManager<T>,
-    converter: (T) -> String? = { it?.toString() },
+    responseWrapper: (T) -> String? = { it?.toString() },
     includeConsoleListener: Boolean = true,
     open var commandPrefix: String? = null,
-) : BaseCommandMedium<T, String?>(commandManager, converter, includeConsoleListener) {
+) : BaseCommandMedium<T, String?>(commandManager, responseWrapper, includeConsoleListener) {
 
     override fun parseInput(sender: CommandSender, input: String) {
         val commandInput = validatePrefix(input) ?: return
