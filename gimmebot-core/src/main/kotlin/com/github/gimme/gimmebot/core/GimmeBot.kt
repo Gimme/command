@@ -7,7 +7,7 @@ import com.github.gimme.gimmebot.core.data.DataManager
 import com.github.gimme.gimmebot.core.data.config.BotConfig
 import com.github.gimme.gimmebot.core.data.requireResource
 import com.github.gimme.gimmebot.core.data.yaml.loadYamlFromResource
-import com.github.gimme.gimmebot.core.plugin.GimmeBotPlugin
+import com.github.gimme.gimmebot.core.plugin.BasePlatformPlugin
 import mu.KotlinLogging
 import java.io.File
 
@@ -20,7 +20,7 @@ open class GimmeBot : Bot {
     private val logger = KotlinLogging.logger {}
 
     private lateinit var botConfig: BotConfig
-    private val plugins: MutableList<GimmeBotPlugin> = mutableListOf()
+    private val platformPlugins: MutableList<BasePlatformPlugin> = mutableListOf()
 
     /** If the bot is started. */
     var started = false
@@ -56,7 +56,7 @@ open class GimmeBot : Bot {
         if (!started) return
         started = false
 
-        plugins.forEach { plugin -> plugin.enabled = false }
+        platformPlugins.forEach { plugin -> plugin.enabled = false }
 
         onStop()
 
@@ -69,9 +69,9 @@ open class GimmeBot : Bot {
     /** Performs shutdown logic. */
     protected open fun onStop() {}
 
-    override fun install(plugin: GimmeBotPlugin) {
-        plugins.add(plugin)
-        plugin.init(this)
-        plugin.enabled = true
+    override fun install(platformPlugin: BasePlatformPlugin) {
+        platformPlugins.add(platformPlugin)
+        platformPlugin.init(this)
+        platformPlugin.enabled = true
     }
 }

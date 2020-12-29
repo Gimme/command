@@ -6,7 +6,7 @@ import com.github.gimme.gimmebot.core.command.manager.CommandManager
 /**
  * Represents a plugin that can be installed in a [GimmeBot].
  */
-abstract class GimmeBotPlugin {
+abstract class BasePlatformPlugin {
     /** The bot that this plugin is installed in. */
     protected lateinit var bot: GimmeBot
         private set

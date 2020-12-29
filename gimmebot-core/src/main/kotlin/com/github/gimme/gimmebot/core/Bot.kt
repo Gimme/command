@@ -1,6 +1,6 @@
 package com.github.gimme.gimmebot.core
 
-import com.github.gimme.gimmebot.core.plugin.GimmeBotPlugin
+import com.github.gimme.gimmebot.core.plugin.BasePlatformPlugin
 
 /**
  * Represents a bot that can be started to perform tasks.
@@ -12,6 +12,6 @@ interface Bot {
     /** Stops this bot. */
     fun stop()
 
-    /** Adds and enables the given [plugin]. */
-    fun install(plugin: GimmeBotPlugin)
+    /** Adds and enables the given [platformPlugin]. */
+    fun install(platformPlugin: BasePlatformPlugin)
 }
