@@ -1,10 +1,9 @@
 package com.github.gimme.gimmebot.discord
 
-import com.github.gimme.gimmebot.core.command.manager.CommandManager
-import com.github.gimme.gimmebot.core.command.manager.TextCommandManager
+import com.github.gimme.gimmebot.core.command.medium.CommandMedium
 import com.github.gimme.gimmebot.core.data.requireResource
 import com.github.gimme.gimmebot.core.data.yaml.loadYamlFromResource
-import com.github.gimme.gimmebot.core.plugin.BasePlatformPlugin
+import com.github.gimme.gimmebot.core.plugin.TextPlatformPlugin
 import com.github.gimme.gimmebot.discord.command.mediums.ChannelCommandMedium
 import com.github.gimme.gimmebot.discord.config.DiscordConfig
 import net.dv8tion.jda.api.JDA
@@ -14,7 +13,7 @@ import javax.security.auth.login.LoginException
 /**
  * Represents a plugin that connects to a Discord bot.
  */
-open class DiscordPlugin : BasePlatformPlugin() {
+open class DiscordPlugin : TextPlatformPlugin() {
 
     private val discordResourcePath = "discord.yml"
 
@@ -26,26 +25,14 @@ open class DiscordPlugin : BasePlatformPlugin() {
     protected lateinit var config: DiscordConfig
         private set
 
-    private val _commandManager = TextCommandManager()
-    override val commandManager: CommandManager<String?>
-        get() = _commandManager
-
-    override fun onEnable() {
+    @Throws(LoginException::class)
+    override fun initCommandMedium(): CommandMedium<String?> {
         config =
             requireResource(loadYamlFromResource(discordResourcePath, DiscordConfig::class.java), discordResourcePath)
 
-        try {
-            jda = JDABuilder.createDefault(config.token).build()
-        } catch (e: LoginException) {
-            e.printStackTrace()
-            return
-        }
+        jda = JDABuilder.createDefault(config.token).build()
 
-        ChannelCommandMedium(jda, config.prefix).also {
-            it.registerCommandManager(bot.commandManager)
-            it.registerCommandManager(commandManager)
-            it.install()
-        }
+        return ChannelCommandMedium(jda, config.prefix)
     }
 
     override fun onDisable() {
