@@ -34,7 +34,7 @@ open class SimpleCommandManager<R>(private val defaultResponseParser: (Any?) -> 
         commandName: String,
         arguments: List<String>,
     ): R {
-        val command = getCommand(commandName.toLowerCase()) ?: throw ErrorCode.NOT_A_COMMAND.createException()
+        val command = getCommand(commandName) ?: throw ErrorCode.NOT_A_COMMAND.createException()
         val commandNode = executorByCommand[command]
 
         return commandNode?.execute(commandSender, arguments)

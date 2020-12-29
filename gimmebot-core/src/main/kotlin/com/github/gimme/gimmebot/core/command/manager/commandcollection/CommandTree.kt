@@ -15,7 +15,7 @@ class CommandTree : CommandCollection {
 
         var currentNode = root
         for (word in words) {
-            currentNode = currentNode.children.computeIfAbsent(word) { k -> Node(k, null) }
+            currentNode = currentNode.children.computeIfAbsent(word.toLowerCase()) { k -> Node(k, null) }
         }
         currentNode.data = command
     }
@@ -23,7 +23,7 @@ class CommandTree : CommandCollection {
     override fun getCommand(name: String): Command<*>? {
         var currentNode = root
 
-        for (word in name.split(delimiter)) {
+        for (word in name.toLowerCase().split(delimiter)) {
             currentNode = currentNode.children[word] ?: return null
         }
 
@@ -41,7 +41,7 @@ class CommandTree : CommandCollection {
 
         var currentNode = root
         for (word in path) {
-            currentNode = currentNode.children[word] ?: break
+            currentNode = currentNode.children[word.toLowerCase()] ?: break
             lastFound = currentNode.data
         }
         return lastFound
