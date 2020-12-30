@@ -5,7 +5,7 @@ import org.bukkit.plugin.java.JavaPlugin
 /**
  * A Spigot plugin that utilizes a [com.github.gimme.gimmebot.core.GimmeBot] to do the work.
  */
-abstract class SpigotGimmePlugin : JavaPlugin() {
+abstract class GimmeSpigotPlugin : JavaPlugin() {
 
     private lateinit var spigotGimmeBot: SpigotGimmeBot
 
