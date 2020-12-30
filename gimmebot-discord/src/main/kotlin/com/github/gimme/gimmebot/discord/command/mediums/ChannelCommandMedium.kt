@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 
 /**
- * Accepts input from Discord channels.
+ * Handles input/output through Discord channels.
  */
 class ChannelCommandMedium(
     private val jda: JDA,

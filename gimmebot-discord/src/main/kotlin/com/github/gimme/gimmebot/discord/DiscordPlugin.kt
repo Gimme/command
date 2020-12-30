@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.JDABuilder
 import javax.security.auth.login.LoginException
 
 /**
- * Represents a plugin that connects to a Discord bot.
+ * A plugin that connects the bot to Discord.
  */
 open class DiscordPlugin : TextPlatformPlugin() {
 
