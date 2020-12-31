@@ -13,6 +13,7 @@ import com.github.gimme.gimmebot.core.command.manager.CommandManager
  * @param R the output response type
  */
 abstract class BaseCommandMedium<R>(
+    final override val commandManager: CommandManager<R>,
     includeConsoleListener: Boolean = false,
 ) : CommandMedium<R> {
 
@@ -20,10 +21,15 @@ abstract class BaseCommandMedium<R>(
     protected val registeredCommandManagers: MutableList<CommandManagerRegistration<*, R>> = mutableListOf()
     private val ioListeners: MutableList<MessageReceiver> = mutableListOf()
 
+    override val commandManagers: List<CommandManager<*>>
+        get() = registeredCommandManagers.map { it.commandManager }
+
     init {
         if (includeConsoleListener) {
             addIOListener { ConsoleCommandSender }
         }
+
+        registerCommandManager(commandManager) { it }
     }
 
     override fun parseInput(sender: CommandSender, input: String) {
@@ -50,7 +56,7 @@ abstract class BaseCommandMedium<R>(
         throw ErrorCode.NOT_A_COMMAND.createException()
     }
 
-    override fun <T> registerCommandManager(commandManager: CommandManager<T>, responseWrapper: (T) -> R) {
+    final override fun <T> registerCommandManager(commandManager: CommandManager<T>, responseWrapper: (T) -> R) {
         registeredCommandManagers.add(CommandManagerRegistration(commandManager, responseWrapper))
     }
 

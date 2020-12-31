@@ -8,7 +8,13 @@ import com.github.gimme.gimmebot.core.command.manager.CommandManager
  *
  * @param R the output response type
  */
-interface CommandMedium<in R> : CommandInputHandler, CommandOutputHandler<R> {
+interface CommandMedium<R> : CommandInputHandler, CommandOutputHandler<R> {
+
+    /** This medium's main command manager. */
+    val commandManager: CommandManager<R>
+
+    /** This medium's command managers. */
+    val commandManagers: List<CommandManager<*>>
 
     /** Installs this command input medium. */
     fun install()
