@@ -8,9 +8,11 @@ import java.util.Scanner
 /**
  * Accepts input from the main console.
  */
-class ConsoleCommandMedium : TextCommandMedium(false, null) {
+open class ConsoleCommandMedium : TextCommandMedium(true, false, null) {
 
     override fun onInstall() {
+        super.onInstall()
+
         val sc = Scanner(System.`in`)
         val sender = ConsoleCommandSender
 
