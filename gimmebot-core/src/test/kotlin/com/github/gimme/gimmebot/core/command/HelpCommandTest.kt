@@ -1,7 +1,7 @@
 package com.github.gimme.gimmebot.core.command
 
 import com.github.gimme.gimmebot.core.command.executor.CommandExecutor
-import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandTree
+import com.github.gimme.gimmebot.core.command.medium.TextCommandMedium
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
@@ -9,17 +9,20 @@ class HelpCommandTest {
 
     @Test
     fun `should return list of commands`() {
-        val commandCollection = CommandTree()
+        val commandMedium = object : TextCommandMedium() {
+            override fun onInstall() {}
+        }
 
-        commandCollection.addCommand(DummyCommand("one"))
-        commandCollection.addCommand(DummyCommand("two"))
-        commandCollection.addCommand(DummyCommand("three"))
+        commandMedium.commandManager.registerCommand(DummyCommand("one"))
+        commandMedium.commandManager.registerCommand(DummyCommand("two"))
+        commandMedium.commandManager.registerCommand(DummyCommand("three"))
 
-        val response = HelpCommand(commandCollection).execute(DUMMY_COMMAND_SENDER, listOf())
+        val response = HelpCommand(commandMedium).execute(DUMMY_COMMAND_SENDER, listOf())
 
-        assertTrue(response.contains("one"))
-        assertTrue(response.contains("two"))
-        assertTrue(response.contains("three"))
+        assertTrue(response.size == 3)
+        assertTrue(response[0].name == "one")
+        assertTrue(response[1].name == "two")
+        assertTrue(response[2].name == "three")
     }
 
     private class DummyCommand(name: String) : DefaultBaseCommand(name) {
