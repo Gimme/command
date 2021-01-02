@@ -20,8 +20,6 @@ abstract class BasePlatformPlugin : Enableable {
             field = Enableable.enable(this, enabled)
         }
 
-    override fun onDisable() {}
-
     internal fun init(bot: GimmeBot) {
         this.bot = bot
     }

@@ -36,6 +36,8 @@ open class DiscordPlugin : TextPlatformPlugin() {
     }
 
     override fun onDisable() {
+        super.onDisable()
+
         jda.shutdownNow()
     }
 }

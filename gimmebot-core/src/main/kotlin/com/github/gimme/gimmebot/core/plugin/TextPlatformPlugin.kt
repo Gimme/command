@@ -18,15 +18,15 @@ abstract class TextPlatformPlugin : BasePlatformPlugin() {
         get() = _commandManager
 
     override fun onEnable() {
-        installCommandMedium()
+        this.commandMedium = initCommandMedium().apply {
+            registerCommandManager(bot.commandManager) { it?.toString() }
+            registerCommandManager(commandManager) { it }
+            enable()
+        }
     }
 
-    private fun installCommandMedium() {
-        this.commandMedium = initCommandMedium().also { medium ->
-            medium.registerCommandManager(bot.commandManager) { it?.toString() }
-            medium.registerCommandManager(commandManager) { it }
-            medium.enable()
-        }
+    override fun onDisable() {
+        commandMedium.disable()
     }
 
     /**
