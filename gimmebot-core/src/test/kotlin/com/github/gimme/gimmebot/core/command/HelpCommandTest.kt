@@ -2,14 +2,14 @@ package com.github.gimme.gimmebot.core.command
 
 import com.github.gimme.gimmebot.core.command.executor.CommandExecutor
 import com.github.gimme.gimmebot.core.command.medium.TextCommandMedium
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 class HelpCommandTest {
 
     @Test
     fun `should return list of commands`() {
-        val commandMedium = object : TextCommandMedium() {
+        val commandMedium = object : TextCommandMedium(false) {
             override fun onEnable() {}
         }
 
@@ -19,10 +19,10 @@ class HelpCommandTest {
 
         val response = HelpCommand(commandMedium).execute(DUMMY_COMMAND_SENDER, listOf())
 
-        assertTrue(response.size == 3)
-        assertTrue(response[0].name == "one")
-        assertTrue(response[1].name == "two")
-        assertTrue(response[2].name == "three")
+        assertEquals( 3, response.size)
+        assertEquals("one", response[0].name)
+        assertEquals("two", response[1].name)
+        assertEquals("three", response[2].name)
     }
 
     private class DummyCommand(name: String) : DefaultBaseCommand(name) {
