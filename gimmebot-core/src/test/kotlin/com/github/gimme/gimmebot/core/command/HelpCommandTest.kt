@@ -11,6 +11,7 @@ class HelpCommandTest {
     fun `should return list of commands`() {
         val commandMedium = object : TextCommandMedium(false) {
             override fun onEnable() {}
+            override fun onDisable() {}
         }
 
         commandMedium.commandManager.registerCommand(DummyCommand("one"))
@@ -27,6 +28,7 @@ class HelpCommandTest {
 
     private class DummyCommand(name: String) : DefaultBaseCommand(name) {
         @CommandExecutor
-        fun execute() {}
+        fun execute() {
+        }
     }
 }

@@ -28,6 +28,8 @@ class TextCommandMediumTest {
             override fun onEnable() {
                 parseInput(DUMMY_COMMAND_SENDER, input)
             }
+
+            override fun onDisable() {}
         }.apply {
             registerCommandManager(commandManager)
             enable()
