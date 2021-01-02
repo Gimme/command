@@ -13,8 +13,10 @@ class SpigotCommandMedium(
 ) : TextCommandMedium(includeHelpCommand, includeConsoleListener, "/") {
 
     override fun onEnable() {
-        super.onEnable()
-
         TODO("Start listening to command input from MC chat")
+    }
+
+    override fun onDisable() {
+        TODO("Not yet implemented")
     }
 }
