@@ -22,7 +22,7 @@ interface Enableable {
     fun onEnable()
 
     /** Performs logic when disabled. */
-    fun onDisable() {}
+    fun onDisable()
 
     companion object {
         /**
