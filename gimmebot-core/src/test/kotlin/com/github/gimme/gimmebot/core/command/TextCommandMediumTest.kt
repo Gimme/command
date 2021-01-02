@@ -28,9 +28,9 @@ class TextCommandMediumTest {
             override fun onInstall() {
                 parseInput(DUMMY_COMMAND_SENDER, input)
             }
-        }.also {
-            it.registerCommandManager(commandManager)
-            it.install()
+        }.apply {
+            registerCommandManager(commandManager)
+            install()
         }
 
         Assertions.assertNotNull(actualArgs)
