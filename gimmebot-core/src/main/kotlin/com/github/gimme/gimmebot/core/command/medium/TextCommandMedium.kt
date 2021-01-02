@@ -13,12 +13,12 @@ import com.github.gimme.gimmebot.core.command.manager.TextCommandManager
  * @property commandPrefix prefix required for the input to be recognized as a command
  */
 abstract class TextCommandMedium(
-    private val includeHelpCommand: Boolean = true,
+    includeHelpCommand: Boolean = true,
     includeConsoleListener: Boolean = true,
     open var commandPrefix: String? = null,
 ) : BaseCommandMedium<String?>(TextCommandManager(), includeConsoleListener) {
 
-    override fun onEnable() {
+    init {
         if (includeHelpCommand) {
             commandManager.registerCommand(HelpCommand(this)) {
                 val sb = StringBuilder("Commands:")
