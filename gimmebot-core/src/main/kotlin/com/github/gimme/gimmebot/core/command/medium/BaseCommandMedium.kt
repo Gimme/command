@@ -26,7 +26,7 @@ abstract class BaseCommandMedium<R>(
 
     init {
         if (includeConsoleListener) {
-            addIOListener { ConsoleCommandSender }
+            addIOListener(ConsoleCommandSender)
         }
 
         registerCommandManager(commandManager) { it }
