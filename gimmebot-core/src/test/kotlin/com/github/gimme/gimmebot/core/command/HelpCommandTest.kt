@@ -1,5 +1,6 @@
 package com.github.gimme.gimmebot.core.command
 
+import com.github.gimme.gimmebot.core.command.commands.HelpCommand
 import com.github.gimme.gimmebot.core.command.executor.CommandExecutor
 import com.github.gimme.gimmebot.core.command.medium.TextCommandMedium
 import org.junit.jupiter.api.Assertions.assertEquals

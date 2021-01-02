@@ -1,5 +1,6 @@
-package com.github.gimme.gimmebot.core.command
+package com.github.gimme.gimmebot.core.command.commands
 
+import com.github.gimme.gimmebot.core.command.BaseCommand
 import com.github.gimme.gimmebot.core.command.executor.CommandExecutor
 import com.github.gimme.gimmebot.core.command.medium.CommandMedium
 

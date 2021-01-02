@@ -3,7 +3,7 @@ package com.github.gimme.gimmebot.core.command.medium
 import com.github.gimme.gimmebot.core.command.CommandException
 import com.github.gimme.gimmebot.core.command.CommandSender
 import com.github.gimme.gimmebot.core.command.ErrorCode
-import com.github.gimme.gimmebot.core.command.HelpCommand
+import com.github.gimme.gimmebot.core.command.commands.HelpCommand
 import com.github.gimme.gimmebot.core.command.manager.CommandManager
 import com.github.gimme.gimmebot.core.command.manager.TextCommandManager
 
