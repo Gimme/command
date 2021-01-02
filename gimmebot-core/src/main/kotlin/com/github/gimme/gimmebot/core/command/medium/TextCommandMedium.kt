@@ -18,7 +18,7 @@ abstract class TextCommandMedium(
     open var commandPrefix: String? = null,
 ) : BaseCommandMedium<String?>(TextCommandManager(), includeConsoleListener) {
 
-    override fun onInstall() {
+    override fun onEnable() {
         if (includeHelpCommand) {
             commandManager.registerCommand(HelpCommand(this)) {
                 val sb = StringBuilder("Commands:")

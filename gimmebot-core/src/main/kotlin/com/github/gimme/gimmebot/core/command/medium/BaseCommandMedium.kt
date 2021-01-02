@@ -6,6 +6,7 @@ import com.github.gimme.gimmebot.core.command.ConsoleCommandSender
 import com.github.gimme.gimmebot.core.command.ErrorCode
 import com.github.gimme.gimmebot.core.command.MessageReceiver
 import com.github.gimme.gimmebot.core.command.manager.CommandManager
+import com.github.gimme.gimmebot.core.common.Enableable
 
 /**
  * Represents a command input medium with base functionality.
@@ -23,6 +24,11 @@ abstract class BaseCommandMedium<R>(
 
     override val commandManagers: List<CommandManager<*>>
         get() = registeredCommandManagers.map { it.commandManager }
+
+    override var enabled: Boolean = false
+        set(enabled) {
+            field = Enableable.enable(this, enabled)
+        }
 
     init {
         if (includeConsoleListener) {
@@ -63,13 +69,6 @@ abstract class BaseCommandMedium<R>(
     final override fun addIOListener(messageReceiver: MessageReceiver) {
         ioListeners.add(messageReceiver)
     }
-
-    override fun install() {
-        onInstall()
-    }
-
-    /** Performs logic when installed. */
-    protected abstract fun onInstall()
 
     /**
      * Represents a registered [commandManager] that can be used to execute commands with its responses converted to a

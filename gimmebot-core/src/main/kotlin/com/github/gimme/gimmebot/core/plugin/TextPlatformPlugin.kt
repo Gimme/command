@@ -25,7 +25,7 @@ abstract class TextPlatformPlugin : BasePlatformPlugin() {
         this.commandMedium = initCommandMedium().also { medium ->
             medium.registerCommandManager(bot.commandManager) { it?.toString() }
             medium.registerCommandManager(commandManager) { it }
-            medium.install()
+            medium.enable()
         }
     }
 

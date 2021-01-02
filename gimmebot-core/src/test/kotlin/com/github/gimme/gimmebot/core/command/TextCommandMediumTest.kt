@@ -25,12 +25,12 @@ class TextCommandMediumTest {
         commandManager.registerCommand(command)
 
         object : TextCommandMedium() {
-            override fun onInstall() {
+            override fun onEnable() {
                 parseInput(DUMMY_COMMAND_SENDER, input)
             }
         }.apply {
             registerCommandManager(commandManager)
-            install()
+            enable()
         }
 
         Assertions.assertNotNull(actualArgs)

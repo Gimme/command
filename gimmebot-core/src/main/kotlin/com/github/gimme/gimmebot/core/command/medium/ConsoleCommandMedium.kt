@@ -10,8 +10,8 @@ import java.util.Scanner
  */
 open class ConsoleCommandMedium : TextCommandMedium(true, false, null) {
 
-    override fun onInstall() {
-        super.onInstall()
+    override fun onEnable() {
+        super.onEnable()
 
         val sc = Scanner(System.`in`)
         val sender = ConsoleCommandSender

@@ -10,7 +10,7 @@ class HelpCommandTest {
     @Test
     fun `should return list of commands`() {
         val commandMedium = object : TextCommandMedium() {
-            override fun onInstall() {}
+            override fun onEnable() {}
         }
 
         commandMedium.commandManager.registerCommand(DummyCommand("one"))

@@ -12,8 +12,8 @@ class SpigotCommandMedium(
     includeConsoleListener: Boolean = true,
 ) : TextCommandMedium(includeHelpCommand, includeConsoleListener, "/") {
 
-    override fun onInstall() {
-        super.onInstall()
+    override fun onEnable() {
+        super.onEnable()
 
         TODO("Start listening to command input from MC chat")
     }

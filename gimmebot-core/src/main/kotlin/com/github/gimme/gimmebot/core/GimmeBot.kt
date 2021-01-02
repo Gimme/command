@@ -44,7 +44,7 @@ open class GimmeBot : Bot {
         // This starts a new thread and keeps the bot running
         ConsoleCommandMedium().apply {
             registerCommandManager(commandManager)
-            install()
+            enable()
         }
 
         onStart()

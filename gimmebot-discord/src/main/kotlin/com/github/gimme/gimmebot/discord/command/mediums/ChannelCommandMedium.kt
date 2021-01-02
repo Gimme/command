@@ -16,8 +16,8 @@ class ChannelCommandMedium(
     includeConsoleListener: Boolean = true,
 ) : TextCommandMedium(includeHelpCommand, includeConsoleListener, commandPrefix) {
 
-    override fun onInstall() {
-        super.onInstall()
+    override fun onEnable() {
+        super.onEnable()
 
         jda.addEventListener(object : ListenerAdapter() {
             override fun onMessageReceived(event: MessageReceivedEvent) {
