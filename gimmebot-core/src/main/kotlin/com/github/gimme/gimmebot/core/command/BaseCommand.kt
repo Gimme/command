@@ -11,7 +11,7 @@ import kotlin.reflect.full.findAnnotation
 /**
  * Represents a command with base functionality.
  *
- * A public method marked with @[com.github.gimme.gimmebot.core.command.executor.CommandExecutor] is called when the
+ * A public method marked with @[CommandExecutor] is called when the
  * command is executed.
  *
  * @param T      the response type
