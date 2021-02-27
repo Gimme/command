@@ -35,7 +35,7 @@ internal fun <T> tryExecuteCommandByReflection(
 ): T {
     val function = command.getFirstCommandExecutorFunction()
 
-    return attemptToCallFunction(function, command, commandSender, args)
+    return attemptToCallFunction(function, command, commandSender, args, mapOf()) // TODO: supply with named args
 }
 
 /**
@@ -62,7 +62,8 @@ internal fun <T> Command<T>.getFirstCommandExecutorFunction(): KFunction<T> {
 
 /**
  * Attempts to call the specified [function] in the given [command] as the given [commandSender], and returns the
- * optional command response if the given [args] fit the parameters of the [function] and it was successfully called.
+ * optional command response if the given [orderedArgs] and [namedArgs] fit the parameters of the [function] and it was
+ * successfully called.
  *
  * @param T the command response type
  * @throws CommandException if the command execution was unsuccessful
@@ -72,68 +73,82 @@ private fun <T> attemptToCallFunction(
     function: KFunction<T>,
     command: Command<T>,
     commandSender: CommandSender,
-    args: List<String>,
+    orderedArgs: List<String>,
+    namedArgs: Map<String, String>,
 ): T {
     val parameters: List<KParameter> = function.parameters
 
     // First argument has to be the instance (command)
     val typedArgsMap: MutableMap<KParameter, Any?> = mutableMapOf(Pair(parameters[0], command))
-    //val typedArgs: MutableList<Any?> = mutableListOf(command)
 
-    var paramIndex = 1 // Current parameter index
-    var argIndex = 0 // Current argument index
+    // If the first parameter is of a command sender type, inject it
 
-    // If the first parameter has the command sender type, we inject it
-    getCommandSenderParameter(parameters)?.let {
-        if (it.type.isSubtypeOf(COMMAND_SENDER_TYPE)) {
-            typedArgsMap[it] =
-                it.type.jvmErasure.safeCast(commandSender) ?: throw ErrorCode.INCOMPATIBLE_SENDER.createException()
-            paramIndex++
-        }
+    val param2 = parameters.getOrNull(1)
+    if (param2 != null && param2.type.isSubtypeOf(COMMAND_SENDER_TYPE)) {
+        typedArgsMap[param2] =
+            param2.type.jvmErasure.safeCast(commandSender) ?: throw ErrorCode.INCOMPATIBLE_SENDER.createException()
     }
 
-    val amountOfInputParameters = parameters.size - paramIndex
-    var amountOfOptionalArgs = 0
-    for (i in parameters.size - 1 downTo 0) {
-        if (!parameters[i].isOptional) break
-        amountOfOptionalArgs++
-    }
-    val hasVararg = parameters[parameters.size - 1].isVararg
-    val minRequiredAmountOfArgs = amountOfInputParameters - (if (hasVararg) 1 else 0) - amountOfOptionalArgs
-
-    if (args.size < minRequiredAmountOfArgs) throw ErrorCode.TOO_FEW_ARGUMENTS.createException()
-    if (!hasVararg && args.size > amountOfInputParameters) throw ErrorCode.TOO_MANY_ARGUMENTS.createException()
-
-    while (argIndex < args.size) {
-        if (paramIndex >= parameters.size) throw ErrorCode.TOO_MANY_ARGUMENTS.createException()
-        val param = parameters[paramIndex]
-        val arg = args[argIndex]
-
-        if (param.isVararg) {
-            val parameterType: ParameterType = ParameterType.fromArrayClass(param)
-                ?: throw InvalidParameterException("The function: \"" + function.name + "\" in " + command.javaClass.name +
-                        " has an unsupported parameter type: " + param.type.jvmErasure.jvmName)
-
-            val varargCollection = computeVarargs(parameterType, args, argIndex)
-
-            argIndex += varargCollection.size
-            typedArgsMap[param] = parameterType.castArray(varargCollection)
-        } else {
-            val value =
-                ParameterType.fromClass(param)?.castArg(arg) ?: throw ErrorCode.INVALID_ARGUMENT.createException(arg)
-            typedArgsMap[param] = value
-            argIndex++
-        }
-
-        paramIndex++
-    }
-
-    if (paramIndex < parameters.size && parameters[paramIndex].isVararg) {
-        typedArgsMap[parameters[paramIndex]] =
-            ParameterType.fromArrayClass(parameters[paramIndex])!!.castArray(mutableListOf<String>())
+    mergeArgs(function, orderedArgs, namedArgs, typedArgsMap).forEach { (index, arg) ->
+        val param = parameters[index]
+        val value = if (param.isVararg) ParameterType.fromArrayClass(param)?.castArray(arg as Collection<*>)
+            ?: throw ErrorCode.INVALID_ARGUMENT.createException(arg)
+        else ParameterType.fromClass(param)?.castArg(arg) ?: throw ErrorCode.INVALID_ARGUMENT.createException(arg)
+        typedArgsMap[param] = value
     }
 
     return function.callBy(typedArgsMap)
+}
+
+/**
+ * Merges [orderedArgs] amd [namedArgs] into one map of args by parameter index for the specified [function].
+ *
+ * Any parameter among the already [injectedArgs] is ignored.
+ *
+ * @throws CommandException if there was an issue merging or matching the args
+ */
+@Throws(CommandException::class)
+private fun mergeArgs(
+    function: KFunction<*>,
+    orderedArgs: List<Any>,
+    namedArgs: Map<String, Any>,
+    injectedArgs: Map<KParameter, Any?>,
+): Map<Int, Any> {
+    val mergedArgs = mutableMapOf<Int, Any>()
+    var orderedArgsIndex = 0
+
+    val namedArgsCopy = namedArgs.toMutableMap()
+
+    function.parameters
+        .filter { it.kind == KParameter.Kind.VALUE && !injectedArgs.containsKey(it) }
+        .forEach loop@{ param ->
+            var value = namedArgsCopy.remove(param.name)
+
+            if (value == null) {
+                if (param.isVararg) {
+                    val parameterType = ParameterType.fromArrayClass(param)
+                        ?: throw InvalidParameterException("The function: \"" + function.name + "\"" +
+                                " has an unsupported parameter type: " + param.type.jvmErasure.jvmName)
+                    value = computeVarargs(parameterType, orderedArgs, orderedArgsIndex)
+                    orderedArgsIndex += value.size
+                } else {
+                    if (orderedArgsIndex >= orderedArgs.size) {
+                        if (param.isOptional) return@loop
+                        throw ErrorCode.TOO_FEW_ARGUMENTS.createException()
+                    }
+
+                    value = orderedArgs[orderedArgsIndex++]
+                }
+            }
+
+            mergedArgs[param.index] = value
+        }
+
+    if (namedArgsCopy.isNotEmpty()) throw ErrorCode.INVALID_PARAMETER.createException(namedArgsCopy.iterator()
+        .next().key)
+    if (orderedArgsIndex < orderedArgs.size) throw ErrorCode.TOO_MANY_ARGUMENTS.createException()
+
+    return mergedArgs
 }
 
 /**
