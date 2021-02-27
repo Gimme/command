@@ -140,7 +140,7 @@ private fun <T> attemptToCallFunction(
  * Returns a typed collection of all values from the given [args] starting from the specified [startIndex] until an
  * arg is reached that cannot be casted to the type of the given vararg [param].
  */
-private fun computeVarargs(param: ParameterType, args: List<String>, startIndex: Int): Collection<*> {
+private fun computeVarargs(param: ParameterType, args: List<Any>, startIndex: Int): Collection<*> {
     val list: MutableList<Any> = mutableListOf()
 
     var i = startIndex

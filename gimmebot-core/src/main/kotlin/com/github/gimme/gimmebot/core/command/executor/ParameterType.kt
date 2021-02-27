@@ -39,10 +39,10 @@ enum class ParameterType(
         },
         { col -> col.map { v -> v as Boolean }.toBooleanArray() });
 
-    /** Casts the given [string] to the correct type. */
-    fun castArg(string: String): Any? = castArgFunction(string)
+    /** Casts the given [value] to the correct type, or null on failure. */
+    fun castArg(value: Any): Any? = if (clazz.isInstance(value)) value else castArgFunction(value.toString())
 
-    /** Casts the given [collection] to the correct array type. */
+    /** Casts the given [collection] to the correct array type, or null on failure. */
     fun castArray(collection: Collection<*>): Any? = castArrayFunction(collection)
 
     companion object {
