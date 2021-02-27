@@ -13,6 +13,9 @@ enum class ErrorCode(val message: String) {
     /** An argument has the wrong format. */
     INVALID_ARGUMENT("Invalid argument"),
 
+    /** A named argument parameter does not exist. */
+    INVALID_PARAMETER("Invalid parameter"),
+
     /** The command does not accept the type of the current command sender. */
     INCOMPATIBLE_SENDER("You cannot use that command"),
 
