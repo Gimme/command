@@ -32,8 +32,8 @@ enum class ParameterType(
         BooleanArray::class,
         { s ->
             when {
-                s.equals("true", true) -> true
-                s.equals("false", true) -> false
+                s.equals("true", true) || s == "1" -> true
+                s.equals("false", true) || s == "0" -> false
                 else -> null
             }
         },
