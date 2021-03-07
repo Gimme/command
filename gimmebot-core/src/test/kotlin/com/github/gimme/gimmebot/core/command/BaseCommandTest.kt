@@ -141,18 +141,6 @@ class BaseCommandTest {
     }
 
     @Test
-    fun `camel case should be split into separate lowercase words`() {
-        assertAll(
-            { assertEquals("lorem ipsum", "loremIpsum".splitCamelCase(" ")) },
-            { assertEquals("lorem ipsum", "LoremIpsum".splitCamelCase(" ")) },
-            { assertEquals("lorem ipsum", "lorem ipsum".splitCamelCase(" ")) },
-            { assertEquals("lorem ipsum", "Lorem Ipsum".splitCamelCase(" ")) },
-            { assertEquals("lorem-ipsum", "loremIpsum".splitCamelCase("-")) },
-            { assertEquals("lorem-ipsum", "lorem ipsum".splitCamelCase("-")) },
-        )
-    }
-
-    @Test
     fun `should get command usage`() {
         val command = object : DefaultBaseCommand("c") {
             @CommandExecutor("", "2")
@@ -160,7 +148,7 @@ class BaseCommandTest {
             }
         }
 
-        assertEquals("c <param-one> <param-two=2>", command.usage)
+        assertEquals("c <param one> <param two=2>", command.usage)
     }
 
     @Test
@@ -171,7 +159,7 @@ class BaseCommandTest {
             }
         }
 
-        assertEquals("c <param-one> <param-two=2>", command.usage)
+        assertEquals("c <param one> <param two=2>", command.usage)
     }
 
     companion object {

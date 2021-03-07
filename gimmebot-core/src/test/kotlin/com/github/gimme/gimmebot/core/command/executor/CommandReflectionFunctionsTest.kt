@@ -4,6 +4,7 @@ import com.github.gimme.gimmebot.core.command.BaseCommand
 import com.github.gimme.gimmebot.core.command.DUMMY_COMMAND_SENDER
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.assertThrows
 
 class CommandReflectionFunctionsTest {
@@ -64,5 +65,17 @@ class CommandReflectionFunctionsTest {
         assertThrows<ClassCastException> {
             tryExecuteCommandByReflection(command, DUMMY_COMMAND_SENDER, listOf()).toString()
         }
+    }
+
+    @Test
+    fun `camel case should be split into separate lowercase words`() {
+        assertAll(
+            { assertEquals("lorem ipsum", "loremIpsum".splitCamelCase(" ")) },
+            { assertEquals("lorem ipsum", "LoremIpsum".splitCamelCase(" ")) },
+            { assertEquals("lorem ipsum", "lorem ipsum".splitCamelCase(" ")) },
+            { assertEquals("lorem ipsum", "Lorem Ipsum".splitCamelCase(" ")) },
+            { assertEquals("lorem-ipsum", "loremIpsum".splitCamelCase("-")) },
+            { assertEquals("lorem-ipsum", "lorem ipsum".splitCamelCase("-")) },
+        )
     }
 }

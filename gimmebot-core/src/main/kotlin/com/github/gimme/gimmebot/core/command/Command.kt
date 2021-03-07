@@ -6,10 +6,16 @@ package com.github.gimme.gimmebot.core.command
  * @param T the response type
  * @property name the name of this command. Used as the main identifier.
  * @property usage information of how to use the command
+ * @property parameters this command's parameters
  */
-interface Command<out T>: Grouped {
+interface Command<out T> : Grouped {
+
     val name: String
     val usage: String
+    val parameters: CommandParameterSet
+
+    override val group: String
+        get() = name
 
     /**
      * Executes this command as the given [commandSender] with the given [args] and returns the response.
@@ -19,6 +25,23 @@ interface Command<out T>: Grouped {
     @Throws(CommandException::class)
     fun execute(commandSender: CommandSender, args: List<String>): T
 
-    override val group: String
-        get() = name
+    /**
+     * Returns suggestions on the next input word based on already submitted [namedArgs] and amount of [orderedArgs]
+     * already submitted.
+     */
+    fun getCompletionSuggestions(namedArgs: Set<String>, orderedArgs: Int): Set<String> {
+        val unusedParameters: List<CommandParameter> = this.parameters.filter { !namedArgs.contains(it.id) }.drop(orderedArgs)
+        val nextParameter: CommandParameter? = unusedParameters.firstOrNull()
+
+        val suggestions = mutableSetOf<String>()
+
+        nextParameter?.let { suggestions.addAll(it.suggestions) }
+        unusedParameters.forEach { suggestions.addAll(it.getFlagAliases()) }
+
+        return suggestions
+    }
+
+    private fun CommandParameter.getFlagAliases(): Set<String> {
+        return mutableSetOf("--$id").apply { addAll(flags.map { "-$it" }) }
+    }
 }

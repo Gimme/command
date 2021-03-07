@@ -1,11 +1,10 @@
 package com.github.gimme.gimmebot.core.command
 
 import com.github.gimme.gimmebot.core.command.executor.CommandExecutor
-import com.github.gimme.gimmebot.core.command.executor.getCommandDataParameters
+import com.github.gimme.gimmebot.core.command.executor.generateParameters
 import com.github.gimme.gimmebot.core.command.executor.getDefaultValue
 import com.github.gimme.gimmebot.core.command.executor.getFirstCommandExecutorFunction
 import com.github.gimme.gimmebot.core.command.executor.tryExecuteCommandByReflection
-import org.apache.commons.lang3.StringUtils
 import kotlin.reflect.full.findAnnotation
 
 /**
@@ -26,13 +25,14 @@ abstract class BaseCommand<out T>(name: String, parent: String? = null) : Comman
         val commandExecutor: CommandExecutor = function.findAnnotation()!!
         val sb = StringBuilder(name)
 
-        getCommandDataParameters(function).forEachIndexed { index, parameter ->
-            val defaultValue = getDefaultValue(commandExecutor, index)
-            sb.append(" <${parameter.name?.splitCamelCase("-")}${defaultValue?.let { "=$defaultValue" } ?: ""}>")
+        parameters.forEachIndexed { index, parameter ->
+            val defaultValue = commandExecutor.getDefaultValue(index)
+            sb.append(" <${parameter.displayName}${defaultValue?.let { "=$defaultValue" } ?: ""}>")
         }
 
         sb.toString()
     }
+    override val parameters: CommandParameterSet by lazy { generateParameters() }
 
     init {
         require(name.isNotEmpty())
@@ -57,11 +57,3 @@ abstract class BaseCommand<out T>(name: String, parent: String? = null) : Comman
         return true
     }
 }
-
-/**
- * Converts this string from camel case to separate lowercase words separated by the specified [separator].
- */
-internal fun String.splitCamelCase(separator: String): String =
-    StringUtils.join(StringUtils.splitByCharacterTypeCamelCase(this), separator)
-        .toLowerCase()
-        .replace("$separator $separator", separator)
