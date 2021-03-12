@@ -1,4 +1,4 @@
-package com.github.gimme.gimmebot.core.command.executor
+package com.github.gimme.gimmebot.boot.command.executor
 
 import kotlin.reflect.KClass
 import kotlin.reflect.KParameter
@@ -6,7 +6,7 @@ import kotlin.reflect.jvm.jvmErasure
 
 /**
  * Represents a supported parameter type for
- * [com.github.gimme.gimmebot.core.command.executor.CommandExecutor] commands.
+ * [com.github.gimme.gimmebot.boot.command.executor.CommandExecutor] commands.
  *
  * It is used to cast string input arguments to the corresponding type.
  */

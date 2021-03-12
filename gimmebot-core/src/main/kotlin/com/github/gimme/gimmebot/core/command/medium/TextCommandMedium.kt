@@ -3,7 +3,6 @@ package com.github.gimme.gimmebot.core.command.medium
 import com.github.gimme.gimmebot.core.command.CommandException
 import com.github.gimme.gimmebot.core.command.CommandSender
 import com.github.gimme.gimmebot.core.command.ErrorCode
-import com.github.gimme.gimmebot.core.command.commands.HelpCommand
 import com.github.gimme.gimmebot.core.command.manager.CommandManager
 import com.github.gimme.gimmebot.core.command.manager.TextCommandManager
 
@@ -13,24 +12,9 @@ import com.github.gimme.gimmebot.core.command.manager.TextCommandManager
  * @property commandPrefix prefix required for the input to be recognized as a command
  */
 abstract class TextCommandMedium(
-    includeHelpCommand: Boolean = true,
     includeConsoleListener: Boolean = true,
     open var commandPrefix: String? = null,
 ) : BaseCommandMedium<String?>(TextCommandManager(), includeConsoleListener) {
-
-    init {
-        if (includeHelpCommand) {
-            commandManager.registerCommand(HelpCommand(this)) {
-                val sb = StringBuilder("Commands:")
-
-                it.forEach { command ->
-                    sb.append("\n|  ${command.usage}")
-                }
-
-                sb.toString()
-            }
-        }
-    }
 
     override fun parseInput(sender: CommandSender, input: String) {
         val commandInput = validatePrefix(input) ?: return

@@ -1,7 +1,7 @@
-package com.github.gimme.gimmebot.core.command
+package com.github.gimme.gimmebot.boot.command
 
-import com.github.gimme.gimmebot.core.command.commands.HelpCommand
-import com.github.gimme.gimmebot.core.command.executor.CommandExecutor
+import com.github.gimme.gimmebot.boot.command.commands.HelpCommand
+import com.github.gimme.gimmebot.boot.command.executor.CommandExecutor
 import com.github.gimme.gimmebot.core.command.medium.TextCommandMedium
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -10,7 +10,7 @@ class HelpCommandTest {
 
     @Test
     fun `should return list of commands`() {
-        val commandMedium = object : TextCommandMedium(false) {
+        val commandMedium = object : TextCommandMedium() {
             override fun onEnable() {}
             override fun onDisable() {}
         }
@@ -27,7 +27,7 @@ class HelpCommandTest {
         assertEquals("three", response[2].name)
     }
 
-    private class DummyCommand(name: String) : DefaultBaseCommand(name) {
+    private class DummyCommand(name: String) : SimpleCommand<Any>(name) {
         @CommandExecutor
         fun execute() {
         }

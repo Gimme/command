@@ -1,4 +1,4 @@
-package com.github.gimme.gimmebot.core.command.executor
+package com.github.gimme.gimmebot.boot.command.executor
 
 /**
  * Marks a function in a [com.github.gimme.gimmebot.core.command.Command] class as a command executor meaning it

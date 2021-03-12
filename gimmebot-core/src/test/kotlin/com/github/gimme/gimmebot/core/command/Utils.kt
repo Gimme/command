@@ -1,14 +1,21 @@
 package com.github.gimme.gimmebot.core.command
 
 val DUMMY_COMMAND_SENDER = object : CommandSender {
-    override val name: String
-        get() = ""
+    override val name = ""
 
     override fun sendMessage(message: String) {}
 }
 
 val DUMMY_COMMAND = object : DefaultBaseCommand("test") {
+    override val usage = ""
+    override val parameters = CommandParameterSet(listOf())
+
     override fun execute(commandSender: CommandSender, args: List<String>) {}
 }
 
-const val DUMMY_RESPONSE = ""
+open class DefaultBaseCommand(name: String) : BaseCommand<Any>(name) {
+    override val usage = ""
+    override val parameters = CommandParameterSet(listOf())
+
+    override fun execute(commandSender: CommandSender, args: List<String>) {}
+}

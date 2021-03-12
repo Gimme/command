@@ -4,12 +4,13 @@ import com.github.gimme.gimmebot.core.command.ConsoleCommandSender
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import java.util.Scanner
+import java.util.*
 
 /**
  * Accepts input from the main console.
  */
-open class ConsoleCommandMedium : TextCommandMedium(true, false, null) {
+open class ConsoleCommandMedium :
+    TextCommandMedium(includeConsoleListener = false, commandPrefix = null) {
 
     private var job: Job? = null
 

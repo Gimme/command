@@ -13,9 +13,8 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter
 class ChannelCommandMedium(
     private val jda: JDA,
     commandPrefix: String?,
-    includeHelpCommand: Boolean = true,
     includeConsoleListener: Boolean = true,
-) : TextCommandMedium(includeHelpCommand, includeConsoleListener, commandPrefix) {
+) : TextCommandMedium(includeConsoleListener, commandPrefix) {
 
     private val eventListener: EventListener = object : ListenerAdapter() {
         override fun onMessageReceived(event: MessageReceivedEvent) {

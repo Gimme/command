@@ -8,9 +8,8 @@ import org.bukkit.plugin.java.JavaPlugin
  */
 class SpigotCommandMedium(
     private val plugin: JavaPlugin,
-    includeHelpCommand: Boolean = true,
     includeConsoleListener: Boolean = true,
-) : TextCommandMedium(includeHelpCommand, includeConsoleListener, "/") {
+) : TextCommandMedium(includeConsoleListener, "/") {
 
     override fun onEnable() {
         TODO("Start listening to command input from MC chat")

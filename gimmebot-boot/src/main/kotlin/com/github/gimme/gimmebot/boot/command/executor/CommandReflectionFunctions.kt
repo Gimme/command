@@ -1,14 +1,13 @@
-package com.github.gimme.gimmebot.core.command.executor
+package com.github.gimme.gimmebot.boot.command.executor
 
+import com.github.gimme.gimmebot.boot.command.exceptions.UnsupportedParameterException
 import com.github.gimme.gimmebot.core.command.Command
 import com.github.gimme.gimmebot.core.command.CommandException
 import com.github.gimme.gimmebot.core.command.CommandParameter
 import com.github.gimme.gimmebot.core.command.CommandParameterSet
-import com.github.gimme.gimmebot.core.command.CommandParameterType
 import com.github.gimme.gimmebot.core.command.CommandResponse
 import com.github.gimme.gimmebot.core.command.CommandSender
 import com.github.gimme.gimmebot.core.command.ErrorCode
-import com.github.gimme.gimmebot.core.command.exceptions.UnsupportedParameterException
 import org.apache.commons.lang3.StringUtils
 import kotlin.reflect.KFunction
 import kotlin.reflect.KParameter
@@ -43,7 +42,7 @@ internal fun Command<*>.generateParameters(): CommandParameterSet {
                 CommandParameter(
                     id = id,
                     displayName = name.splitCamelCase(" "),
-                    type = CommandParameterType.from(param),
+                    type = commandParameterTypeFrom(param),
                     vararg = param.isVararg,
                     optional = param.isOptional,
                     flags = flags,
