@@ -1,4 +1,4 @@
-package com.github.gimme.gimmebot.core.command.medium
+package com.github.gimme.gimmebot.core.command.channel
 
 import com.github.gimme.gimmebot.core.command.CommandSender
 

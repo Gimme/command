@@ -1,4 +1,4 @@
-package com.github.gimme.gimmebot.core.command.medium
+package com.github.gimme.gimmebot.core.command.channel
 
 import com.github.gimme.gimmebot.core.command.CommandException
 import com.github.gimme.gimmebot.core.command.CommandSender
@@ -7,14 +7,14 @@ import com.github.gimme.gimmebot.core.command.manager.CommandManager
 import com.github.gimme.gimmebot.core.command.manager.TextCommandManager
 
 /**
- * Represents a text-based command medium with, for example a chat box or a command line interface.
+ * Represents a text-based command channel with, for example, a chat box or a command line.
  *
  * @property commandPrefix prefix required for the input to be recognized as a command
  */
-abstract class TextCommandMedium(
+abstract class TextCommandChannel(
     includeConsoleListener: Boolean = true,
     open var commandPrefix: String? = null,
-) : BaseCommandMedium<String?>(TextCommandManager(), includeConsoleListener) {
+) : BaseCommandChannel<String?>(TextCommandManager(), includeConsoleListener) {
 
     override fun parseInput(sender: CommandSender, input: String) {
         val commandInput = validatePrefix(input) ?: return
@@ -66,7 +66,7 @@ abstract class TextCommandMedium(
     }
 
     /**
-     * Registers the given [commandManager] making the contained commands executable through this medium with the
+     * Registers the given [commandManager] making the contained commands executable through this channel with the
      * results converted to strings.
      */
     fun <T> registerCommandManager(commandManager: CommandManager<T>) {

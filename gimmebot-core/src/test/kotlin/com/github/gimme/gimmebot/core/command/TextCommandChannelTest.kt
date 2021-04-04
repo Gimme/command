@@ -1,13 +1,13 @@
 package com.github.gimme.gimmebot.core.command
 
 import com.github.gimme.gimmebot.core.command.manager.TextCommandManager
-import com.github.gimme.gimmebot.core.command.medium.TextCommandMedium
+import com.github.gimme.gimmebot.core.command.channel.TextCommandChannel
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 
-class TextCommandMediumTest {
+class TextCommandChannelTest {
 
     @ParameterizedTest
     @MethodSource("args")
@@ -24,7 +24,7 @@ class TextCommandMediumTest {
 
         commandManager.registerCommand(command)
 
-        object : TextCommandMedium() {
+        object : TextCommandChannel() {
             override fun onEnable() {
                 parseInput(DUMMY_COMMAND_SENDER, input)
             }

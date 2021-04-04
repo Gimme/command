@@ -2,7 +2,7 @@ package com.github.gimme.gimmebot.core
 
 import com.github.gimme.gimmebot.core.command.manager.CommandManager
 import com.github.gimme.gimmebot.core.command.manager.SimpleCommandManager
-import com.github.gimme.gimmebot.core.command.medium.ConsoleCommandMedium
+import com.github.gimme.gimmebot.core.command.channel.ConsoleCommandChannel
 import com.github.gimme.gimmebot.core.data.DataManager
 import com.github.gimme.gimmebot.core.data.config.BotConfig
 import com.github.gimme.gimmebot.core.data.requireResource
@@ -40,7 +40,7 @@ open class GimmeBot : Bot {
         dataManager = DataManager(File(name))
 
         // This starts a new thread and keeps the bot running
-        ConsoleCommandMedium().apply {
+        ConsoleCommandChannel().apply {
             registerCommandManager(this@GimmeBot.commandManager)
             enable()
         }

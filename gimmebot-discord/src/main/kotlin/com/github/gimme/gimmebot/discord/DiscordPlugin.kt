@@ -1,10 +1,10 @@
 package com.github.gimme.gimmebot.discord
 
-import com.github.gimme.gimmebot.core.command.medium.CommandMedium
+import com.github.gimme.gimmebot.core.command.channel.CommandChannel
 import com.github.gimme.gimmebot.core.data.requireResource
 import com.github.gimme.gimmebot.core.data.yaml.loadYamlFromResource
 //import com.github.gimme.gimmebot.core.plugin.TextPlatformPlugin
-import com.github.gimme.gimmebot.discord.command.mediums.ChannelCommandMedium
+import com.github.gimme.gimmebot.discord.command.ChannelCommandChannel
 import com.github.gimme.gimmebot.discord.config.DiscordConfig
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
@@ -26,13 +26,13 @@ open class DiscordPlugin /*: TextPlatformPlugin()*/ {
         private set
 
     @Throws(LoginException::class)
-    /*override*/ fun initCommandMedium(): CommandMedium<String?> {
+    /*override*/ fun initCommandMedium(): CommandChannel<String?> {
         config =
             requireResource(loadYamlFromResource(discordResourcePath, DiscordConfig::class.java), discordResourcePath)
 
         jda = JDABuilder.createDefault(config.token).build()
 
-        return ChannelCommandMedium(jda, config.prefix)
+        return ChannelCommandChannel(jda, config.prefix)
     }
 
     /*override*/ fun onDisable() {

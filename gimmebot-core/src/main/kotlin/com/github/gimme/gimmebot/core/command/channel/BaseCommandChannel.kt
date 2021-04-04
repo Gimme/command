@@ -1,4 +1,4 @@
-package com.github.gimme.gimmebot.core.command.medium
+package com.github.gimme.gimmebot.core.command.channel
 
 import com.github.gimme.gimmebot.core.command.CommandException
 import com.github.gimme.gimmebot.core.command.CommandSender
@@ -9,14 +9,14 @@ import com.github.gimme.gimmebot.core.command.manager.CommandManager
 import com.github.gimme.gimmebot.core.common.Enableable
 
 /**
- * Represents a command input medium with base functionality.
+ * Represents a command input/output channel with base functionality.
  *
  * @param R the output response type
  */
-abstract class BaseCommandMedium<R>(
+abstract class BaseCommandChannel<R>(
     final override val commandManager: CommandManager<R>,
     includeConsoleListener: Boolean = false,
-) : CommandMedium<R> {
+) : CommandChannel<R> {
 
     /** This medium's registered command managers. */
     protected val registeredCommandManagers: MutableList<CommandManagerRegistration<*, R>> = mutableListOf()

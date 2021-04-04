@@ -1,7 +1,6 @@
-package com.github.gimme.gimmebot.discord.command.mediums
+package com.github.gimme.gimmebot.discord.command
 
-import com.github.gimme.gimmebot.core.command.medium.TextCommandMedium
-import com.github.gimme.gimmebot.discord.command.ChannelCommandSender
+import com.github.gimme.gimmebot.core.command.channel.TextCommandChannel
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.hooks.EventListener
@@ -10,11 +9,11 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter
 /**
  * Handles input/output through Discord channels.
  */
-class ChannelCommandMedium(
+class ChannelCommandChannel(
     private val jda: JDA,
     commandPrefix: String?,
     includeConsoleListener: Boolean = true,
-) : TextCommandMedium(includeConsoleListener, commandPrefix) {
+) : TextCommandChannel(includeConsoleListener, commandPrefix) {
 
     private val eventListener: EventListener = object : ListenerAdapter() {
         override fun onMessageReceived(event: MessageReceivedEvent) {

@@ -2,12 +2,12 @@ package com.github.gimme.gimmebot.boot.command.commands
 
 import com.github.gimme.gimmebot.boot.command.SimpleCommand
 import com.github.gimme.gimmebot.boot.command.executor.CommandExecutor
-import com.github.gimme.gimmebot.core.command.medium.CommandMedium
+import com.github.gimme.gimmebot.core.command.channel.CommandChannel
 
 /**
  * Displays a list of available commands.
  */
-class HelpCommand(private val commandMedium: CommandMedium<*>) : SimpleCommand<List<HelpCommand.CommandHelp>>("help") {
+class HelpCommand(private val commandChannel: CommandChannel<*>) : SimpleCommand<List<HelpCommand.CommandHelp>>("help") {
 
     /** Prints available commands. */
     @CommandExecutor
@@ -15,7 +15,7 @@ class HelpCommand(private val commandMedium: CommandMedium<*>) : SimpleCommand<L
 
         val list: MutableList<CommandHelp> = mutableListOf()
 
-        commandMedium.commandManagers.forEach { commandManager ->
+        commandChannel.commandManagers.forEach { commandManager ->
             commandManager.commandCollection.getCommands().forEach {
                 list.add(CommandHelp(it.name, it.usage))
             }

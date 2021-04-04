@@ -1,4 +1,4 @@
-package com.github.gimme.gimmebot.core.command.medium
+package com.github.gimme.gimmebot.core.command.channel
 
 import com.github.gimme.gimmebot.core.command.ConsoleCommandSender
 import kotlinx.coroutines.GlobalScope
@@ -9,8 +9,8 @@ import java.util.*
 /**
  * Accepts input from the main console.
  */
-open class ConsoleCommandMedium :
-    TextCommandMedium(includeConsoleListener = false, commandPrefix = null) {
+open class ConsoleCommandChannel :
+    TextCommandChannel(includeConsoleListener = false, commandPrefix = null) {
 
     private var job: Job? = null
 
