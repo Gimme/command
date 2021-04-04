@@ -1,13 +1,15 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.4.31"
+    kotlin("jvm") version "1.4.32"
     `java-library`
     `maven-publish`
 }
 
 group = "com.github.gimme.gimmebot"
 version = "1.0-SNAPSHOT"
+java.targetCompatibility = JavaVersion.VERSION_1_8
+java.targetCompatibility = JavaVersion.VERSION_1_8
 
 repositories {
     mavenCentral()
