@@ -2,9 +2,9 @@ package com.github.gimme.gimmebot.boot.command
 
 import com.github.gimme.gimmebot.boot.command.executor.CommandExecutor
 import com.github.gimme.gimmebot.core.command.Command
-import com.github.gimme.gimmebot.core.command.CommandException
+import com.github.gimme.gimmebot.core.command.exception.CommandException
 import com.github.gimme.gimmebot.core.command.sender.CommandSender
-import com.github.gimme.gimmebot.core.command.ErrorCode
+import com.github.gimme.gimmebot.core.command.exception.ErrorCode
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertIterableEquals

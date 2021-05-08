@@ -1,5 +1,8 @@
 package com.github.gimme.gimmebot.core.command
 
+import com.github.gimme.gimmebot.core.command.exception.CommandException
+import com.github.gimme.gimmebot.core.command.exception.ErrorCode
+
 /**
  * Represents a command parameter, which helps define how arguments can be passed to the command execution function.
  *

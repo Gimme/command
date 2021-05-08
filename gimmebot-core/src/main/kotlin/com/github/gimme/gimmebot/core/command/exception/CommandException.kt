@@ -1,4 +1,4 @@
-package com.github.gimme.gimmebot.core.command
+package com.github.gimme.gimmebot.core.command.exception
 
 /**
  * An exception to be thrown when something goes wrong during command execution.

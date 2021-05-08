@@ -1,7 +1,7 @@
 package com.github.gimme.gimmebot.core.command.manager
 
 import com.github.gimme.gimmebot.core.command.Command
-import com.github.gimme.gimmebot.core.command.CommandException
+import com.github.gimme.gimmebot.core.command.exception.CommandException
 import com.github.gimme.gimmebot.core.command.sender.CommandSender
 import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandCollection
 
