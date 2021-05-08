@@ -2,6 +2,7 @@ package com.github.gimme.gimmebot.core.command
 
 import com.github.gimme.gimmebot.core.command.exception.CommandException
 import com.github.gimme.gimmebot.core.command.sender.CommandSender
+import com.github.gimme.gimmebot.core.common.Grouped
 
 /**
  * Represents an executable command.
