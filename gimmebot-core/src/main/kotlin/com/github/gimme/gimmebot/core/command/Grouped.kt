@@ -11,4 +11,9 @@ interface Grouped {
      * among elements inside that parent group.
      */
     val group: String
+
+    /**
+     *
+     */
+    fun getTokens(): List<String> = group.split(".")
 }
