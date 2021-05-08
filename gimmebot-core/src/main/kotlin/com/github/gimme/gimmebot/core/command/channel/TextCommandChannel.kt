@@ -1,7 +1,7 @@
 package com.github.gimme.gimmebot.core.command.channel
 
 import com.github.gimme.gimmebot.core.command.CommandException
-import com.github.gimme.gimmebot.core.command.CommandSender
+import com.github.gimme.gimmebot.core.command.sender.CommandSender
 import com.github.gimme.gimmebot.core.command.ErrorCode
 import com.github.gimme.gimmebot.core.command.manager.CommandManager
 import com.github.gimme.gimmebot.core.command.manager.TextCommandManager

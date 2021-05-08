@@ -1,6 +1,6 @@
 package com.github.gimme.gimmebot.core.command.channel
 
-import com.github.gimme.gimmebot.core.command.ConsoleCommandSender
+import com.github.gimme.gimmebot.core.command.sender.ConsoleCommandSender
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch

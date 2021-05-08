@@ -1,5 +1,7 @@
 package com.github.gimme.gimmebot.core.command
 
+import com.github.gimme.gimmebot.core.command.sender.MessageReceiver
+
 /**
  * Represents a response after executing a command with and [body] to be communicated back to the
  * sender. If the command execution failed, an [error] is included with the reason.

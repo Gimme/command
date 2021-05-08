@@ -6,8 +6,8 @@ import com.github.gimme.gimmebot.core.command.CommandException
 import com.github.gimme.gimmebot.core.command.CommandParameter
 import com.github.gimme.gimmebot.core.command.CommandParameterSet
 import com.github.gimme.gimmebot.core.command.CommandResponse
-import com.github.gimme.gimmebot.core.command.CommandSender
 import com.github.gimme.gimmebot.core.command.ErrorCode
+import com.github.gimme.gimmebot.core.command.sender.CommandSender
 import org.apache.commons.lang3.StringUtils
 import kotlin.reflect.KFunction
 import kotlin.reflect.KParameter

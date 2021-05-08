@@ -1,6 +1,6 @@
 package com.github.gimme.gimmebot.core.command.channel
 
-import com.github.gimme.gimmebot.core.command.MessageReceiver
+import com.github.gimme.gimmebot.core.command.sender.MessageReceiver
 import com.github.gimme.gimmebot.core.command.manager.CommandManager
 import com.github.gimme.gimmebot.core.common.Enableable
 

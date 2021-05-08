@@ -2,6 +2,7 @@ package com.github.gimme.gimmebot.core.command
 
 import com.github.gimme.gimmebot.core.command.manager.TextCommandManager
 import com.github.gimme.gimmebot.core.command.channel.TextCommandChannel
+import com.github.gimme.gimmebot.core.command.sender.CommandSender
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments

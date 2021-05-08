@@ -1,4 +1,4 @@
-package com.github.gimme.gimmebot.core.command
+package com.github.gimme.gimmebot.core.command.sender
 
 /**
  * Accepts input from console.

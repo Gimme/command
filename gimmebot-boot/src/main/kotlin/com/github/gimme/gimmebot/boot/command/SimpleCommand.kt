@@ -8,7 +8,7 @@ import com.github.gimme.gimmebot.boot.command.executor.tryExecuteCommandByReflec
 import com.github.gimme.gimmebot.core.command.BaseCommand
 import com.github.gimme.gimmebot.core.command.Command
 import com.github.gimme.gimmebot.core.command.CommandParameterSet
-import com.github.gimme.gimmebot.core.command.CommandSender
+import com.github.gimme.gimmebot.core.command.sender.CommandSender
 import kotlin.reflect.full.findAnnotation
 
 /**

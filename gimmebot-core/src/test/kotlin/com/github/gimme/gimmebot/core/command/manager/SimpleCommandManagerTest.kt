@@ -1,6 +1,6 @@
 package com.github.gimme.gimmebot.core.command.manager
 
-import com.github.gimme.gimmebot.core.command.CommandSender
+import com.github.gimme.gimmebot.core.command.sender.CommandSender
 import com.github.gimme.gimmebot.core.command.DUMMY_COMMAND
 import com.github.gimme.gimmebot.core.command.DUMMY_COMMAND_SENDER
 import com.github.gimme.gimmebot.core.command.DefaultBaseCommand
