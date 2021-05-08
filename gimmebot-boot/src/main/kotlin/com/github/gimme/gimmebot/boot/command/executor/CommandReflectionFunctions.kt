@@ -2,9 +2,9 @@ package com.github.gimme.gimmebot.boot.command.executor
 
 import com.github.gimme.gimmebot.boot.command.exceptions.UnsupportedParameterException
 import com.github.gimme.gimmebot.core.command.Command
-import com.github.gimme.gimmebot.core.command.exception.CommandException
 import com.github.gimme.gimmebot.core.command.CommandParameter
 import com.github.gimme.gimmebot.core.command.CommandParameterSet
+import com.github.gimme.gimmebot.core.command.exception.CommandException
 import com.github.gimme.gimmebot.core.command.exception.ErrorCode
 import com.github.gimme.gimmebot.core.command.sender.CommandSender
 import org.apache.commons.lang3.StringUtils
@@ -35,12 +35,13 @@ internal fun Command<*>.generateParameters(): CommandParameterSet {
             .map { param ->
                 val name = param.name ?: throw UnsupportedParameterException(param)
                 val id = name.splitCamelCase("-")
+                val displayName = name.splitCamelCase(" ")
                 val flags = generateFlags(id, usedFlags)
                 usedFlags.addAll(flags)
 
                 CommandParameter(
                     id = id,
-                    displayName = name.splitCamelCase(" "),
+                    displayName = displayName,
                     type = commandParameterTypeFrom(param),
                     vararg = param.isVararg,
                     optional = param.isOptional,
