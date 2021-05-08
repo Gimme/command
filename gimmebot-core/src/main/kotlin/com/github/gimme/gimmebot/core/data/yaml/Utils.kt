@@ -2,9 +2,7 @@ package com.github.gimme.gimmebot.core.data.yaml
 
 import org.yaml.snakeyaml.Yaml
 import java.io.File
-import java.io.IOException
 import java.io.InputStream
-import kotlin.jvm.Throws
 
 private val yaml = Yaml()
 
@@ -13,13 +11,13 @@ fun <T> loadYamlFromFile(file: File, type: Class<T>): T? =
     yaml.loadAs(file.bufferedReader(), type)
 
 /**
- * Loads an object with the specified [type] from the resource at the given [resourcePath] using the given [classLoader]
- * or the current thread's class loader by default. Returns null if failed to load.
+ * Loads an object with the specified [type] from the resource at the given [resourcePath] using the given
+ * [classLoader]. Returns null if failed to load.
  */
 fun <T> loadYamlFromResource(
     resourcePath: String,
     type: Class<T>,
-    classLoader: ClassLoader = Thread.currentThread().contextClassLoader,
+    classLoader: ClassLoader = type.classLoader,
 ): T? {
     val inputStream = getOptionalResourceAsStream(resourcePath, classLoader) ?: return null
     return yaml.loadAs(inputStream, type)
