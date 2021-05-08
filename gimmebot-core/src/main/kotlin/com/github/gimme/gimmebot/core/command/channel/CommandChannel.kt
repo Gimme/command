@@ -9,7 +9,7 @@ import com.github.gimme.gimmebot.core.common.Enableable
  *
  * @param R the output response type
  */
-interface CommandChannel<R> : CommandInputHandler, CommandOutputHandler<R>, Enableable {
+interface CommandChannel<R> : CommandInputParser, CommandOutputSender<R>, Enableable {
 
     /** This channel's main command manager. */
     val commandManager: CommandManager<R>
