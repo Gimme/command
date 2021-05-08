@@ -38,8 +38,10 @@ abstract class BaseCommandChannel<R>(
         registerCommandManager(commandManager) { it }
     }
 
-    override fun parseInput(sender: CommandSender, input: String) {
+    override fun parseInput(sender: CommandSender, input: String): Boolean {
         ioListeners.forEach { it.sendMessage("${sender.name}: $input") }
+
+        return false
     }
 
     override fun respond(commandSender: CommandSender, response: R) {

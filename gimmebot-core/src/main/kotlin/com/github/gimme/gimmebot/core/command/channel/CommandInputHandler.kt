@@ -7,6 +7,6 @@ import com.github.gimme.gimmebot.core.command.CommandSender
  */
 interface CommandInputHandler {
 
-    /** Parses the specified [input] as the given [sender]. */
-    fun parseInput(sender: CommandSender, input: String)
+    /** Parses the specified [input] as the given [sender] and returns if the [input] matched a command. */
+    fun parseInput(sender: CommandSender, input: String): Boolean
 }

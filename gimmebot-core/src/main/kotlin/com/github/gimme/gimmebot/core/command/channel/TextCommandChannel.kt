@@ -16,19 +16,21 @@ abstract class TextCommandChannel(
     open var commandPrefix: String? = null,
 ) : BaseCommandChannel<String?>(TextCommandManager(), includeConsoleListener) {
 
-    override fun parseInput(sender: CommandSender, input: String) {
-        val commandInput = validatePrefix(input) ?: return
+    override fun parseInput(sender: CommandSender, input: String): Boolean {
+        val commandInput = validatePrefix(input) ?: return false
 
         super.parseInput(sender, input)
 
         val message = try { // Execute the command
             executeCommand(sender, commandInput)
         } catch (e: CommandException) { // The command returned with an error
+            if (e.code == ErrorCode.NOT_A_COMMAND.code()) return false
             e.message
         }
 
         // Send back the response
         respond(sender, message)
+        return true
     }
 
     override fun respond(commandSender: CommandSender, response: String?) {
