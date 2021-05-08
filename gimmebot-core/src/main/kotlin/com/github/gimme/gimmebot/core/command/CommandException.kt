@@ -9,12 +9,4 @@ package com.github.gimme.gimmebot.core.command
 class CommandException(
     val code: String,
     override val message: String,
-) : RuntimeException(message) {
-
-    /**
-     * Creates a new empty [CommandResponse] with this error.
-     */
-    fun response(): CommandResponse<Any> {
-        return CommandResponse(error = this)
-    }
-}
+) : RuntimeException(message)

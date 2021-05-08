@@ -5,7 +5,6 @@ import com.github.gimme.gimmebot.core.command.Command
 import com.github.gimme.gimmebot.core.command.CommandException
 import com.github.gimme.gimmebot.core.command.CommandParameter
 import com.github.gimme.gimmebot.core.command.CommandParameterSet
-import com.github.gimme.gimmebot.core.command.CommandResponse
 import com.github.gimme.gimmebot.core.command.ErrorCode
 import com.github.gimme.gimmebot.core.command.sender.CommandSender
 import org.apache.commons.lang3.StringUtils
@@ -78,7 +77,7 @@ internal fun String.splitCamelCase(separator: String): String =
         .replace("$separator $separator", separator)
 
 /**
- * Attempts to execute the given [command] as the given [commandSender], and returns the optional [CommandResponse] if
+ * Attempts to execute the given [command] as the given [commandSender], and returns the response if
  * the given [args] fit the parameters of a function in the [command] annotated with @[CommandExecutor] and it was
  * successfully called.
  *
