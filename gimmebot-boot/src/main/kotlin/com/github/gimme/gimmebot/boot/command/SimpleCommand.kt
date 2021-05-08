@@ -23,7 +23,10 @@ import kotlin.reflect.full.findAnnotation
  */
 abstract class SimpleCommand<out T>(name: String, parent: String? = null) : BaseCommand<T>(name, parent) {
 
-    override val usage: String by lazy {
+    final override var usage: String
+    final override var parameters: CommandParameterSet = generateParameters()
+
+    init {
         val function = getFirstCommandExecutorFunction()
         val commandExecutor: CommandExecutor = function.findAnnotation()!!
         val sb = StringBuilder(name)
@@ -33,9 +36,8 @@ abstract class SimpleCommand<out T>(name: String, parent: String? = null) : Base
             sb.append(" <${parameter.displayName}${defaultValue?.let { "=$defaultValue" } ?: ""}>")
         }
 
-        sb.toString()
+        this.usage = sb.toString()
     }
-    override val parameters: CommandParameterSet by lazy { generateParameters() }
 
     protected constructor(name: String, parent: Command<T>) : this(name, parent.name)
 

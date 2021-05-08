@@ -5,7 +5,7 @@ package com.github.gimme.gimmebot.core.command
  *
  * The main purpose of this class is to supply efficient lookup methods.
  */
-class CommandParameterSet(parameters: Collection<CommandParameter>): Set<CommandParameter> {
+class CommandParameterSet(parameters: Collection<CommandParameter> = listOf()): Set<CommandParameter> {
 
     private val parameters: List<CommandParameter> = parameters.toList()
     private val parameterById: Map<String, CommandParameter> = parameters.map { it.id to it }.toMap()

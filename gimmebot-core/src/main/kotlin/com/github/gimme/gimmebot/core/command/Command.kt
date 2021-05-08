@@ -11,8 +11,8 @@ package com.github.gimme.gimmebot.core.command
 interface Command<out T> : Grouped {
 
     val name: String
-    val usage: String
-    val parameters: CommandParameterSet
+    var usage: String
+    var parameters: CommandParameterSet
 
     override val group: String
         get() = name
