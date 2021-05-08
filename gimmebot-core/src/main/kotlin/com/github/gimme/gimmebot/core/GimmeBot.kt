@@ -1,9 +1,6 @@
 package com.github.gimme.gimmebot.core
 
 import com.github.gimme.gimmebot.core.data.DataManager
-import com.github.gimme.gimmebot.core.data.config.BotConfig
-import com.github.gimme.gimmebot.core.data.requireResource
-import com.github.gimme.gimmebot.core.data.yaml.loadYamlFromResource
 import mu.KotlinLogging
 import java.io.File
 
@@ -14,8 +11,6 @@ open class GimmeBot : Bot {
 
     private val botResourcePath = "bot.yml"
     private val logger = KotlinLogging.logger {}
-
-    private lateinit var botConfig: BotConfig
 
     /** If the bot is started. */
     var started = false
@@ -28,14 +23,11 @@ open class GimmeBot : Bot {
         if (started) return
         started = true
 
-        botConfig = requireResource(loadYamlFromResource(botResourcePath, BotConfig::class.java), botResourcePath)
-        val name = botConfig.name
-
-        dataManager = DataManager(File(name))
+        dataManager = DataManager(File("bot-name")) // TODO: unique name
 
         onStart()
 
-        logger.info("$name started!")
+        logger.info("Bot started!")
     }
 
     override fun stop() {
@@ -44,7 +36,7 @@ open class GimmeBot : Bot {
 
         onStop()
 
-        logger.info("${botConfig.name} stopped!")
+        logger.info("Bot stopped!")
     }
 
     /** Performs startup logic. */

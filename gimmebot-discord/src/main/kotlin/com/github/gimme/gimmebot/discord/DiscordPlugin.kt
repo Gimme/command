@@ -3,7 +3,6 @@ package com.github.gimme.gimmebot.discord
 import com.github.gimme.gimmebot.core.command.channel.CommandChannel
 import com.github.gimme.gimmebot.core.data.requireResource
 import com.github.gimme.gimmebot.core.data.yaml.loadYamlFromResource
-//import com.github.gimme.gimmebot.core.plugin.TextPlatformPlugin
 import com.github.gimme.gimmebot.discord.command.ChannelCommandChannel
 import com.github.gimme.gimmebot.discord.config.DiscordConfig
 import net.dv8tion.jda.api.JDA
