@@ -4,28 +4,24 @@ package com.github.gimme.gimmebot.core.command
  * Represents a command with base functionality.
  *
  * @param T      the response type
- * @param name   the non-empty name of this command
- * @param parent the name of this command's optional parent
+ * @param name   the command name
+ * @param parent the parent command, or null if no parent
  */
-abstract class BaseCommand<out T>(name: String, parent: String? = null) : Command<T> {
+abstract class BaseCommand<out T>(
+    final override val name: String,
+    final override val parent: Command<T>? = null,
+) : Command<T> {
 
-    final override val name: String
+    final override val id: String = "${parent?.let { "${it.id}$groupDelimiter" } ?: ""}$name"
 
-    init {
-        require(name.isNotEmpty())
-        this.name = (parent?.let { "$parent." } ?: "") + name.toLowerCase()
-    }
-
-    protected constructor(name: String, parent: Command<T>) : this(name, parent.name)
-
-    override fun hashCode(): Int = group.hashCode()
+    override fun hashCode(): Int = id.hashCode()
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
         other as BaseCommand<*>
 
-        if (name != other.name) return false
+        if (id != other.id) return false
 
         return true
     }

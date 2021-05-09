@@ -2,24 +2,23 @@ package com.github.gimme.gimmebot.core.command
 
 import com.github.gimme.gimmebot.core.command.exception.CommandException
 import com.github.gimme.gimmebot.core.command.sender.CommandSender
-import com.github.gimme.gimmebot.core.common.Grouped
+import com.github.gimme.gimmebot.core.common.grouped.Grouped
 
 /**
  * Represents an executable command.
  *
  * @param T the response type
- * @property name the name of this command. Used as the main identifier.
+ * @property name the command name
+ * @property parent the parent command to this command
  * @property usage information of how to use the command
  * @property parameters this command's parameters
  */
 interface Command<out T> : Grouped {
 
     val name: String
+    val parent: Command<*>?
     var usage: String
     var parameters: CommandParameterSet
-
-    override val group: String
-        get() = name
 
     /**
      * Executes this command as the given [commandSender] with the given [args] and returns the response.

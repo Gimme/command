@@ -1,29 +1,29 @@
 package com.github.gimme.gimmebot.core.command.manager.commandcollection
 
 import com.github.gimme.gimmebot.core.command.Command
+import com.github.gimme.gimmebot.core.common.grouped.Grouped
 
 /**
  * Represents a tree structure of commands.
  */
 class CommandTree : CommandCollection {
 
-    private val delimiter = "."
     private val root: Node<Command<*>> = Node("", null)
 
     override fun addCommand(command: Command<*>) {
-        val words = command.group.split(delimiter)
+        val words = command.path
 
         var currentNode = root
         for (word in words) {
-            currentNode = currentNode.children.computeIfAbsent(word.toLowerCase()) { k -> Node(k, null) }
+            currentNode = currentNode.children.computeIfAbsent(word) { k -> Node(k, null) }
         }
         currentNode.data = command
     }
 
-    override fun getCommand(name: String): Command<*>? {
+    override fun getCommand(id: Grouped): Command<*>? {
         var currentNode = root
 
-        for (word in name.toLowerCase().split(delimiter)) {
+        for (word in id.path) {
             currentNode = currentNode.children[word] ?: return null
         }
 
@@ -47,7 +47,7 @@ class CommandTree : CommandCollection {
         return lastFound
     }
 
-    override fun containsCommand(name: String): Boolean = getCommand(name) != null
+    override fun containsCommand(id: Grouped): Boolean = getCommand(id) != null
 
     private data class Node<T>(
         val name: String,

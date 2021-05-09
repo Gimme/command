@@ -1,7 +1,7 @@
 package com.github.gimme.gimmebot.boot.command.executor
 
 import com.github.gimme.gimmebot.boot.command.DUMMY_COMMAND_SENDER
-import com.github.gimme.gimmebot.boot.command.SimpleCommand
+import com.github.gimme.gimmebot.boot.command.TextCommand
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
@@ -11,7 +11,7 @@ class CommandReflectionFunctionsTest {
 
     @Test
     fun `should get first command executor function`() {
-        val commandExecutorFunction = object : SimpleCommand<String>("c") {
+        val commandExecutorFunction = object : TextCommand<String>("c") {
             fun c1(): String {
                 return ""
             }
@@ -33,7 +33,7 @@ class CommandReflectionFunctionsTest {
     @Test
     fun `getting non-existing command executor should throw exception`() {
         assertThrows<IllegalStateException> {
-            object : SimpleCommand<String>("c") {
+            object : TextCommand<String>("c") {
                 fun c(): String {
                     return ""
                 }
@@ -43,7 +43,7 @@ class CommandReflectionFunctionsTest {
 
     @Test
     fun `should execute command`() {
-        val command = object : SimpleCommand<String>("c") {
+        val command = object : TextCommand<String>("c") {
             @CommandExecutor
             fun c(): String {
                 return "abc"
@@ -55,7 +55,7 @@ class CommandReflectionFunctionsTest {
 
     @Test
     fun `executing command with wrong return type should throw exception`() {
-        val command = object : SimpleCommand<String>("c") {
+        val command = object : TextCommand<String>("c") {
             @CommandExecutor
             fun c(): Int {
                 return 1

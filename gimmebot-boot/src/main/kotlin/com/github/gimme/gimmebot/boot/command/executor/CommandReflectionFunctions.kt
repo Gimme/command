@@ -114,7 +114,7 @@ internal fun <T> Command<T>.getFirstCommandExecutorFunction(): KFunction<T> {
         return function as KFunction<T>
     }
 
-    throw IllegalStateException("No function marked with @${CommandExecutor::class.simpleName} in the command \"${this.name}\"")
+    throw IllegalStateException("No function marked with @${CommandExecutor::class.simpleName} in the command \"${this.id}\"")
 }
 
 /**

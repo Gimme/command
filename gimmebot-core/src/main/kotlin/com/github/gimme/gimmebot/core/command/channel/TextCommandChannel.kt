@@ -1,10 +1,12 @@
 package com.github.gimme.gimmebot.core.command.channel
 
+import com.github.gimme.gimmebot.core.command.Command
 import com.github.gimme.gimmebot.core.command.exception.CommandException
-import com.github.gimme.gimmebot.core.command.sender.CommandSender
 import com.github.gimme.gimmebot.core.command.exception.ErrorCode
 import com.github.gimme.gimmebot.core.command.manager.CommandManager
 import com.github.gimme.gimmebot.core.command.manager.TextCommandManager
+import com.github.gimme.gimmebot.core.command.sender.CommandSender
+import com.github.gimme.gimmebot.core.common.grouped.id
 
 /**
  * Represents a text-based command channel with, for example, a chat box or a command line.
@@ -43,28 +45,28 @@ abstract class TextCommandChannel(
 
     @Throws(CommandException::class)
     private fun executeCommand(commandSender: CommandSender, commandInput: String): String? {
-        var bestMatchCommandName: String? = null
+        var bestMatchCommand: Command<*>? = null
 
         registeredCommandManagers.forEach {
             val foundCommand = it.commandManager.commandCollection.findCommand(commandInput.split(" "))
 
-            foundCommand?.name?.let { name ->
-                if (name.length > bestMatchCommandName?.length ?: -1) {
-                    bestMatchCommandName = foundCommand.name
+            foundCommand?.let {
+                if (foundCommand.id.length > bestMatchCommand?.id?.length ?: -1) {
+                    bestMatchCommand = foundCommand
                 }
             }
         }
 
-        val commandName = bestMatchCommandName ?: throw ErrorCode.NOT_A_COMMAND.createException()
+        val command = bestMatchCommand ?: throw ErrorCode.NOT_A_COMMAND.createException()
 
         // Remove command name, leaving only the arguments
-        val argsInput = commandInput.removePrefix(commandName)
+        val argsInput = commandInput.removePrefix(command.id(" "))
 
         // Split into words on spaces, ignoring spaces between two quotation marks
         val args = argsInput.split("\\s(?=(?:[^\"]*\"[^\"]*\")*[^\"]*\$)".toRegex())
             .map { s -> s.replace("\"", "") }.drop(1)
 
-        return executeCommand(commandSender, commandName, args)
+        return executeCommand(commandSender, command, args)
     }
 
     /**

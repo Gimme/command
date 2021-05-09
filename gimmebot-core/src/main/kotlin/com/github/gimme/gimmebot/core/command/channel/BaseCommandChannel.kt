@@ -1,12 +1,13 @@
 package com.github.gimme.gimmebot.core.command.channel
 
 import com.github.gimme.gimmebot.core.command.exception.CommandException
+import com.github.gimme.gimmebot.core.command.exception.ErrorCode
+import com.github.gimme.gimmebot.core.command.manager.CommandManager
 import com.github.gimme.gimmebot.core.command.sender.CommandSender
 import com.github.gimme.gimmebot.core.command.sender.ConsoleCommandSender
-import com.github.gimme.gimmebot.core.command.exception.ErrorCode
 import com.github.gimme.gimmebot.core.command.sender.MessageReceiver
-import com.github.gimme.gimmebot.core.command.manager.CommandManager
 import com.github.gimme.gimmebot.core.common.Enableable
+import com.github.gimme.gimmebot.core.common.grouped.Grouped
 
 /**
  * Represents a command input/output channel with base functionality.
@@ -54,11 +55,11 @@ abstract class BaseCommandChannel<R>(
      * @throws CommandException if the command execution was unsuccessful
      */
     @Throws(CommandException::class)
-    protected fun executeCommand(commandSender: CommandSender, commandName: String, arguments: List<String>): R {
+    protected fun executeCommand(commandSender: CommandSender, commandId: Grouped, arguments: List<String>): R {
         registeredCommandManagers.forEach {
-            if (!it.commandManager.hasCommand(commandName)) return@forEach
+            if (!it.commandManager.hasCommand(commandId)) return@forEach
 
-            return it.executeCommand(commandSender, commandName, arguments)
+            return it.executeCommand(commandSender, commandId, arguments)
         }
 
         throw ErrorCode.NOT_A_COMMAND.createException()
@@ -86,14 +87,14 @@ abstract class BaseCommandChannel<R>(
         val responseWrapper: (T) -> R,
     ) {
         /**
-         * Executes the command with the specified [commandName] through this registered [commandManager] converting the
+         * Executes the command with the specified [commandId] through this registered [commandManager] converting the
          * response through the [responseWrapper].
          *
          * @throws CommandException if the command execution was unsuccessful
          */
         @Throws(CommandException::class)
-        fun executeCommand(commandSender: CommandSender, commandName: String, arguments: List<String> = listOf()): R {
-            val response = commandManager.executeCommand(commandSender, commandName, arguments)
+        fun executeCommand(commandSender: CommandSender, commandId: Grouped, arguments: List<String> = listOf()): R {
+            val response = commandManager.executeCommand(commandSender, commandId, arguments)
             return responseWrapper(response)
         }
     }

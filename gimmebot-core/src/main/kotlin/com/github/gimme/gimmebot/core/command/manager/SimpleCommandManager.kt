@@ -2,9 +2,10 @@ package com.github.gimme.gimmebot.core.command.manager
 
 import com.github.gimme.gimmebot.core.command.Command
 import com.github.gimme.gimmebot.core.command.exception.CommandException
-import com.github.gimme.gimmebot.core.command.sender.CommandSender
 import com.github.gimme.gimmebot.core.command.exception.ErrorCode
 import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandTree
+import com.github.gimme.gimmebot.core.command.sender.CommandSender
+import com.github.gimme.gimmebot.core.common.grouped.Grouped
 
 
 /**
@@ -26,16 +27,16 @@ open class SimpleCommandManager<R>(private val defaultResponseParser: (Any?) -> 
         }
     }
 
-    override fun getCommand(name: String): Command<*>? = commandCollection.getCommand(name)
+    override fun getCommand(id: Grouped): Command<*>? = commandCollection.getCommand(id)
 
-    override fun hasCommand(name: String): Boolean = commandCollection.containsCommand(name)
+    override fun hasCommand(id: Grouped): Boolean = commandCollection.containsCommand(id)
 
     override fun executeCommand(
         commandSender: CommandSender,
-        commandName: String,
+        commandId: Grouped,
         arguments: List<String>,
     ): R {
-        val command = getCommand(commandName) ?: throw ErrorCode.NOT_A_COMMAND.createException()
+        val command = getCommand(commandId) ?: throw ErrorCode.NOT_A_COMMAND.createException()
         val commandNode = executorByCommand[command]
 
         return commandNode?.execute(commandSender, arguments)

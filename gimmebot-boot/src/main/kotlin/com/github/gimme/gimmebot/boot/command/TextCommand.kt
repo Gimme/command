@@ -17,11 +17,9 @@ import kotlin.reflect.full.findAnnotation
  * A public method marked with @[CommandExecutor] is called when the
  * command is executed.
  *
- * @param T      the response type
- * @param name   the non-empty name of this command
- * @param parent the name of this command's optional parent
+ * @param T the response type
  */
-abstract class SimpleCommand<out T>(name: String, parent: String? = null) : BaseCommand<T>(name, parent) {
+abstract class TextCommand<out T>(name: String, parent: Command<T>? = null) : BaseCommand<T>(name, parent) {
 
     final override var usage: String
     final override var parameters: CommandParameterSet = generateParameters()
@@ -38,8 +36,6 @@ abstract class SimpleCommand<out T>(name: String, parent: String? = null) : Base
 
         this.usage = sb.toString()
     }
-
-    protected constructor(name: String, parent: Command<T>) : this(name, parent.name)
 
     override fun execute(commandSender: CommandSender, args: List<String>): T {
         return tryExecuteCommandByReflection(this, commandSender, args)
