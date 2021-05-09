@@ -18,6 +18,14 @@ interface Enableable {
         enabled = false
     }
 
+    /**
+     * Disables then re-enables this.
+     */
+    fun reload() {
+        disable()
+        enable()
+    }
+
     /** Performs logic when enabled. */
     fun onEnable()
 
