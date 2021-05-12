@@ -74,7 +74,9 @@ abstract class TextCommandChannel(
      * results converted to strings.
      */
     fun <T> registerCommandManager(commandManager: CommandManager<T>) {
-        super.registerCommandManager(commandManager) { it?.toString() }
+        super.registerCommandManager(commandManager) {
+            if (it is Unit) null else it?.toString()
+        }
     }
 
     /**
