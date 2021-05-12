@@ -7,6 +7,9 @@ import com.github.gimme.gimmebot.core.command.Command
  */
 interface CommandCollection {
 
+    /** Returns all commands in this collection. */
+    val commands: List<Command<*>>
+
     /** Adds the given [command] to this collection. */
     fun addCommand(command: Command<*>)
 
@@ -14,9 +17,6 @@ interface CommandCollection {
      * Returns the command from this collection with the [name], or null if no command with that [name] is registered.
      */
     fun getCommand(name: String): Command<*>?
-
-    /** Returns all commands in this collection. */
-    fun getCommands(): List<Command<*>>
 
     /** Returns the command that best matches the start of the [path], or null if no match. */
     fun findCommand(path: List<String>): Command<*>?

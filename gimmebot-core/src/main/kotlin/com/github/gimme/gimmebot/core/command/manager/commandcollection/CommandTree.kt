@@ -9,6 +9,13 @@ class CommandTree : CommandCollection {
 
     private val root: Node<Command<*>> = Node("", null)
 
+    override val commands: List<Command<*>>
+        get() {
+            val list = mutableListOf<Command<*>>()
+            root.fetchAllData(list)
+            return list
+        }
+
     override fun addCommand(command: Command<*>) {
         val words = command.name.split(" ")
 
@@ -27,23 +34,6 @@ class CommandTree : CommandCollection {
         }
 
         return currentNode.data
-    }
-
-    override fun getCommands(): List<Command<*>> {
-        val list = mutableListOf<Command<*>>()
-        root.fetchAllData(list)
-        return list
-    }
-
-    override fun findCommand(path: List<String>): Command<*>? {
-        var lastFound: Command<*>? = null
-
-        var currentNode = root
-        for (word in path) {
-            currentNode = currentNode.children[word.toLowerCase()] ?: break
-            lastFound = currentNode.data
-        }
-        return lastFound
     }
 
     override fun containsCommand(name: String): Boolean = getCommand(name) != null
