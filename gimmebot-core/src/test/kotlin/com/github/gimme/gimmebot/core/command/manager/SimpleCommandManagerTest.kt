@@ -3,7 +3,6 @@ package com.github.gimme.gimmebot.core.command.manager
 import com.github.gimme.gimmebot.core.command.DUMMY_COMMAND
 import com.github.gimme.gimmebot.core.command.DUMMY_COMMAND_SENDER
 import com.github.gimme.gimmebot.core.command.DefaultBaseCommand
-import com.github.gimme.gimmebot.core.command.GroupedId
 import com.github.gimme.gimmebot.core.command.sender.CommandSender
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertIterableEquals
@@ -23,8 +22,8 @@ class SimpleCommandManagerTest {
         commandManager.registerCommand(DUMMY_COMMAND)
 
         assertAll(
-            { assertNull(commandManager.getCommand(GroupedId("test726"))) },
-            { assertEquals(DUMMY_COMMAND, commandManager.getCommand(GroupedId("test"))) },
+            { assertNull(commandManager.getCommand("test726")) },
+            { assertEquals(DUMMY_COMMAND, commandManager.getCommand("test")) },
         )
     }
 
@@ -33,7 +32,7 @@ class SimpleCommandManagerTest {
         commandManager.registerCommand(object : DefaultBaseCommand("test") {})
         commandManager.registerCommand(DUMMY_COMMAND)
 
-        assertEquals(DUMMY_COMMAND, commandManager.getCommand(GroupedId("test")))
+        assertEquals(DUMMY_COMMAND, commandManager.getCommand("test"))
     }
 
     @ParameterizedTest
@@ -53,7 +52,7 @@ class SimpleCommandManagerTest {
         }
 
         commandManager.registerCommand(command)
-        commandManager.executeCommand(DUMMY_COMMAND_SENDER, GroupedId(inputCommandName))
+        commandManager.executeCommand(DUMMY_COMMAND_SENDER, inputCommandName)
 
         assertTrue(executed)
     }
@@ -69,7 +68,7 @@ class SimpleCommandManagerTest {
                 parentExecuted = true
             }
         }
-        val childCommand = object : DefaultBaseCommand("parent.child") {
+        val childCommand = object : DefaultBaseCommand("parent child") {
             override fun execute(commandSender: CommandSender, args: List<String>) {
                 assertIterableEquals(listOf("x", "y"), args)
                 childExecuted = true
@@ -78,8 +77,8 @@ class SimpleCommandManagerTest {
 
         commandManager.registerCommand(parentCommand)
         commandManager.registerCommand(childCommand)
-        commandManager.executeCommand(DUMMY_COMMAND_SENDER, GroupedId("parent"), listOf("a", "b"))
-        commandManager.executeCommand(DUMMY_COMMAND_SENDER, GroupedId("parent.child"), listOf("x", "y"))
+        commandManager.executeCommand(DUMMY_COMMAND_SENDER, "parent", listOf("a", "b"))
+        commandManager.executeCommand(DUMMY_COMMAND_SENDER, "parent child", listOf("x", "y"))
 
         assertTrue(parentExecuted)
         assertTrue(childExecuted)
@@ -90,8 +89,8 @@ class SimpleCommandManagerTest {
         val commandManager2 = SimpleCommandManager { it }
         commandManager2.registerCommand(childCommand)
         commandManager2.registerCommand(parentCommand)
-        commandManager2.executeCommand(DUMMY_COMMAND_SENDER, GroupedId("parent.child"), listOf("x", "y"))
-        commandManager2.executeCommand(DUMMY_COMMAND_SENDER, GroupedId("parent"), listOf("a", "b"))
+        commandManager2.executeCommand(DUMMY_COMMAND_SENDER, "parent child", listOf("x", "y"))
+        commandManager2.executeCommand(DUMMY_COMMAND_SENDER, "parent", listOf("a", "b"))
 
         assertTrue(childExecuted)
         assertTrue(parentExecuted)

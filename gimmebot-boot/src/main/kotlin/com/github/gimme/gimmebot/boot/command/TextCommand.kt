@@ -6,7 +6,6 @@ import com.github.gimme.gimmebot.boot.command.executor.getDefaultValue
 import com.github.gimme.gimmebot.boot.command.executor.getFirstCommandExecutorFunction
 import com.github.gimme.gimmebot.boot.command.executor.tryExecuteCommandByReflection
 import com.github.gimme.gimmebot.core.command.BaseCommand
-import com.github.gimme.gimmebot.core.command.Command
 import com.github.gimme.gimmebot.core.command.CommandParameterSet
 import com.github.gimme.gimmebot.core.command.sender.CommandSender
 import kotlin.reflect.full.findAnnotation
@@ -19,7 +18,7 @@ import kotlin.reflect.full.findAnnotation
  *
  * @param T the response type
  */
-abstract class TextCommand<out T>(name: String, parent: Command<T>? = null) : BaseCommand<T>(name, parent) {
+abstract class TextCommand<out T>(name: String) : BaseCommand<T>(name) {
 
     final override var usage: String
     final override var parameters: CommandParameterSet = generateParameters()

@@ -6,7 +6,6 @@ import com.github.gimme.gimmebot.core.command.exception.ErrorCode
 import com.github.gimme.gimmebot.core.command.manager.CommandManager
 import com.github.gimme.gimmebot.core.command.manager.TextCommandManager
 import com.github.gimme.gimmebot.core.command.sender.CommandSender
-import com.github.gimme.gimmebot.core.common.grouped.id
 
 /**
  * Represents a text-based command channel with, for example, a chat box or a command line.
@@ -51,7 +50,7 @@ abstract class TextCommandChannel(
             val foundCommand = it.commandManager.commandCollection.findCommand(commandInput.split(" "))
 
             foundCommand?.let {
-                if (foundCommand.id.length > bestMatchCommand?.id?.length ?: -1) {
+                if (foundCommand.name.length > bestMatchCommand?.name?.length ?: -1) {
                     bestMatchCommand = foundCommand
                 }
             }
@@ -60,13 +59,13 @@ abstract class TextCommandChannel(
         val command = bestMatchCommand ?: throw ErrorCode.NOT_A_COMMAND.createException()
 
         // Remove command name, leaving only the arguments
-        val argsInput = commandInput.removePrefix(command.id(" "))
+        val argsInput = commandInput.removePrefix(command.name)
 
         // Split into words on spaces, ignoring spaces between two quotation marks
         val args = argsInput.split("\\s(?=(?:[^\"]*\"[^\"]*\")*[^\"]*\$)".toRegex())
             .map { s -> s.replace("\"", "") }.drop(1)
 
-        return executeCommand(commandSender, command, args)
+        return executeCommand(commandSender, command.name, args)
     }
 
     /**
