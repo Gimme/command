@@ -23,6 +23,8 @@ abstract class TextCommand<out T>(
     name: String,
     aliases: Set<String> = setOf(),
     parentCommand: Command<*>? = null,
+    summary: String = "",
+    description: String = "",
 ) : BaseCommand<T>(
     name = parentCommand?.let { "${parentCommand.name} $name" } ?: name,
     aliases = parentCommand?.let {
@@ -32,6 +34,8 @@ abstract class TextCommand<out T>(
             }
         }.toSet().minus("${parentCommand.name} $name")
     } ?: aliases,
+    summary = summary,
+    description = description,
 ) {
 
     final override var usage: String

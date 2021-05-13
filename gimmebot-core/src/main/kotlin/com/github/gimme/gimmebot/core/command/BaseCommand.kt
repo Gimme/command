@@ -8,6 +8,8 @@ package com.github.gimme.gimmebot.core.command
 abstract class BaseCommand<out T>(
     override val name: String,
     override val aliases: Set<String> = setOf(),
+    override val summary: String = "",
+    override val description: String = "",
 ) : Command<T> {
 
     override fun hashCode(): Int = name.hashCode()

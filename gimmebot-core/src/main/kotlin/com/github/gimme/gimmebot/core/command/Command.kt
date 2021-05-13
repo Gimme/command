@@ -6,16 +6,20 @@ import com.github.gimme.gimmebot.core.command.sender.CommandSender
 /**
  * Represents an executable command.
  *
- * @param T the response type
- * @property name the command name
- * @property aliases aliases for the name
- * @property usage information of how to use the command
- * @property parameters this command's parameters
+ * @param T              the response type
+ * @property name        the command name
+ * @property aliases     aliases for the name
+ * @property summary     a summary of what this command does
+ * @property description a detailed description of this command
+ * @property usage       information of how to use the command
+ * @property parameters  this command's parameters
  */
 interface Command<out T> {
 
     val name: String
     val aliases: Set<String>
+    val summary: String
+    val description: String
     var usage: String
     var parameters: CommandParameterSet
 
@@ -32,7 +36,8 @@ interface Command<out T> {
      * already submitted.
      */
     fun getCompletionSuggestions(namedArgs: Set<String>, orderedArgs: Int): Set<String> {
-        val unusedParameters: List<CommandParameter> = this.parameters.filter { !namedArgs.contains(it.id) }.drop(orderedArgs)
+        val unusedParameters: List<CommandParameter> =
+            this.parameters.filter { !namedArgs.contains(it.id) }.drop(orderedArgs)
         val nextParameter: CommandParameter? = unusedParameters.firstOrNull()
 
         val suggestions = mutableSetOf<String>()
