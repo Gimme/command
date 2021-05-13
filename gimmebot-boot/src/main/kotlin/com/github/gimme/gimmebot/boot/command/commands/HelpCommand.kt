@@ -16,7 +16,7 @@ class HelpCommand(private val commandChannel: CommandChannel<*>) : TextCommand<L
         val list: MutableList<CommandHelp> = mutableListOf()
 
         commandChannel.commandManagers.forEach { commandManager ->
-            commandManager.commandCollection.commands.forEach {
+            commandManager.commandCollection.forEach {
                 list.add(CommandHelp(it.name, it.usage))
             }
         }

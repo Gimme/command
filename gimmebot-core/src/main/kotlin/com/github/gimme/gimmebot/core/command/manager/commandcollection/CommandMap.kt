@@ -9,8 +9,8 @@ class CommandMap : CommandCollection {
 
     private val map = mutableMapOf<String, Command<*>>()
 
-    override val commands: List<Command<*>>
-        get() = map.values.toList()
+    override val commands: Set<Command<*>>
+        get() = map.values.toSet()
 
     override fun addCommand(command: Command<*>) {
         map[command.name] = command

@@ -8,7 +8,7 @@ import com.github.gimme.gimmebot.core.command.Command
 interface CommandCollection : Iterable<Command<*>> {
 
     /** Returns all commands in this collection. */
-    val commands: List<Command<*>>
+    val commands: Set<Command<*>>
 
     /** Adds the given [command] to this collection. */
     fun addCommand(command: Command<*>)
