@@ -110,8 +110,15 @@ internal fun <T> Command<T>.getFirstCommandExecutorFunction(): KFunction<T> {
         // Make sure it has the right annotation
         if (!function.hasAnnotation<CommandExecutor>()) continue
 
-        @Suppress("UNCHECKED_CAST")
-        return function as KFunction<T>
+        return try {
+            @Suppress("UNCHECKED_CAST")
+            function as KFunction<T>
+        } catch (e: ClassCastException) {
+            throw ClassCastException("The return type: \"${function.returnType.jvmErasure.qualifiedName}\" of the" +
+                    " command executor function: \"${function.name}\" in the command: \"$name\" does not match the" +
+                    " command's return type."
+            )
+        }
     }
 
     throw IllegalStateException("No function marked with @${CommandExecutor::class.simpleName} in the command \"${this.name}\"")
