@@ -5,7 +5,10 @@ package com.github.gimme.gimmebot.core.command
  *
  * @param T the response type
  */
-abstract class BaseCommand<out T>(override val name: String) : Command<T> {
+abstract class BaseCommand<out T>(
+    override val name: String,
+    override val aliases: Set<String> = setOf(),
+) : Command<T> {
 
     override fun hashCode(): Int = name.hashCode()
     override fun equals(other: Any?): Boolean {

@@ -1,6 +1,5 @@
 package com.github.gimme.gimmebot.core.command.channel
 
-import com.github.gimme.gimmebot.core.command.Command
 import com.github.gimme.gimmebot.core.command.exception.CommandException
 import com.github.gimme.gimmebot.core.command.exception.ErrorCode
 import com.github.gimme.gimmebot.core.command.manager.CommandManager
@@ -45,40 +44,40 @@ abstract class TextCommandChannel(
 
     @Throws(CommandException::class)
     private fun executeCommand(commandSender: CommandSender, commandInput: String): String? {
-        var bestMatchCommand: Command<*>? = null
+        var bestMatchCommandLabel: String? = null
 
         registeredCommandManagers.forEach {
-            val foundCommand = it.commandManager.commandCollection.findCommand(commandInput)
+            val foundCommandLabel = it.commandManager.commandCollection.findCommand(commandInput)
 
-            foundCommand?.let {
-                if (foundCommand.name.length > bestMatchCommand?.name?.length ?: -1) {
-                    bestMatchCommand = foundCommand
+            foundCommandLabel?.let {
+                if (foundCommandLabel.length > bestMatchCommandLabel?.length ?: -1) {
+                    bestMatchCommandLabel = foundCommandLabel
                 }
             }
         }
 
-        val command = bestMatchCommand ?: throw ErrorCode.NOT_A_COMMAND.createException()
+        val commandLabel = bestMatchCommandLabel ?: throw ErrorCode.NOT_A_COMMAND.createException()
 
         // Remove command name, leaving only the arguments
-        val argsInput = commandInput.removePrefix(command.name)
+        val argsInput = commandInput.removePrefix(commandLabel)
 
         // Split into words on spaces, ignoring spaces between two quotation marks
         val args = argsInput.split("\\s(?=(?:[^\"]*\"[^\"]*\")*[^\"]*\$)".toRegex())
             .map { s -> s.replace("\"", "") }.drop(1)
 
-        return executeCommand(commandSender, command.name, args)
+        return executeCommand(commandSender, commandLabel, args)
     }
 
     /**
-     * Returns the best matching command from the [commandInput], or null if no match.
+     * Returns the best matching command label from the [commandInput], or null if no match.
      */
-    private fun CommandCollection.findCommand(commandInput: String): Command<*>? {
+    private fun CommandCollection.findCommand(commandInput: String): String? {
         val words = commandInput.split(" ")
 
         var s = commandInput
 
         for (word in words.reversed()) {
-            this.getCommand(s)?.let { return it }
+            if (this.containsCommand(s)) return s
 
             s = s.removeSuffix(" $word")
         }

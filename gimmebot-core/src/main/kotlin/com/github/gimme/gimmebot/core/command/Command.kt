@@ -8,12 +8,14 @@ import com.github.gimme.gimmebot.core.command.sender.CommandSender
  *
  * @param T the response type
  * @property name the command name
+ * @property aliases aliases for the name
  * @property usage information of how to use the command
  * @property parameters this command's parameters
  */
 interface Command<out T> {
 
     val name: String
+    val aliases: Set<String>
     var usage: String
     var parameters: CommandParameterSet
 

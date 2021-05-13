@@ -21,8 +21,18 @@ import kotlin.reflect.full.findAnnotation
  */
 abstract class TextCommand<out T>(
     name: String,
+    aliases: Set<String> = setOf(),
     parentCommand: Command<*>? = null,
-) : BaseCommand<T>(parentCommand?.let { "${it.name} $name" } ?: name) {
+) : BaseCommand<T>(
+    name = parentCommand?.let { "${parentCommand.name} $name" } ?: name,
+    aliases = parentCommand?.let {
+        (parentCommand.aliases + parentCommand.name).flatMap { parentAlias ->
+            (aliases + name).map { alias ->
+                "$parentAlias $alias"
+            }
+        }.toSet().minus("${parentCommand.name} $name")
+    } ?: aliases,
+) {
 
     final override var usage: String
     final override var parameters: CommandParameterSet = generateParameters()

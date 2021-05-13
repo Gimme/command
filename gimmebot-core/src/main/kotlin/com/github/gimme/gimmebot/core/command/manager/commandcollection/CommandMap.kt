@@ -14,6 +14,10 @@ class CommandMap : CommandCollection {
 
     override fun addCommand(command: Command<*>) {
         map[command.name] = command
+
+        command.aliases.forEach {
+            map.putIfAbsent(it, command)
+        }
     }
 
     override fun getCommand(name: String): Command<*>? = map[name]
