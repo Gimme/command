@@ -4,7 +4,7 @@ import com.github.gimme.gimmebot.core.command.Command
 import com.github.gimme.gimmebot.core.command.exception.CommandException
 import com.github.gimme.gimmebot.core.command.exception.ErrorCode
 import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandCollection
-import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandTree
+import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandMap
 import com.github.gimme.gimmebot.core.command.sender.CommandSender
 
 
@@ -17,7 +17,7 @@ open class SimpleCommandManager<R>(private val defaultResponseParser: (Any?) -> 
 
     private val executorByCommand: MutableMap<Command<*>, CommandNode<*, R>> = mutableMapOf()
 
-    override val commandCollection: CommandCollection = CommandTree()
+    override val commandCollection: CommandCollection = CommandMap()
 
     final override fun <T> registerCommand(command: Command<T>, responseConverter: ((T) -> R)?) {
         commandCollection.addCommand(command)
