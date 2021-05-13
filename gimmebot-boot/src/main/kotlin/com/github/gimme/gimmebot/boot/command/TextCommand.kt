@@ -6,19 +6,23 @@ import com.github.gimme.gimmebot.boot.command.executor.getDefaultValue
 import com.github.gimme.gimmebot.boot.command.executor.getFirstCommandExecutorFunction
 import com.github.gimme.gimmebot.boot.command.executor.tryExecuteCommandByReflection
 import com.github.gimme.gimmebot.core.command.BaseCommand
+import com.github.gimme.gimmebot.core.command.Command
 import com.github.gimme.gimmebot.core.command.CommandParameterSet
 import com.github.gimme.gimmebot.core.command.sender.CommandSender
 import kotlin.reflect.full.findAnnotation
 
 /**
- * Represents an easy to set up command.
+ * Represents an easy to set up text command.
  *
  * A public method marked with @[CommandExecutor] is called when the
  * command is executed.
  *
  * @param T the response type
  */
-abstract class TextCommand<out T>(name: String) : BaseCommand<T>(name) {
+abstract class TextCommand<out T>(
+    name: String,
+    parentCommand: Command<*>? = null,
+) : BaseCommand<T>(parentCommand?.let { "${it.name} $name" } ?: name) {
 
     final override var usage: String
     final override var parameters: CommandParameterSet = generateParameters()
