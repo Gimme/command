@@ -5,7 +5,7 @@ import com.github.gimme.gimmebot.core.command.Command
 /**
  * Represents a collection of commands.
  */
-interface CommandCollection {
+interface CommandCollection : Iterable<Command<*>> {
 
     /** Returns all commands in this collection. */
     val commands: List<Command<*>>
@@ -20,4 +20,6 @@ interface CommandCollection {
 
     /** Returns if this collection contains the command with the [name]. */
     fun containsCommand(name: String): Boolean
+
+    override fun iterator(): Iterator<Command<*>> = commands.iterator()
 }

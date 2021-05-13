@@ -19,4 +19,6 @@ class CommandMap : CommandCollection {
     override fun getCommand(name: String): Command<*>? = map[name]
 
     override fun containsCommand(name: String): Boolean = map.containsKey(name)
+
+    override fun iterator(): Iterator<Command<*>> = map.values.iterator()
 }
