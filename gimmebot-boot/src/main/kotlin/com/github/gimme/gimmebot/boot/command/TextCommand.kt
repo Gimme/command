@@ -19,7 +19,7 @@ import kotlin.reflect.full.findAnnotation
  *
  * @param T the response type
  */
-abstract class TextCommand<out T>(
+abstract class TextCommand<out T> @JvmOverloads constructor(
     name: String,
     aliases: Set<String> = setOf(),
     parentCommand: Command<*>? = null,
