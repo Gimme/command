@@ -15,7 +15,13 @@ val DUMMY_COMMAND = object : DefaultBaseCommand("test") {
     override fun execute(commandSender: CommandSender, args: List<String>) {}
 }
 
-open class DefaultBaseCommand(name: String) : BaseCommand<Any>(name) {
+open class DefaultBaseCommand(
+    name: String,
+    parent: Command<*>? = null,
+) : BaseCommand<Any>(
+    name = name,
+    parent = parent,
+) {
     override var usage = ""
     override var parameters = CommandParameterSet(listOf())
 

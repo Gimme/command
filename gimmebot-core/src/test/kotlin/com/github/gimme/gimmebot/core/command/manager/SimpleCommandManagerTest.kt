@@ -40,12 +40,31 @@ class SimpleCommandManagerTest {
         "test, test",
         "TEST, TEST",
         "Test, Test",
-        "test1 test2, test1 test2",
     )
     fun `should execute command`(commandName: String, inputCommandName: String) {
         var executed = false
 
         val command = object : DefaultBaseCommand(commandName) {
+            override fun execute(commandSender: CommandSender, args: List<String>) {
+                executed = true
+            }
+        }
+
+        commandManager.registerCommand(command)
+        commandManager.executeCommand(DUMMY_COMMAND_SENDER, inputCommandName)
+
+        assertTrue(executed)
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+        "a, b, a b",
+        "te/st, ., te/st .",
+    )
+    fun `Executes hierarchical command`(commandParent: String, commandName: String, inputCommandName: String) {
+        var executed = false
+
+        val command = object : DefaultBaseCommand(commandName, DefaultBaseCommand(commandParent)) {
             override fun execute(commandSender: CommandSender, args: List<String>) {
                 executed = true
             }
@@ -68,7 +87,7 @@ class SimpleCommandManagerTest {
                 parentExecuted = true
             }
         }
-        val childCommand = object : DefaultBaseCommand("parent child") {
+        val childCommand = object : DefaultBaseCommand("child", DefaultBaseCommand("parent")) {
             override fun execute(commandSender: CommandSender, args: List<String>) {
                 assertIterableEquals(listOf("x", "y"), args)
                 childExecuted = true
