@@ -1,5 +1,6 @@
 package com.github.gimme.gimmebot.core.command.channel
 
+import com.github.gimme.gimmebot.core.command.Command
 import com.github.gimme.gimmebot.core.command.exception.CommandException
 import com.github.gimme.gimmebot.core.command.exception.ErrorCode
 import com.github.gimme.gimmebot.core.command.manager.CommandManager
@@ -66,11 +67,15 @@ abstract class BaseCommandChannel<R>(
 
     final override fun <T> registerCommandManager(commandManager: CommandManager<T>, responseWrapper: (T) -> R) {
         registeredCommandManagers.add(CommandManagerRegistration(commandManager, responseWrapper))
+        commandManager.commandCollection.forEach { onRegisterCommand(it) }
+        commandManager.addRegisterCommandListener(this)
     }
 
     final override fun addIOListener(messageReceiver: MessageReceiver) {
         ioListeners.add(messageReceiver)
     }
+
+    override fun onRegisterCommand(command: Command<*>) {}
 
     /**
      * Represents a registered [commandManager] that can be used to execute commands with its responses converted to a

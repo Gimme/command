@@ -1,7 +1,7 @@
 package com.github.gimme.gimmebot.core.command.channel
 
-import com.github.gimme.gimmebot.core.command.sender.MessageReceiver
 import com.github.gimme.gimmebot.core.command.manager.CommandManager
+import com.github.gimme.gimmebot.core.command.sender.MessageReceiver
 import com.github.gimme.gimmebot.core.common.Enableable
 
 /**
@@ -9,7 +9,7 @@ import com.github.gimme.gimmebot.core.common.Enableable
  *
  * @param R the output response type
  */
-interface CommandChannel<R> : CommandInputParser, CommandOutputSender<R>, Enableable {
+interface CommandChannel<R> : CommandInputParser, CommandOutputSender<R>, Enableable, CommandManager.RegisterCommandListener {
 
     /** This channel's main command manager. */
     val commandManager: CommandManager<R>

@@ -15,6 +15,7 @@ import com.github.gimme.gimmebot.core.command.sender.CommandSender
  */
 open class SimpleCommandManager<R>(private val defaultResponseParser: (Any?) -> R) : CommandManager<R> {
 
+    private val registerCommandListeners: MutableList<CommandManager.RegisterCommandListener> = mutableListOf()
     private val executorByCommand: MutableMap<Command<*>, CommandNode<*, R>> = mutableMapOf()
 
     override val commandCollection: CommandCollection = CommandMap()
@@ -25,6 +26,7 @@ open class SimpleCommandManager<R>(private val defaultResponseParser: (Any?) -> 
         if (responseConverter != null) {
             executorByCommand[command] = CommandNode(command, responseConverter)
         }
+        registerCommandListeners.forEach { it.onRegisterCommand(command) }
     }
 
     override fun getCommand(name: String): Command<*>? = commandCollection.getCommand(name)
@@ -41,6 +43,10 @@ open class SimpleCommandManager<R>(private val defaultResponseParser: (Any?) -> 
 
         return commandNode?.execute(commandSender, arguments)
             ?: defaultResponseParser(command.execute(commandSender, arguments))
+    }
+
+    override fun addRegisterCommandListener(registerCommandListener: CommandManager.RegisterCommandListener) {
+        registerCommandListeners.add(registerCommandListener)
     }
 
     /**

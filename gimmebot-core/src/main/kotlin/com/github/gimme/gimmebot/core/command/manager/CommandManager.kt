@@ -35,4 +35,19 @@ interface CommandManager<R> {
      */
     @Throws(CommandException::class)
     fun executeCommand(commandSender: CommandSender, commandName: String, arguments: List<String> = listOf()): R
+
+    /**
+     * Adds a listener to commands being registered with this command manager.
+     */
+    fun addRegisterCommandListener(registerCommandListener: RegisterCommandListener)
+
+    /**
+     * A listener to commands being registered.
+     */
+    interface RegisterCommandListener {
+        /**
+         * Does something when a command is registered.
+         */
+        fun onRegisterCommand(command: Command<*>)
+    }
 }
