@@ -26,15 +26,9 @@ abstract class TextCommand<out T> @JvmOverloads constructor(
     summary: String = "",
     description: String = "",
 ) : BaseCommand<T>(
-    name = parent?.let { "${parent.name} $name" } ?: name,
+    name = name,
     parent = parent,
-    aliases = parent?.let {
-        (parent.aliases + parent.name).flatMap { parentAlias ->
-            (aliases + name).map { alias ->
-                "$parentAlias $alias"
-            }
-        }.toSet().minus("${parent.name} $name")
-    } ?: aliases,
+    aliases = aliases,
     summary = summary,
     description = description,
 ) {

@@ -13,14 +13,14 @@ abstract class BaseCommand<out T> @JvmOverloads constructor(
     override var description: String = "",
 ) : Command<T> {
 
-    override fun hashCode(): Int = name.hashCode()
+    override fun hashCode(): Int = id.hashCode()
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
         other as BaseCommand<*>
 
-        if (name != other.name) return false
+        if (id != other.id) return false
 
         return true
     }

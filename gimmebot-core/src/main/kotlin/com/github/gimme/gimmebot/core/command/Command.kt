@@ -14,6 +14,7 @@ import com.github.gimme.gimmebot.core.command.sender.CommandSender
  * @property description a detailed description of this command
  * @property usage       information of how to use the command
  * @property parameters  this command's parameters
+ * @property id          the id of this command (unique among commands with different paths)
  * @property isRoot      if this is a root command (no parent)
  */
 interface Command<out T> {
@@ -26,6 +27,7 @@ interface Command<out T> {
     var usage: String
     var parameters: CommandParameterSet
 
+    val id: String get() = getPath(".")
     val isRoot: Boolean get() = parent == null
 
     /**
