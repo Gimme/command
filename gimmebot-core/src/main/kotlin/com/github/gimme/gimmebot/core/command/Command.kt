@@ -9,7 +9,7 @@ import com.github.gimme.gimmebot.core.command.sender.CommandSender
  * @param T              the response type
  * @property name        the command name
  * @property aliases     aliases for the name
- * @property summary     a summary of what this command does
+ * @property summary     a short summary of what this command does
  * @property description a detailed description of this command
  * @property usage       information of how to use the command
  * @property parameters  this command's parameters
@@ -17,9 +17,9 @@ import com.github.gimme.gimmebot.core.command.sender.CommandSender
 interface Command<out T> {
 
     val name: String
-    val aliases: Set<String>
-    val summary: String
-    val description: String
+    var aliases: Set<String>
+    var summary: String
+    var description: String
     var usage: String
     var parameters: CommandParameterSet
 

@@ -7,9 +7,9 @@ package com.github.gimme.gimmebot.core.command
  */
 abstract class BaseCommand<out T> @JvmOverloads constructor(
     override val name: String,
-    override val aliases: Set<String> = setOf(),
-    override val summary: String = "",
-    override val description: String = "",
+    override var aliases: Set<String> = setOf(),
+    override var summary: String = "",
+    override var description: String = "",
 ) : Command<T> {
 
     override fun hashCode(): Int = name.hashCode()
