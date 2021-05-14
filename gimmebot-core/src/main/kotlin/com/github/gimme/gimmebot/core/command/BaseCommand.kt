@@ -13,6 +13,10 @@ abstract class BaseCommand<out T> @JvmOverloads constructor(
     override var description: String = "",
 ) : Command<T> {
 
+    init {
+        require(!name.contains(" ")) { "Command names cannot contain spaces: \"$name\"" }
+    }
+
     override fun hashCode(): Int = id.hashCode()
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

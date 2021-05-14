@@ -7,7 +7,7 @@ import com.github.gimme.gimmebot.core.command.sender.CommandSender
  * Represents an executable command.
  *
  * @param T              the response type
- * @property name        the command name
+ * @property name        the command name (cannot contain spaces)
  * @property parent      the optional parent command
  * @property aliases     aliases for the name
  * @property summary     a short summary of what this command does
