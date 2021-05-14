@@ -27,7 +27,7 @@ interface Command<out T> {
     var usage: String
     var parameters: CommandParameterSet
 
-    val id: String get() = getPath(".")
+    val id: String get() = getPath(" ")
     val isRoot: Boolean get() = parent == null
 
     /**

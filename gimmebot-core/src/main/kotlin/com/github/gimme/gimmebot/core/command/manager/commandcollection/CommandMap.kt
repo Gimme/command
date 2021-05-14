@@ -13,7 +13,7 @@ class CommandMap : CommandCollection {
         get() = map.values.toSet()
 
     override fun addCommand(command: Command<*>) {
-        map[command.name] = command
+        map[command.id] = command
 
         command.aliases.forEach {
             map.putIfAbsent(it, command)
