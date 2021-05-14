@@ -50,16 +50,16 @@ abstract class BaseCommandChannel<R>(
     }
 
     /**
-     * Executes a command with the [commandName] through one of the [registeredCommandManagers].
+     * Executes a command with the [commandId] through one of the [registeredCommandManagers].
      *
      * @throws CommandException if the command execution was unsuccessful
      */
     @Throws(CommandException::class)
-    protected fun executeCommand(commandSender: CommandSender, commandName: String, arguments: List<String>): R {
+    protected fun executeCommand(commandSender: CommandSender, commandId: String, arguments: List<String>): R {
         registeredCommandManagers.forEach {
-            if (!it.commandManager.hasCommand(commandName)) return@forEach
+            if (!it.commandManager.hasCommand(commandId)) return@forEach
 
-            return it.executeCommand(commandSender, commandName, arguments)
+            return it.executeCommand(commandSender, commandId, arguments)
         }
 
         throw ErrorCode.NOT_A_COMMAND.createException()
@@ -91,14 +91,14 @@ abstract class BaseCommandChannel<R>(
         val responseWrapper: (T) -> R,
     ) {
         /**
-         * Executes the command with the [commandName] through this registered [commandManager] converting the
+         * Executes the command with the [commandId] through this registered [commandManager] converting the
          * response through the [responseWrapper].
          *
          * @throws CommandException if the command execution was unsuccessful
          */
         @Throws(CommandException::class)
-        fun executeCommand(commandSender: CommandSender, commandName: String, arguments: List<String> = listOf()): R {
-            val response = commandManager.executeCommand(commandSender, commandName, arguments)
+        fun executeCommand(commandSender: CommandSender, commandId: String, arguments: List<String> = listOf()): R {
+            val response = commandManager.executeCommand(commandSender, commandId, arguments)
             return responseWrapper(response)
         }
     }

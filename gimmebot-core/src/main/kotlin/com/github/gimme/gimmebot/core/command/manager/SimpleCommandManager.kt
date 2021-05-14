@@ -29,16 +29,16 @@ open class SimpleCommandManager<R>(private val defaultResponseParser: (Any?) -> 
         registerCommandListeners.forEach { it.onRegisterCommand(command) }
     }
 
-    override fun getCommand(name: String): Command<*>? = commandCollection.getCommand(name)
+    override fun getCommand(id: String): Command<*>? = commandCollection.getCommand(id)
 
-    override fun hasCommand(name: String): Boolean = commandCollection.containsCommand(name)
+    override fun hasCommand(id: String): Boolean = commandCollection.containsCommand(id)
 
     override fun executeCommand(
         commandSender: CommandSender,
-        commandName: String,
+        commandId: String,
         arguments: List<String>,
     ): R {
-        val command = getCommand(commandName) ?: throw ErrorCode.NOT_A_COMMAND.createException()
+        val command = getCommand(commandId) ?: throw ErrorCode.NOT_A_COMMAND.createException()
         val commandNode = executorByCommand[command]
 
         return commandNode?.execute(commandSender, arguments)

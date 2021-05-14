@@ -21,20 +21,20 @@ interface CommandManager<R> {
      */
     fun <T> registerCommand(command: Command<T>, responseConverter: ((T) -> R)? = null)
 
-    /** Returns the command with the [name] if it has been registered, else null. */
-    fun getCommand(name: String): Command<*>?
+    /** Returns the command with the [id] if it has been registered, else null. */
+    fun getCommand(id: String): Command<*>?
 
-    /** Returns if the command with the [name] has been registered. */
-    fun hasCommand(name: String): Boolean
+    /** Returns if the command with the [id] has been registered. */
+    fun hasCommand(id: String): Boolean
 
     /**
-     * Executes the registered command with the [commandName] with the [arguments] as the given [commandSender] and
+     * Executes the registered command with the [commandId] with the [arguments] as the given [commandSender] and
      * returns the response.
      *
      * @throws CommandException if the command execution was unsuccessful
      */
     @Throws(CommandException::class)
-    fun executeCommand(commandSender: CommandSender, commandName: String, arguments: List<String> = listOf()): R
+    fun executeCommand(commandSender: CommandSender, commandId: String, arguments: List<String> = listOf()): R
 
     /**
      * Adds a listener to commands being registered with this command manager.

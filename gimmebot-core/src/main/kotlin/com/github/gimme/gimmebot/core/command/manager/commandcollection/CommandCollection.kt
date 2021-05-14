@@ -14,12 +14,12 @@ interface CommandCollection : Iterable<Command<*>> {
     fun addCommand(command: Command<*>)
 
     /**
-     * Returns the command from this collection with the [name], or null if no command with that [name] is registered.
+     * Returns the command from this collection with the [id], or null if no command with that [id] is registered.
      */
-    fun getCommand(name: String): Command<*>?
+    fun getCommand(id: String): Command<*>?
 
-    /** Returns if this collection contains the command with the [name]. */
-    fun containsCommand(name: String): Boolean
+    /** Returns if this collection contains the command with the [id]. */
+    fun containsCommand(id: String): Boolean
 
     override fun iterator(): Iterator<Command<*>> = commands.iterator()
 }
