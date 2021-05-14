@@ -29,6 +29,11 @@ interface Command<out T> {
     val isRoot: Boolean get() = parent == null
 
     /**
+     * Returns the full [name]-path to this command including all [parent]s separated by the [delimiter].
+     */
+    fun getPath(delimiter: String): String = parent?.let { "${it.getPath(delimiter)}$delimiter$name" } ?: name
+
+    /**
      * Executes this command as the given [commandSender] with the given [args] and returns the response.
      *
      * @throws CommandException if the command execution was unsuccessful

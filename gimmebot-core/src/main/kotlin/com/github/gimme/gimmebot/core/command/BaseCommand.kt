@@ -6,7 +6,7 @@ package com.github.gimme.gimmebot.core.command
  * @param T the response type
  */
 abstract class BaseCommand<out T> @JvmOverloads constructor(
-    override val name: String,
+    final override val name: String,
     override val parent: Command<*>? = null,
     override var aliases: Set<String> = setOf(),
     override var summary: String = "",
