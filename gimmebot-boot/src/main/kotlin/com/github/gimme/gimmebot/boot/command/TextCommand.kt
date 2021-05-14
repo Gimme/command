@@ -21,18 +21,19 @@ import kotlin.reflect.full.findAnnotation
  */
 abstract class TextCommand<out T> @JvmOverloads constructor(
     name: String,
+    parent: Command<*>? = null,
     aliases: Set<String> = setOf(),
-    parentCommand: Command<*>? = null,
     summary: String = "",
     description: String = "",
 ) : BaseCommand<T>(
-    name = parentCommand?.let { "${parentCommand.name} $name" } ?: name,
-    aliases = parentCommand?.let {
-        (parentCommand.aliases + parentCommand.name).flatMap { parentAlias ->
+    name = parent?.let { "${parent.name} $name" } ?: name,
+    parent = parent,
+    aliases = parent?.let {
+        (parent.aliases + parent.name).flatMap { parentAlias ->
             (aliases + name).map { alias ->
                 "$parentAlias $alias"
             }
-        }.toSet().minus("${parentCommand.name} $name")
+        }.toSet().minus("${parent.name} $name")
     } ?: aliases,
     summary = summary,
     description = description,
