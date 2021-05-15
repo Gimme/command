@@ -4,7 +4,6 @@ import com.github.gimme.gimmebot.core.command.exception.CommandException
 import com.github.gimme.gimmebot.core.command.exception.ErrorCode
 import com.github.gimme.gimmebot.core.command.manager.CommandManager
 import com.github.gimme.gimmebot.core.command.manager.TextCommandManager
-import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandCollection
 import com.github.gimme.gimmebot.core.command.sender.CommandSender
 
 /**
@@ -67,23 +66,6 @@ abstract class TextCommandChannel(
             .map { s -> s.replace("\"", "") }.drop(1)
 
         return executeCommand(commandSender, commandPath, args)
-    }
-
-    /**
-     * Returns the best matching command label from the [commandInput], or null if no match.
-     */
-    private fun CommandCollection.findCommand(commandInput: String): String? {
-        val words = commandInput.split(" ")
-
-        var s = commandInput
-
-        for (word in words.reversed()) {
-            if (this.containsCommand(s)) return s
-
-            s = s.removeSuffix(" $word")
-        }
-
-        return null
     }
 
     /**

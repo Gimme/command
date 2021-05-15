@@ -21,5 +21,10 @@ interface CommandCollection : Iterable<Command<*>> {
     /** Returns if this collection contains a command at the [path]. */
     fun containsCommand(path: List<String>): Boolean
 
+    /**
+     * Returns the longest matching sub-set from the start of the [path] that leads to a command, or null if no match.
+     */
+    fun findCommand(path: List<String>): List<String>?
+
     override fun iterator(): Iterator<Command<*>> = commands.iterator()
 }

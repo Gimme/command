@@ -51,6 +51,18 @@ class CommandMap : CommandCollection {
 
     override fun containsCommand(path: List<String>): Boolean = getCommand(path) != null
 
+    override fun findCommand(path: List<String>): List<String>? {
+        val result = mutableListOf<String>()
+        var node: Node = root
+
+        for (s in path) {
+            node = node[s] ?: break
+            result.add(s)
+        }
+
+        return if (result.size > 0) result else null
+    }
+
     override fun iterator(): Iterator<Command<*>> = commands.iterator()
 
     private class Node(val command: Command<*>? = null): LinkedHashMap<String, Node>()
