@@ -22,8 +22,8 @@ class SimpleCommandManagerTest {
         commandManager.registerCommand(DUMMY_COMMAND)
 
         assertAll(
-            { assertNull(commandManager.getCommand("test726")) },
-            { assertEquals(DUMMY_COMMAND, commandManager.getCommand("test")) },
+            { assertNull(commandManager.getCommand(listOf("test726"))) },
+            { assertEquals(DUMMY_COMMAND, commandManager.getCommand(listOf("test"))) },
         )
     }
 
@@ -32,16 +32,16 @@ class SimpleCommandManagerTest {
         commandManager.registerCommand(object : DefaultBaseCommand("test") {})
         commandManager.registerCommand(DUMMY_COMMAND)
 
-        assertEquals(DUMMY_COMMAND, commandManager.getCommand("test"))
+        assertEquals(DUMMY_COMMAND, commandManager.getCommand(listOf("test")))
     }
 
     @ParameterizedTest
     @CsvSource(
-        "test, test",
-        "TEST, TEST",
-        "Test, Test",
+        "test",
+        "TEST",
+        "Test",
     )
-    fun `should execute command`(commandName: String, inputCommandName: String) {
+    fun `should execute command`(commandName: String) {
         var executed = false
 
         val command = object : DefaultBaseCommand(commandName) {
@@ -51,17 +51,17 @@ class SimpleCommandManagerTest {
         }
 
         commandManager.registerCommand(command)
-        commandManager.executeCommand(DUMMY_COMMAND_SENDER, inputCommandName)
+        commandManager.executeCommand(DUMMY_COMMAND_SENDER, command)
 
         assertTrue(executed)
     }
 
     @ParameterizedTest
     @CsvSource(
-        "a, b, a b",
-        "te/st, ., te/st .",
+        "a, b",
+        "te/st, .",
     )
-    fun `Executes hierarchical command`(commandParent: String, commandName: String, inputCommandName: String) {
+    fun `Executes hierarchical command`(commandParent: String, commandName: String) {
         var executed = false
 
         val command = object : DefaultBaseCommand(commandName, DefaultBaseCommand(commandParent)) {
@@ -71,7 +71,7 @@ class SimpleCommandManagerTest {
         }
 
         commandManager.registerCommand(command)
-        commandManager.executeCommand(DUMMY_COMMAND_SENDER, inputCommandName)
+        commandManager.executeCommand(DUMMY_COMMAND_SENDER, command)
 
         assertTrue(executed)
     }
@@ -96,8 +96,8 @@ class SimpleCommandManagerTest {
 
         commandManager.registerCommand(parentCommand)
         commandManager.registerCommand(childCommand)
-        commandManager.executeCommand(DUMMY_COMMAND_SENDER, "parent", listOf("a", "b"))
-        commandManager.executeCommand(DUMMY_COMMAND_SENDER, "parent child", listOf("x", "y"))
+        commandManager.executeCommand(DUMMY_COMMAND_SENDER, parentCommand, listOf("a", "b"))
+        commandManager.executeCommand(DUMMY_COMMAND_SENDER, childCommand, listOf("x", "y"))
 
         assertTrue(parentExecuted)
         assertTrue(childExecuted)
@@ -108,8 +108,8 @@ class SimpleCommandManagerTest {
         val commandManager2 = SimpleCommandManager { it }
         commandManager2.registerCommand(childCommand)
         commandManager2.registerCommand(parentCommand)
-        commandManager2.executeCommand(DUMMY_COMMAND_SENDER, "parent child", listOf("x", "y"))
-        commandManager2.executeCommand(DUMMY_COMMAND_SENDER, "parent", listOf("a", "b"))
+        commandManager2.executeCommand(DUMMY_COMMAND_SENDER, childCommand, listOf("x", "y"))
+        commandManager2.executeCommand(DUMMY_COMMAND_SENDER, parentCommand, listOf("a", "b"))
 
         assertTrue(childExecuted)
         assertTrue(parentExecuted)

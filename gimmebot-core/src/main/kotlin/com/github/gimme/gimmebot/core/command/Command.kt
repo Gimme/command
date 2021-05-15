@@ -16,6 +16,7 @@ import com.github.gimme.gimmebot.core.command.sender.CommandSender
  * @property parameters  this command's parameters
  * @property id          the id of this command (unique among commands with different paths)
  * @property isRoot      if this is a root command (no parent)
+ * @property path        the full [name]-path to this command
  */
 interface Command<out T> {
 
@@ -27,13 +28,14 @@ interface Command<out T> {
     var usage: String
     var parameters: CommandParameterSet
 
-    val id: String get() = getPath(" ")
+    val id: String get() = path(" ")
     val isRoot: Boolean get() = parent == null
+    val path: List<String> get() = (parent?.path ?: listOf()) + name
 
     /**
-     * Returns the full [name]-path to this command including all [parent]s separated by the [delimiter].
+     * Returns the full [name]-path to this command including all [parent]s separated by the [separator].
      */
-    fun getPath(delimiter: String): String = parent?.let { "${it.getPath(delimiter)}$delimiter$name" } ?: name
+    fun path(separator: String): String = path.joinToString(" ")
 
     /**
      * Executes this command as the given [commandSender] with the given [args] and returns the response.

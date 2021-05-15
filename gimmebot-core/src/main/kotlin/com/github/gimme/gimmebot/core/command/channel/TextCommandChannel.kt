@@ -44,19 +44,20 @@ abstract class TextCommandChannel(
 
     @Throws(CommandException::class)
     private fun executeCommand(commandSender: CommandSender, commandInput: String): String? {
-        var bestMatchCommandLabel: String? = null
+        var bestMatchCommandPath: List<String>? = null
 
         registeredCommandManagers.forEach {
-            val foundCommandLabel = it.commandManager.commandCollection.findCommand(commandInput)
+            val foundCommandPath = it.commandManager.commandCollection.findCommand(commandInput.split(" "))
 
-            foundCommandLabel?.let {
-                if (foundCommandLabel.length > bestMatchCommandLabel?.length ?: -1) {
-                    bestMatchCommandLabel = foundCommandLabel
+            foundCommandPath?.let {
+                if (foundCommandPath.size > bestMatchCommandPath?.size ?: -1) {
+                    bestMatchCommandPath = foundCommandPath
                 }
             }
         }
 
-        val commandLabel = bestMatchCommandLabel ?: throw ErrorCode.NOT_A_COMMAND.createException()
+        val commandPath = bestMatchCommandPath ?: throw ErrorCode.NOT_A_COMMAND.createException()
+        val commandLabel = commandPath.joinToString(" ")
 
         // Remove command name, leaving only the arguments
         val argsInput = commandInput.removePrefix(commandLabel)
@@ -65,7 +66,7 @@ abstract class TextCommandChannel(
         val args = argsInput.split("\\s(?=(?:[^\"]*\"[^\"]*\")*[^\"]*\$)".toRegex())
             .map { s -> s.replace("\"", "") }.drop(1)
 
-        return executeCommand(commandSender, commandLabel, args)
+        return executeCommand(commandSender, commandPath, args)
     }
 
     /**

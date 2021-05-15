@@ -17,7 +17,7 @@ class HelpCommand(private val commandChannel: CommandChannel<*>) : TextCommand<L
 
         commandChannel.commandManagers.forEach { commandManager ->
             commandManager.commandCollection.forEach {
-                list.add(CommandHelp(it.getPath(" "), it.usage))
+                list.add(CommandHelp(it.path(" "), it.usage))
             }
         }
 
