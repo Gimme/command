@@ -21,13 +21,10 @@ import kotlin.reflect.jvm.jvmErasure
 private val COMMAND_SENDER_TYPE: KType = CommandSender::class.createType()
 
 /**
- * Generates and returns a set of [CommandParameter]s that match the parameters of the first member function annotated with
- * @[CommandExecutor].
+ * Generates a set of [CommandParameter]s that matches the parameters of the [function].
  */
-internal fun Command<*>.generateParameters(): CommandParameterSet {
+internal fun generateParameters(function: KFunction<Any?>): CommandParameterSet {
     val usedFlags = mutableSetOf<Char>()
-
-    val function = this.getFirstCommandExecutorFunction()
 
     return CommandParameterSet(
         function.parameters
@@ -50,6 +47,20 @@ internal fun Command<*>.generateParameters(): CommandParameterSet {
             }
             .toList()
     )
+}
+
+/**
+ * Generates a "usage string" that matches the [Command.parameters] with default values from [commandExecutor].
+ */
+internal fun Command<*>.generateUsage(commandExecutor: CommandExecutor): String {
+    val sb = StringBuilder(name)
+
+    parameters.forEachIndexed { index, parameter ->
+        val defaultValue = commandExecutor.getDefaultValue(index)
+        sb.append(" <${parameter.displayName}${defaultValue?.let { "=$defaultValue" } ?: ""}>")
+    }
+
+    return sb.toString()
 }
 
 /**
@@ -114,9 +125,10 @@ internal fun <T> Command<T>.getFirstCommandExecutorFunction(): KFunction<T> {
             @Suppress("UNCHECKED_CAST")
             function as KFunction<T>
         } catch (e: ClassCastException) {
-            throw ClassCastException("The return type: \"${function.returnType.jvmErasure.qualifiedName}\" of the" +
-                    " command executor function: \"${function.name}\" in the command: \"$id\" does not match the" +
-                    " command's return type."
+            throw ClassCastException(
+                "The return type: \"${function.returnType.jvmErasure.qualifiedName}\" of the" +
+                        " command executor function: \"${function.name}\" in the command: \"$id\" does not match the" +
+                        " command's return type."
             )
         }
     }
