@@ -15,8 +15,8 @@ import kotlin.reflect.full.findAnnotation
  * Represents an easy-to-set-up command with automatic generation of some properties derived from a member function
  * marked with @[CommandExecutor].
  *
- * If a public method in this is marked with @[CommandExecutor], the command's [parameters] and [usage] are
- * automatically derived from it, and it gets called called when the command is [execute]d.
+ * If a method in this is marked with @[CommandExecutor], the command's [parameters] and [usage] are automatically
+ * derived from it, and it gets called called when the command is [execute]d.
  *
  * @param T the response type
  */
