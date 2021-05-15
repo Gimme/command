@@ -27,7 +27,7 @@ class HelpCommandTest {
         assertEquals("three", response[2].name)
     }
 
-    private class DummyCommand(name: String) : BaseCommand<Any>(name) {
+    private class DummyCommand(name: String) : FunctionCommand<Any>(name) {
         @CommandExecutor
         fun execute() {
         }
