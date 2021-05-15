@@ -21,20 +21,20 @@ import kotlin.reflect.full.findAnnotation
 abstract class BaseCommand<out T> @JvmOverloads constructor(
     final override val name: String,
     override val parent: Command<*>? = null,
-    override var aliases: Set<String> = setOf(),
+    final override var aliases: Set<String> = setOf(),
     override var summary: String = "",
     override var description: String = "",
 ) : Command<T> {
-
-    init {
-        require(name.isNotEmpty()) { "Command names cannot be empty" }
-        require(!name.contains(" ")) { "Command names cannot contain spaces: \"$name\"" }
-    }
 
     final override var parameters: CommandParameterSet
     final override var usage: String
 
     init {
+        (aliases + name).forEach {
+            require(it.isNotEmpty()) { "Command names cannot be empty" }
+            require(!it.contains(" ")) { "Command names cannot contain spaces: \"$it\"" }
+        }
+
         val function = getFirstCommandExecutorFunction()
         val commandExecutor: CommandExecutor = function.findAnnotation()!!
 
