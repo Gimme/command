@@ -27,6 +27,7 @@ abstract class BaseCommand<out T> @JvmOverloads constructor(
 ) : Command<T> {
 
     init {
+        require(name.isNotEmpty()) { "Command names cannot be empty" }
         require(!name.contains(" ")) { "Command names cannot contain spaces: \"$name\"" }
     }
 
