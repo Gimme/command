@@ -5,33 +5,30 @@ import com.github.gimme.gimmebot.boot.command.executor.generateParameters
 import com.github.gimme.gimmebot.boot.command.executor.getDefaultValue
 import com.github.gimme.gimmebot.boot.command.executor.getFirstCommandExecutorFunction
 import com.github.gimme.gimmebot.boot.command.executor.tryExecuteCommandByReflection
-import com.github.gimme.gimmebot.core.command.BaseCommand
 import com.github.gimme.gimmebot.core.command.Command
 import com.github.gimme.gimmebot.core.command.CommandParameterSet
 import com.github.gimme.gimmebot.core.command.sender.CommandSender
 import kotlin.reflect.full.findAnnotation
 
 /**
- * Represents an easy to set up text command.
+ * Represents an easy-to-set-up command with base functionality.
  *
- * A public method marked with @[CommandExecutor] is called when the
- * command is executed.
+ * If a public method in this is marked with @[CommandExecutor], the command's [parameters] and [usage] are
+ * automatically derived from it, and it gets called called when the command is [execute]d.
  *
  * @param T the response type
  */
-abstract class TextCommand<out T> @JvmOverloads constructor(
-    name: String,
-    parent: Command<*>? = null,
-    aliases: Set<String> = setOf(),
-    summary: String = "",
-    description: String = "",
-) : BaseCommand<T>(
-    name = name,
-    parent = parent,
-    aliases = aliases,
-    summary = summary,
-    description = description,
-) {
+abstract class BaseCommand<out T> @JvmOverloads constructor(
+    final override val name: String,
+    override val parent: Command<*>? = null,
+    override var aliases: Set<String> = setOf(),
+    override var summary: String = "",
+    override var description: String = "",
+) : Command<T> {
+
+    init {
+        require(!name.contains(" ")) { "Command names cannot contain spaces: \"$name\"" }
+    }
 
     final override var usage: String
     final override var parameters: CommandParameterSet = generateParameters()
@@ -51,5 +48,17 @@ abstract class TextCommand<out T> @JvmOverloads constructor(
 
     override fun execute(commandSender: CommandSender, args: List<String>): T {
         return tryExecuteCommandByReflection(this, commandSender, args)
+    }
+
+    override fun hashCode(): Int = id.hashCode()
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as BaseCommand<*>
+
+        if (id != other.id) return false
+
+        return true
     }
 }
