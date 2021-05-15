@@ -15,6 +15,7 @@ import com.github.gimme.gimmebot.core.command.sender.CommandSender
  * @property usage       information of how to use the command
  * @property parameters  this command's parameters
  * @property id          the id of this command (unique among commands with different paths)
+ * @property root        the root command in the parent-chain
  * @property isRoot      if this is a root command (no parent)
  * @property path        the full [name]-path to this command
  */
@@ -29,13 +30,9 @@ interface Command<out T> {
     var parameters: CommandParameterSet
 
     val id: String get() = path(" ")
+    val root: Command<*> get() = parent?.root ?: this
     val isRoot: Boolean get() = parent == null
     val path: List<String> get() = (parent?.path ?: listOf()) + name
-
-    /**
-     * Returns the full [name]-path to this command including all [parent]s separated by the [separator].
-     */
-    fun path(separator: String): String = path.joinToString(" ")
 
     /**
      * Executes this command as the given [commandSender] with the given [args] and returns the response.
@@ -44,6 +41,11 @@ interface Command<out T> {
      */
     @Throws(CommandException::class)
     fun execute(commandSender: CommandSender, args: List<String>): T
+
+    /**
+     * Returns the full [name]-path to this command including all [parent]s separated by the [separator].
+     */
+    fun path(separator: String): String = path.joinToString(" ")
 
     /**
      * Returns suggestions on the next input word based on already submitted [namedArgs] and amount of [orderedArgs]
