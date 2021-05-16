@@ -32,6 +32,8 @@ open class SimpleCommandManager<R>(private val defaultResponseParser: (Any?) -> 
 
     override fun hasCommand(path: List<String>): Boolean = commandCollection.containsCommand(path)
 
+    override fun getBranches(path: List<String>): Set<String> = commandCollection.getBranches(path)
+
     override fun executeCommand(
         commandSender: CommandSender,
         command: Command<*>,

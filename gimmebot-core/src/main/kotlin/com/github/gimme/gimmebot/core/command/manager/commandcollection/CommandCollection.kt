@@ -26,5 +26,10 @@ interface CommandCollection : Iterable<Command<*>> {
      */
     fun findCommand(path: List<String>): List<String>?
 
+    /**
+     * Returns the roots of all child branches under the [path], or an empty set if the [path] does not exist.
+     */
+    fun getBranches(path: List<String>): Set<String>
+
     override fun iterator(): Iterator<Command<*>> = commands.iterator()
 }

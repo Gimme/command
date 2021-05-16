@@ -28,6 +28,12 @@ interface CommandManager<R> {
     fun hasCommand(path: List<String>): Boolean
 
     /**
+     * Returns the roots of all child branches under the command [path], or an empty set if no command exists under that
+     * [path].
+     */
+    fun getBranches(path: List<String>): Set<String>
+
+    /**
      * Executes the registered [command] with the [arguments] as the given [commandSender] and
      * returns the response.
      *

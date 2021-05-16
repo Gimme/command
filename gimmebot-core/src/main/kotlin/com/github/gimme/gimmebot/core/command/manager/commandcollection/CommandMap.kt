@@ -35,6 +35,8 @@ class CommandMap : CommandCollection {
         return if (node.command != null) result else null
     }
 
+    override fun getBranches(path: List<String>): Set<String> = getNode(path)?.keys ?: setOf()
+
     override fun iterator(): Iterator<Command<*>> = commands.iterator()
 
     private fun getNode(path: List<String>): Node? {
