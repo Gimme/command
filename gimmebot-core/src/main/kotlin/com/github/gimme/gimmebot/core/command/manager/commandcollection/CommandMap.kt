@@ -24,15 +24,18 @@ class CommandMap : CommandCollection {
     override fun containsCommand(path: List<String>): Boolean = getCommand(path) != null
 
     override fun findCommand(path: List<String>): List<String>? {
-        val result = mutableListOf<String>()
+        var longestPathToCommand: List<String>? = null
+
+        val currentPath = mutableListOf<String>()
         var node: Node = root
 
         for (s in path) {
             node = node[s] ?: break
-            result.add(s)
+            currentPath.add(s)
+            if (node.command != null) longestPathToCommand = currentPath
         }
 
-        return if (node.command != null) result else null
+        return longestPathToCommand
     }
 
     override fun getBranches(path: List<String>): Set<String> = getNode(path)?.keys ?: setOf()
@@ -51,5 +54,5 @@ class CommandMap : CommandCollection {
         return node
     }
 
-    private class Node(var command: Command<*>? = null): LinkedHashMap<String, Node>()
+    private class Node(var command: Command<*>? = null) : LinkedHashMap<String, Node>()
 }
