@@ -13,41 +13,13 @@ class CommandMap : CommandCollection {
 
     override fun addCommand(command: Command<*>) {
         commands.add(command)
-        addCommandWithAliases(command)
-    }
 
-    private fun addCommandWithAliases(command: Command<*>): List<Node> {
-        val parentNodes: List<Node> = command.parent?.let { parent ->
-            addCommandWithAliases(parent)
-        } ?: listOf(root)
-
-        val list: MutableList<Node> = mutableListOf()
-
-        parentNodes.forEach { node ->
-            list.add(node.addCommand(command.name, command, true))
-
-            command.aliases.forEach { name ->
-                list.add(node.addCommand(name, command, false))
-            }
+        command.pathAliases.forEach { path ->
+            computeNodeIfAbsent(path).command = command
         }
-
-        return list
     }
 
-    private fun Node.addCommand(name: String, command: Command<*>, overwrite: Boolean = true): Node {
-        return if (overwrite) {
-            val node = Node(command)
-            this[name] = node
-            node
-        } else computeIfAbsent(name) { Node(command) }
-    }
-
-    override fun getCommand(path: List<String>): Command<*>? {
-        var node = root
-        path.forEach { node = node[it] ?: return null }
-
-        return node.command
-    }
+    override fun getCommand(path: List<String>): Command<*>? = getNode(path)?.command
 
     override fun containsCommand(path: List<String>): Boolean = getCommand(path) != null
 
@@ -60,10 +32,22 @@ class CommandMap : CommandCollection {
             result.add(s)
         }
 
-        return if (result.size > 0) result else null
+        return if (node.command != null) result else null
     }
 
     override fun iterator(): Iterator<Command<*>> = commands.iterator()
 
-    private class Node(val command: Command<*>? = null): LinkedHashMap<String, Node>()
+    private fun getNode(path: List<String>): Node? {
+        var node = root
+        path.forEach { node = node[it] ?: return null }
+        return node
+    }
+
+    private fun computeNodeIfAbsent(path: List<String>): Node {
+        var node = root
+        path.forEach { node = node.computeIfAbsent(it) { Node() } }
+        return node
+    }
+
+    private class Node(var command: Command<*>? = null): LinkedHashMap<String, Node>()
 }
