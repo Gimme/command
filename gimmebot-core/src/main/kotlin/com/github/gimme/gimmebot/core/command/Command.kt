@@ -18,6 +18,7 @@ import com.github.gimme.gimmebot.core.command.sender.CommandSender
  * @property root        the root command in the parent-chain
  * @property isRoot      if this is a root command (no parent)
  * @property path        the full [name]-path to this command
+ * @property pathAliases all full paths to this command including [aliases]
  */
 interface Command<out T> {
 
@@ -33,6 +34,17 @@ interface Command<out T> {
     val root: Command<*> get() = parent?.root ?: this
     val isRoot: Boolean get() = parent == null
     val path: List<String> get() = (parent?.path ?: listOf()) + name
+
+    val pathAliases: List<List<String>>
+        get() {
+            return parent?.let { parent ->
+                parent.pathAliases.flatMap { parentPath ->
+                    (aliases + name).map { alias ->
+                        parentPath + alias
+                    }
+                }
+            } ?: (aliases + name).map { listOf(it) }
+        }
 
     /**
      * Executes this command as the given [commandSender] with the given [args] and returns the response.
