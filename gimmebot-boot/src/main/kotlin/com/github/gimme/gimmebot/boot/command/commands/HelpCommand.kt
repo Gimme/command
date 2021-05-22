@@ -16,7 +16,7 @@ class HelpCommand(private val commandChannel: CommandChannel<*>) : FunctionComma
         val list: MutableList<CommandHelp> = mutableListOf()
 
         commandChannel.commandManagers.forEach { commandManager ->
-            commandManager.commandCollection.forEach {
+            commandManager.commands.forEach {
                 list.add(CommandHelp(it.path(" "), it.usage))
             }
         }

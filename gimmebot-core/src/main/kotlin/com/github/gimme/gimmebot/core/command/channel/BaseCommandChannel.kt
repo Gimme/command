@@ -67,7 +67,7 @@ abstract class BaseCommandChannel<R>(
 
     final override fun <T> registerCommandManager(commandManager: CommandManager<T>, responseWrapper: (T) -> R) {
         registeredCommandManagers.add(CommandManagerRegistration(commandManager, responseWrapper))
-        commandManager.commandCollection.forEach { onRegisterCommand(it) }
+        commandManager.commands.forEach { onRegisterCommand(it) }
         commandManager.addRegisterCommandListener(this)
     }
 

@@ -2,7 +2,6 @@ package com.github.gimme.gimmebot.core.command.manager
 
 import com.github.gimme.gimmebot.core.command.Command
 import com.github.gimme.gimmebot.core.command.exception.CommandException
-import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandCollection
 import com.github.gimme.gimmebot.core.command.sender.CommandSender
 
 /**
@@ -12,8 +11,8 @@ import com.github.gimme.gimmebot.core.command.sender.CommandSender
  */
 interface CommandManager<R> {
 
-    /** The mutable collection of all registered commands. */
-    val commandCollection: CommandCollection
+    /** Returns all registered commands. */
+    val commands: Iterable<Command<*>>
 
     /**
      * Registers the given [command] to be executable through this manager with the specified [responseConverter] to
@@ -26,6 +25,11 @@ interface CommandManager<R> {
 
     /** Returns if a command has been registered at the [path]. */
     fun hasCommand(path: List<String>): Boolean
+
+    /**
+     * Returns the longest matching sub-set from the start of the [path] that leads to a command, or null if no match.
+     */
+    fun findCommand(path: List<String>): List<String>?
 
     /**
      * Returns the roots of all child branches under the command [path], or an empty set if no command exists under that

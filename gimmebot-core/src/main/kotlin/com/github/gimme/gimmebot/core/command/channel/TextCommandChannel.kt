@@ -62,7 +62,7 @@ abstract class TextCommandChannel(
         var bestMatchCommandPath: List<String>? = null
 
         registeredCommandManagers.forEach {
-            val foundCommandPath = it.commandManager.commandCollection.findCommand(input)
+            val foundCommandPath = it.commandManager.findCommand(input)
 
             foundCommandPath?.let {
                 if (foundCommandPath.size > bestMatchCommandPath?.size ?: -1) {
@@ -96,7 +96,7 @@ abstract class TextCommandChannel(
         val suggestions = mutableSetOf<String>()
 
         registeredCommandManagers.forEach {
-            suggestions.addAll(it.commandManager.commandCollection.getBranches(completedWords))
+            suggestions.addAll(it.commandManager.getBranches(completedWords))
         }
 
         findBestMatchCommand(completedWords)?.let { commandPath ->

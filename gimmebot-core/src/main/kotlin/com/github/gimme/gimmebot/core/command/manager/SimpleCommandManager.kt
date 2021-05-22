@@ -17,7 +17,9 @@ open class SimpleCommandManager<R>(private val defaultResponseParser: (Any?) -> 
     private val registerCommandListeners: MutableList<CommandManager.RegisterCommandListener> = mutableListOf()
     private val executorByCommand: MutableMap<Command<*>, CommandNode<*, R>> = mutableMapOf()
 
-    override val commandCollection: CommandCollection = CommandMap()
+    private val commandCollection: CommandCollection = CommandMap()
+
+    override val commands: Iterable<Command<*>> = commandCollection
 
     final override fun <T> registerCommand(command: Command<T>, responseConverter: ((T) -> R)?) {
         commandCollection.addCommand(command)
@@ -31,6 +33,8 @@ open class SimpleCommandManager<R>(private val defaultResponseParser: (Any?) -> 
     override fun getCommand(path: List<String>): Command<*>? = commandCollection.getCommand(path)
 
     override fun hasCommand(path: List<String>): Boolean = commandCollection.containsCommand(path)
+
+    override fun findCommand(path: List<String>): List<String>? = commandCollection.findCommand(path)
 
     override fun getBranches(path: List<String>): Set<String> = commandCollection.getBranches(path)
 
