@@ -60,12 +60,14 @@ interface Command<out T> {
     fun path(separator: String): String = path.joinToString(" ")
 
     /**
-     * Returns suggestions on the next input word based on already submitted [namedArgs] and amount of [orderedArgs]
-     * already submitted.
+     * Returns suggestions on the next input word based on already submitted [namedArgs]/[flags] and amount of
+     * [orderedArgs] already submitted.
      */
-    fun getCompletionSuggestions(namedArgs: Set<String>, orderedArgs: Int): Set<String> {
+    fun getCompletionSuggestions(namedArgs: Set<String>, flags: Set<Char>, orderedArgs: Int): Set<String> {
         val unusedParameters: List<CommandParameter> =
-            this.parameters.filter { !namedArgs.contains(it.id) }.drop(orderedArgs)
+            this.parameters
+                .filter { !namedArgs.contains(it.id) && !flags.any { flag -> it.flags.contains(flag) } }
+                .drop(orderedArgs)
         val nextParameter: CommandParameter? = unusedParameters.firstOrNull()
 
         val suggestions = mutableSetOf<String>()

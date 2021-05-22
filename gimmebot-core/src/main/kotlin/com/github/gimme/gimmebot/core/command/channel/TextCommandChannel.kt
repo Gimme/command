@@ -1,5 +1,6 @@
 package com.github.gimme.gimmebot.core.command.channel
 
+import com.github.gimme.gimmebot.core.command.Command
 import com.github.gimme.gimmebot.core.command.exception.CommandException
 import com.github.gimme.gimmebot.core.command.exception.ErrorCode
 import com.github.gimme.gimmebot.core.command.manager.CommandManager
@@ -43,19 +44,8 @@ abstract class TextCommandChannel(
 
     @Throws(CommandException::class)
     private fun executeCommand(commandSender: CommandSender, commandInput: String): String? {
-        var bestMatchCommandPath: List<String>? = null
-
-        registeredCommandManagers.forEach {
-            val foundCommandPath = it.commandManager.commandCollection.findCommand(commandInput.split(" "))
-
-            foundCommandPath?.let {
-                if (foundCommandPath.size > bestMatchCommandPath?.size ?: -1) {
-                    bestMatchCommandPath = foundCommandPath
-                }
-            }
-        }
-
-        val commandPath = bestMatchCommandPath ?: throw ErrorCode.NOT_A_COMMAND.createException()
+        val commandPath = findBestMatchCommand(commandInput.split(" "))
+            ?: throw ErrorCode.NOT_A_COMMAND.createException()
         val commandLabel = commandPath.joinToString(" ")
 
         // Remove command name, leaving only the arguments
@@ -68,6 +58,22 @@ abstract class TextCommandChannel(
         return executeCommand(commandSender, commandPath, args)
     }
 
+    private fun findBestMatchCommand(input: List<String>): List<String>? {
+        var bestMatchCommandPath: List<String>? = null
+
+        registeredCommandManagers.forEach {
+            val foundCommandPath = it.commandManager.commandCollection.findCommand(input)
+
+            foundCommandPath?.let {
+                if (foundCommandPath.size > bestMatchCommandPath?.size ?: -1) {
+                    bestMatchCommandPath = foundCommandPath
+                }
+            }
+        }
+
+        return bestMatchCommandPath
+    }
+
     /**
      * Registers the given [commandManager] making the contained commands executable through this channel with the
      * results converted to strings.
@@ -76,6 +82,62 @@ abstract class TextCommandChannel(
         super.registerCommandManager(commandManager) {
             if (it is Unit) null else it?.toString()
         }
+    }
+
+    /**
+     * Returns all possible completions to the last word in the [input] that fits the expected input of a registered
+     * command.
+     */
+    fun autocomplete(input: String): Set<String> {
+        val words = input.split(" ")
+        val completedWords = words.dropLast(1)
+        val currentWord = words.last()
+
+        val suggestions = mutableSetOf<String>()
+
+        registeredCommandManagers.forEach {
+            suggestions.addAll(it.commandManager.commandCollection.getBranches(completedWords))
+        }
+
+        findBestMatchCommand(completedWords)?.let { commandPath ->
+            registeredCommandManagers.forEach {
+                it.commandManager.getCommand(commandPath)?.let { command ->
+                    suggestions.addAll(command.autocomplete(completedWords.drop(commandPath.size), currentWord))
+                }
+            }
+        }
+
+        return suggestions
+            .filter { it.startsWith(currentWord) }
+            .toSet()
+    }
+
+    /**
+     * Returns all possible completions to the [currentWord] that fits the expected input of this command based on
+     * already submitted [completedWords].
+     */
+    private fun Command<*>.autocomplete(completedWords: List<String>, currentWord: String): Set<String> {
+        val namedArgs = mutableSetOf<String>()
+        val flags = mutableSetOf<Char>()
+        var orderedArgs = 0
+
+        completedWords.forEach { word ->
+            when {
+                word.startsWith("--") -> {
+                    namedArgs.add(word.removePrefix("--"))
+                }
+                word.startsWith("-") -> {
+                    word.removePrefix("-").forEach { flags.add(it) }
+                }
+                else -> {
+                    orderedArgs++
+                }
+            }
+        }
+
+        return this.getCompletionSuggestions(namedArgs, flags, orderedArgs)
+            .filter { it.startsWith(currentWord) }
+            .toSet()
     }
 
     /**
