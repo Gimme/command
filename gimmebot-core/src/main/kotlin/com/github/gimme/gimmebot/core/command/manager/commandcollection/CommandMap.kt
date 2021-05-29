@@ -1,6 +1,8 @@
 package com.github.gimme.gimmebot.core.command.manager.commandcollection
 
 import com.github.gimme.gimmebot.core.command.Command
+import com.github.gimme.gimmebot.core.command.CommandSearchResult
+import com.github.gimme.gimmebot.core.command.node.CommandNode
 
 /**
  * A collection of commands mapped by name.
@@ -14,8 +16,21 @@ class CommandMap : CommandCollection {
     override fun addCommand(command: Command<*>) {
         commands.add(command)
 
+        addParentNodes(command)
+
         command.pathAliases.forEach { path ->
-            computeNodeIfAbsent(path).command = command
+            computeNodeIfAbsent(path).let {
+                it.command = command
+                it.commandNode = command
+            }
+        }
+    }
+
+    private fun addParentNodes(commandNode: CommandNode) {
+        commandNode.parent?.let {
+            it.pathAliases.forEach { path ->
+                computeNodeIfAbsent(path).commandNode = it
+            }
         }
     }
 
@@ -23,8 +38,10 @@ class CommandMap : CommandCollection {
 
     override fun containsCommand(path: List<String>): Boolean = getCommand(path) != null
 
-    override fun findCommand(path: List<String>): List<String>? {
+    override fun findCommand(path: List<String>): CommandSearchResult {
         var longestPathToCommand: List<String>? = null
+        var command: Command<*>? = null
+        var commandNode: CommandNode? = null
 
         val currentPath = mutableListOf<String>()
         var node: Node = root
@@ -32,13 +49,30 @@ class CommandMap : CommandCollection {
         for (s in path) {
             node = node[s] ?: break
             currentPath.add(s)
-            if (node.command != null) longestPathToCommand = currentPath
+
+            node.command?.let {
+                longestPathToCommand = currentPath
+                command = it
+            }
+
+            node.commandNode?.let {
+                longestPathToCommand = currentPath
+                commandNode = it
+            }
         }
 
-        return longestPathToCommand
+        return CommandSearchResult(
+            path = longestPathToCommand,
+            command = command,
+            commandNode = commandNode,
+            subBranches = node.keys,
+        )
     }
 
     override fun getBranches(path: List<String>): Set<String> = getNode(path)?.keys ?: setOf()
+
+    override fun getLeafCommands(path: List<String>): Set<Command<*>> =
+        getNode(path)?.values?.mapNotNull { it.command }?.toSet() ?: setOf()
 
     override fun iterator(): Iterator<Command<*>> = commands.iterator()
 
@@ -54,5 +88,8 @@ class CommandMap : CommandCollection {
         return node
     }
 
-    private class Node(var command: Command<*>? = null) : LinkedHashMap<String, Node>()
+    private class Node(
+        var command: Command<*>? = null,
+        var commandNode: CommandNode? = null,
+    ) : LinkedHashMap<String, Node>()
 }

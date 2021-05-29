@@ -3,6 +3,7 @@ package com.github.gimme.gimmebot.core.command.channel
 import com.github.gimme.gimmebot.core.command.Command
 import com.github.gimme.gimmebot.core.command.exception.CommandException
 import com.github.gimme.gimmebot.core.command.exception.ErrorCode
+import com.github.gimme.gimmebot.core.command.exception.UncompletedCommandException
 import com.github.gimme.gimmebot.core.command.manager.CommandManager
 import com.github.gimme.gimmebot.core.command.manager.TextCommandManager
 import com.github.gimme.gimmebot.core.command.sender.CommandSender
@@ -24,9 +25,11 @@ abstract class TextCommandChannel(
 
         val message = try { // Execute the command
             executeCommand(sender, commandInput)
+        } catch (e: UncompletedCommandException) { // The command path is not complete
+            handleUncompletedCommand(e)
         } catch (e: CommandException) { // The command returned with an error
             if (e.code == ErrorCode.NOT_A_COMMAND.code()) return false
-            e.message
+            handleCommandError(e)
         }
 
         // Send back the response
@@ -42,10 +45,21 @@ abstract class TextCommandChannel(
         commandSender.sendMessage(response)
     }
 
-    @Throws(CommandException::class)
+    @Throws(CommandException::class, UncompletedCommandException::class)
     private fun executeCommand(commandSender: CommandSender, commandInput: String): String? {
-        val commandPath = findBestMatchCommand(commandInput.split(" "))
+        val commandSearchResult = findCommand(commandInput.split(" "))
+
+        val commandPath = commandSearchResult.path
             ?: throw ErrorCode.NOT_A_COMMAND.createException()
+
+        if (commandSearchResult.command == null) {
+            throw UncompletedCommandException(
+                usedPath = commandSearchResult.path,
+                subBranches = commandSearchResult.subBranches,
+                leafCommands = getLeafCommands(commandPath),
+            )
+        }
+
         val commandLabel = commandPath.joinToString(" ")
 
         // Remove command name, leaving only the arguments
@@ -56,22 +70,6 @@ abstract class TextCommandChannel(
             .map { s -> s.replace("\"", "") }.drop(1)
 
         return executeCommand(commandSender, commandPath, args)
-    }
-
-    private fun findBestMatchCommand(input: List<String>): List<String>? {
-        var bestMatchCommandPath: List<String>? = null
-
-        registeredCommandManagers.forEach {
-            val foundCommandPath = it.commandManager.findCommand(input)
-
-            foundCommandPath?.let {
-                if (foundCommandPath.size > bestMatchCommandPath?.size ?: -1) {
-                    bestMatchCommandPath = foundCommandPath
-                }
-            }
-        }
-
-        return bestMatchCommandPath
     }
 
     /**
@@ -95,15 +93,13 @@ abstract class TextCommandChannel(
 
         val suggestions = mutableSetOf<String>()
 
-        registeredCommandManagers.forEach {
-            suggestions.addAll(it.commandManager.getBranches(completedWords))
-        }
+        val searchResult = findCommand(completedWords)
 
-        findBestMatchCommand(completedWords)?.let { commandPath ->
-            registeredCommandManagers.forEach {
-                it.commandManager.getCommand(commandPath)?.let { command ->
-                    suggestions.addAll(command.autocomplete(completedWords.drop(commandPath.size), currentWord))
-                }
+        searchResult.path?.let { path ->
+            suggestions.addAll(searchResult.subBranches)
+
+            searchResult.command?.let { command ->
+                suggestions.addAll(command.autocomplete(completedWords.drop(path.size), currentWord))
             }
         }
 
@@ -154,4 +150,16 @@ abstract class TextCommandChannel(
         // Remove prefix
         return input.removePrefix(prefix)
     }
+
+    /**
+     * Returns a formatted message based on the thrown [uncompletedCommandException] to be sent out in this channel, or null if no
+     * message should be sent.
+     */
+    protected open fun handleUncompletedCommand(uncompletedCommandException: UncompletedCommandException): String? = null
+
+    /**
+     * Returns a formatted error message based on the thrown [commandException] to be sent out in this channel, or null if no
+     * message should be sent.
+     */
+    protected open fun handleCommandError(commandException: CommandException): String? = commandException.message
 }

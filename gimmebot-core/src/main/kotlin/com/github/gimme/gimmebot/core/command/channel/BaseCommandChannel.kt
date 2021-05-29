@@ -1,9 +1,11 @@
 package com.github.gimme.gimmebot.core.command.channel
 
 import com.github.gimme.gimmebot.core.command.Command
+import com.github.gimme.gimmebot.core.command.CommandSearchResult
 import com.github.gimme.gimmebot.core.command.exception.CommandException
 import com.github.gimme.gimmebot.core.command.exception.ErrorCode
 import com.github.gimme.gimmebot.core.command.manager.CommandManager
+import com.github.gimme.gimmebot.core.command.node.CommandNode
 import com.github.gimme.gimmebot.core.command.sender.CommandSender
 import com.github.gimme.gimmebot.core.command.sender.ConsoleCommandSender
 import com.github.gimme.gimmebot.core.command.sender.MessageReceiver
@@ -76,6 +78,58 @@ abstract class BaseCommandChannel<R>(
     }
 
     override fun onRegisterCommand(command: Command<*>) {}
+
+    protected fun getLeafCommands(path: List<String>): Set<Command<*>> {
+        val result = mutableSetOf<Command<*>>()
+
+        registeredCommandManagers.forEach {
+            result.addAll(it.commandManager.getLeafCommands(path))
+        }
+
+        return result
+    }
+
+    /**
+     * Searches for the command or node with the longest matching sub-set from the start of the [path] and returns the
+     * best result from all [registeredCommandManagers].
+     *
+     * If multiple commands/nodes are found at the same path, only the one with highest priority is returned.
+     *
+     * The result's [CommandSearchResult.subBranches] always includes all sub-branches found for the
+     * [CommandSearchResult.path].
+     */
+    protected fun findCommand(path: List<String>): CommandSearchResult {
+        var longestPath: List<String>? = null
+        var command: Command<*>? = null
+        var commandNode: CommandNode? = null
+        val subBranches: MutableSet<String> = mutableSetOf()
+
+        registeredCommandManagers.forEach {
+            val searchResult = it.commandManager.findCommand(path)
+
+            searchResult.path?.let { commandResultPath ->
+                val bestResultPathSize = longestPath?.size ?: -1
+
+                if (commandResultPath.size > bestResultPathSize) {
+                    longestPath = searchResult.path
+                    command = searchResult.command
+                    commandNode = searchResult.commandNode
+                    subBranches.addAll(searchResult.subBranches)
+                } else if (commandResultPath.size == bestResultPathSize) {
+                    if (command == null) command = searchResult.command
+                    if (commandNode == null) commandNode = searchResult.commandNode
+                    subBranches.addAll(searchResult.subBranches)
+                }
+            }
+        }
+
+        return CommandSearchResult(
+            path = longestPath,
+            command = command,
+            commandNode = commandNode,
+            subBranches = subBranches,
+        )
+    }
 
     /**
      * Represents a registered [commandManager] that can be used to execute commands with its responses converted to a

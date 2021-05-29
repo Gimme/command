@@ -1,6 +1,7 @@
 package com.github.gimme.gimmebot.core.command.manager.commandcollection
 
 import com.github.gimme.gimmebot.core.command.Command
+import com.github.gimme.gimmebot.core.command.CommandSearchResult
 
 /**
  * Represents a collection of commands.
@@ -22,14 +23,21 @@ interface CommandCollection : Iterable<Command<*>> {
     fun containsCommand(path: List<String>): Boolean
 
     /**
-     * Returns the longest matching sub-set from the start of the [path] that leads to a command, or null if no match.
+     * Searches for the command or node with the longest matching sub-set from the start of the [path] and returns the
+     * result.
      */
-    fun findCommand(path: List<String>): List<String>?
+    fun findCommand(path: List<String>): CommandSearchResult
 
     /**
      * Returns the roots of all child branches under the [path], or an empty set if the [path] does not exist.
      */
     fun getBranches(path: List<String>): Set<String>
+
+    /**
+     * Returns all leaves of all child branches under the command [path], or an empty set if no command exists under
+     * that [path].
+     */
+    fun getLeafCommands(path: List<String>): Set<Command<*>>
 
     override fun iterator(): Iterator<Command<*>> = commands.iterator()
 }

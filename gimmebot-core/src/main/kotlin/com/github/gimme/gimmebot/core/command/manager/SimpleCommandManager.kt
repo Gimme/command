@@ -1,6 +1,7 @@
 package com.github.gimme.gimmebot.core.command.manager
 
 import com.github.gimme.gimmebot.core.command.Command
+import com.github.gimme.gimmebot.core.command.CommandSearchResult
 import com.github.gimme.gimmebot.core.command.exception.CommandException
 import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandCollection
 import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandMap
@@ -34,9 +35,11 @@ open class SimpleCommandManager<R>(private val defaultResponseParser: (Any?) -> 
 
     override fun hasCommand(path: List<String>): Boolean = commandCollection.containsCommand(path)
 
-    override fun findCommand(path: List<String>): List<String>? = commandCollection.findCommand(path)
+    override fun findCommand(path: List<String>): CommandSearchResult = commandCollection.findCommand(path)
 
     override fun getBranches(path: List<String>): Set<String> = commandCollection.getBranches(path)
+
+    override fun getLeafCommands(path: List<String>): Set<Command<*>> = commandCollection.getLeafCommands(path)
 
     override fun executeCommand(
         commandSender: CommandSender,
