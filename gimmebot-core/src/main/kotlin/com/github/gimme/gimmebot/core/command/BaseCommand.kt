@@ -1,32 +1,23 @@
 package com.github.gimme.gimmebot.core.command
 
+import com.github.gimme.gimmebot.core.command.node.BaseCommandNode
+import com.github.gimme.gimmebot.core.command.node.CommandNode
+
 /**
- * Represents a command with base functionality.
+ * A base implementation of command with useful "hashCode" and "equals" methods.
  *
  * @param T the response type
  */
 abstract class BaseCommand<out T>(
-    final override val name: String,
-    final override val parent: Command<*>? = null,
-    final override var aliases: Set<String> = setOf(),
+    name: String,
+    parent: CommandNode? = null,
+    aliases: Set<String> = setOf(),
     override var summary: String = "",
     override var description: String = "",
     override var usage: String = "",
     override var parameters: CommandParameterSet = CommandParameterSet(),
-) : Command<T> {
+) : BaseCommandNode(name, parent, aliases), Command<T> {
 
     @JvmOverloads
-    constructor(name: String, parent: Command<*>? = null) : this(name, parent, setOf())
-
-    override fun hashCode(): Int = id.hashCode()
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as BaseCommand<*>
-
-        if (id != other.id) return false
-
-        return true
-    }
+    constructor(name: String, parent: CommandNode? = null) : this(name, parent, setOf())
 }
