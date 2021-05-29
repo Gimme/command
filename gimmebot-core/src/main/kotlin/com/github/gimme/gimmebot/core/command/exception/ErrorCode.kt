@@ -26,7 +26,7 @@ enum class ErrorCode(val message: String) {
     TOO_MANY_ARGUMENTS("Too many arguments");
 
     /** Returns the identifier code. */
-    fun code(): String = name
+    val code: String = name
 
     /**
      * Creates a [CommandException] with this error code and an optional [context] object to be included in the message.
@@ -34,5 +34,5 @@ enum class ErrorCode(val message: String) {
      * For example: the message "Invalid argument" or "Invalid argument: 43" with 43 being the context in this case.
      */
     fun createException(context: Any? = null): CommandException =
-        CommandException(code(), message + (context?.let { ": $it" } ?: ""))
+        CommandException(code, message + (context?.let { ": $it" } ?: ""))
 }

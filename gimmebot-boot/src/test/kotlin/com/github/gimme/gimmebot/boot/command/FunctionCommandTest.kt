@@ -3,8 +3,8 @@ package com.github.gimme.gimmebot.boot.command
 import com.github.gimme.gimmebot.boot.command.executor.CommandExecutor
 import com.github.gimme.gimmebot.core.command.Command
 import com.github.gimme.gimmebot.core.command.exception.CommandException
-import com.github.gimme.gimmebot.core.command.sender.CommandSender
 import com.github.gimme.gimmebot.core.command.exception.ErrorCode
+import com.github.gimme.gimmebot.core.command.sender.CommandSender
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertIterableEquals
@@ -129,7 +129,7 @@ class FunctionCommandTest {
         }
 
         val exception = assertThrows<CommandException> { executeCommand() }
-        assertEquals(errorCode.code(), exception.code)
+        assertEquals(errorCode.code, exception.code)
     }
 
     @Test
