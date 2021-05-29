@@ -15,7 +15,7 @@ package com.github.gimme.gimmebot.boot.command.executor
  *
  * Only one function should be marked in the same class.
  *
- * If the first parameter is a [com.github.gimme.gimmebot.core.command.CommandSender] it gets auto-injected.
+ * If the first parameter is a [com.github.gimme.gimmebot.core.command.sender.CommandSender] it gets auto-injected.
  */
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FUNCTION)
