@@ -14,6 +14,13 @@ open class BaseCommandNode(
     @JvmOverloads
     constructor(name: String, parent: CommandNode? = null) : this(name, parent, setOf())
 
+    init {
+        (aliases + name).forEach {
+            require(it.isNotEmpty()) { "Name cannot be empty" }
+            require(!it.contains(" ")) { "Name cannot contain spaces: \"$it\"" }
+        }
+    }
+
     override fun hashCode(): Int = id.hashCode()
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

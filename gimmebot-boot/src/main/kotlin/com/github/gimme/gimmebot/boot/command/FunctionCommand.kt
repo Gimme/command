@@ -41,11 +41,6 @@ abstract class FunctionCommand<out T>(
     final override var usage: String
 
     init {
-        (aliases + name).forEach {
-            require(it.isNotEmpty()) { "Command names cannot be empty" }
-            require(!it.contains(" ")) { "Command names cannot contain spaces: \"$it\"" }
-        }
-
         val function = getFirstCommandExecutorFunction()
         val commandExecutor: CommandExecutor = function.findAnnotation()!!
 
