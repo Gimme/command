@@ -3,7 +3,7 @@ package com.github.gimme.gimmebot.core.command.channel
 import com.github.gimme.gimmebot.core.command.Command
 import com.github.gimme.gimmebot.core.command.exception.CommandException
 import com.github.gimme.gimmebot.core.command.exception.ErrorCode
-import com.github.gimme.gimmebot.core.command.exception.UncompletedCommandException
+import com.github.gimme.gimmebot.core.command.exception.IncompleteCommandException
 import com.github.gimme.gimmebot.core.command.manager.CommandManager
 import com.github.gimme.gimmebot.core.command.manager.TextCommandManager
 import com.github.gimme.gimmebot.core.command.sender.CommandSender
@@ -23,17 +23,25 @@ abstract class TextCommandChannel(
 
         super.parseInput(sender, input)
 
-        val message = try { // Execute the command
-            executeCommand(sender, commandInput)
-        } catch (e: UncompletedCommandException) { // The command path is not complete
-            handleUncompletedCommand(e)
+        try {
+            // Execute the command
+            val message = executeCommand(sender, commandInput)
+
+            // Send back the response
+            respond(sender, message)
         } catch (e: CommandException) { // The command returned with an error
-            if (e.code == ErrorCode.NOT_A_COMMAND.code()) return false
-            handleCommandError(e)
+            val commandErrorEvent = (e as? IncompleteCommandException)?.let {
+                val event = CommandErrorEvent(e, sender)
+                onIncompleteCommand(event)
+                event
+            } ?: CommandErrorEvent(e, sender)
+
+            onCommandError(commandErrorEvent)
+
+            if (!commandErrorEvent.accept) return false
+            respond(commandErrorEvent.commandSender, commandErrorEvent.responseMessage)
         }
 
-        // Send back the response
-        respond(sender, message)
         return true
     }
 
@@ -45,7 +53,7 @@ abstract class TextCommandChannel(
         commandSender.sendMessage(response)
     }
 
-    @Throws(CommandException::class, UncompletedCommandException::class)
+    @Throws(CommandException::class, IncompleteCommandException::class)
     private fun executeCommand(commandSender: CommandSender, commandInput: String): String? {
         val commandSearchResult = findCommand(commandInput.split(" "))
 
@@ -53,7 +61,7 @@ abstract class TextCommandChannel(
             ?: throw ErrorCode.NOT_A_COMMAND.createException()
 
         if (commandSearchResult.command == null) {
-            throw UncompletedCommandException(
+            throw IncompleteCommandException(
                 usedPath = commandSearchResult.path,
                 subBranches = commandSearchResult.subBranches,
                 leafCommands = getLeafCommands(commandPath),
@@ -152,14 +160,51 @@ abstract class TextCommandChannel(
     }
 
     /**
-     * Returns a formatted message based on the thrown [uncompletedCommandException] to be sent out in this channel, or null if no
-     * message should be sent.
+     * Handles errors on command execution.
+     *
+     * Modifying the [event] affects the response. For example, it can be useful to choose your own
+     * [CommandErrorEvent.responseMessage].
      */
-    protected open fun handleUncompletedCommand(uncompletedCommandException: UncompletedCommandException): String? = null
+    protected open fun onCommandError(event: CommandErrorEvent<*>) {
+        when (event.cause.code) {
+            ErrorCode.NOT_A_COMMAND.code -> event.accept = false
+        }
+    }
 
     /**
-     * Returns a formatted error message based on the thrown [commandException] to be sent out in this channel, or null if no
-     * message should be sent.
+     * Handles the [IncompleteCommandException] error specifically, with some extra data.
+     *
+     * This event will still pass through the regular [onCommandError].
+     *
+     * @see onCommandError
      */
-    protected open fun handleCommandError(commandException: CommandException): String? = commandException.message
+    protected open fun onIncompleteCommand(event: CommandErrorEvent<IncompleteCommandException>) {
+        event.accept = false
+    }
+
+    /**
+     * Represents an event of a command error occurring after an attempted command execution.
+     *
+     * @property cause the [CommandException] that caused this event
+     * @property commandSender the [CommandSender] that attempted to execute the command
+     */
+    protected data class CommandErrorEvent<out T>(
+        val cause: T,
+        val commandSender: CommandSender,
+    ) where T : CommandException {
+
+        /**
+         * The message to be sent out as a response in this channel, or null if no message should be sent.
+         *
+         * The default response message is the [CommandErrorEvent.cause]'s [CommandException.message].
+         */
+        var responseMessage: String? = cause.message
+
+        /**
+         * If the command execution attempt should be accepted.
+         *
+         * If this is set to false, the [responseMessage] is not sent and the command input parser returns with a fail.
+         */
+        var accept: Boolean = true
+    }
 }

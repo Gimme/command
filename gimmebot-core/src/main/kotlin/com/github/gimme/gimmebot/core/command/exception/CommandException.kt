@@ -6,7 +6,10 @@ package com.github.gimme.gimmebot.core.command.exception
  * @property code    an identifier for the type of the error
  * @property message the message explaining what went wrong
  */
-class CommandException(
+open class CommandException(
     val code: String,
     override val message: String,
-) : RuntimeException(message)
+) : RuntimeException(message) {
+
+    constructor(errorCode: ErrorCode) : this(errorCode.code, errorCode.message)
+}

@@ -3,10 +3,9 @@ package com.github.gimme.gimmebot.core.command.exception
 import com.github.gimme.gimmebot.core.command.Command
 
 /**
- * Thrown when the attempted command path to execute is uncompleted and has sub-paths that will lead to a real
- * command.
+ * Thrown when the attempted command path to execute is not complete and has sub-paths that will lead to a real command.
  */
-class UncompletedCommandException(
+class IncompleteCommandException(
     /**
      * The path used in the attempted execution.
      */
@@ -19,4 +18,4 @@ class UncompletedCommandException(
      * All real commands that exist below the path.
      */
     val leafCommands: Set<Command<*>>
-) : RuntimeException()
+) : CommandException(ErrorCode.INCOMPLETE_COMMAND)
