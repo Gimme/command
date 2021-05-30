@@ -37,6 +37,7 @@ internal fun generateParameters(function: KFunction<Any?>, commandExecutor: Comm
             val displayName = name.splitCamelCase(" ")
             val commandParameterType = commandParameterTypeFrom(param)
             val flags = generateFlags(id, usedFlags)
+            val defaultValue = commandExecutor.getDefaultValue(valueParameters.indexOf(param))
             usedFlags.addAll(flags)
 
             CommandParameter(
@@ -45,9 +46,9 @@ internal fun generateParameters(function: KFunction<Any?>, commandExecutor: Comm
                 type = commandParameterType,
                 suggestions = commandParameterType.values ?: { setOf() },
                 vararg = param.isVararg,
-                optional = param.isOptional,
+                optional = param.isOptional || defaultValue?.value != null,
                 flags = flags,
-                defaultValue = commandExecutor.getDefaultValue(valueParameters.indexOf(param))
+                defaultValue = defaultValue
             )
         }
             .toList()
@@ -173,14 +174,15 @@ private fun <T> Command<T>.attemptToCallFunction(
 
     mergeArgs(this, orderedArgs, namedArgs).forEach { arg ->
         val param = params[paramsIndex++]
-        typedArgsMap[param] = arg
+        if (arg != null) typedArgsMap[param] = arg
     }
 
     return function.callBy(typedArgsMap)
 }
 
 /**
- * Merges [orderedArgs] amd [namedArgs] into one list matching the order of the [command]s parameters.
+ * Merges [orderedArgs] amd [namedArgs] into one list matching the order of the [command]s parameters. Null values that
+ * are returned are expected to receive default values through the [KParameter].
  *
  * @throws CommandException if there was an issue merging or matching the args
  */
@@ -189,8 +191,8 @@ private fun mergeArgs(
     command: Command<*>,
     orderedArgs: List<String>,
     namedArgs: Map<String, String>,
-): List<Any> {
-    val mergedArgs = mutableListOf<Any>()
+): List<Any?> {
+    val mergedArgs = mutableListOf<Any?>()
     var orderedArgsIndex = 0
 
     val unusedNamedArgs = namedArgs.keys.toMutableSet()
@@ -204,16 +206,17 @@ private fun mergeArgs(
                 value = orderedArgs.subList(orderedArgsIndex, orderedArgs.size)
                 orderedArgsIndex += value.size
             } else {
-                if (orderedArgsIndex >= orderedArgs.size) {
-                    if (param.optional) return@forEach
-                    throw ErrorCode.TOO_FEW_ARGUMENTS.createException()
+                value = if (orderedArgsIndex >= orderedArgs.size) {
+                    if (param.optional) {
+                        param.defaultValue?.value
+                    } else throw ErrorCode.TOO_FEW_ARGUMENTS.createException()
+                } else {
+                    orderedArgs[orderedArgsIndex++]
                 }
-
-                value = orderedArgs[orderedArgsIndex++]
             }
         }
 
-        val typedArg = param.type.convert(value)
+        val typedArg = value?.let { param.type.convert(it) }
         mergedArgs.add(typedArg)
     }
 
