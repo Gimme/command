@@ -1,11 +1,10 @@
 package com.github.gimme.gimmebot.boot.command.executor
 
 import kotlin.reflect.KParameter
-import kotlin.reflect.jvm.javaType
 
 /**
  * Thrown when a function parameter is not supported to be converted to a
- * [com.github.gimme.gimmebot.core.command.CommandParameter].
+ * [com.github.gimme.gimmebot.core.command.parameter.CommandParameter].
  */
 class UnsupportedParameterException(kParameter: KParameter) :
-    RuntimeException("Unsupported parameter \"${kParameter.name}\" with type: ${kParameter.type.javaType.typeName}")
+    RuntimeException("Unsupported parameter \"${kParameter.name}\" with type: ${kParameter.type}")
