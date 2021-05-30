@@ -3,18 +3,44 @@ package com.github.gimme.gimmebot.boot.command.executor.parameter
 import com.github.gimme.gimmebot.core.command.CommandParameterType
 import kotlin.reflect.KClassifier
 import kotlin.reflect.KParameter
+import kotlin.reflect.full.createType
 import kotlin.reflect.jvm.jvmErasure
+
+/**
+ * Registers a custom command parameter type. This [T] type can then be safely used in
+ * [com.github.gimme.gimmebot.boot.command.executor.CommandExecutor] function declarations for automatic command
+ * parameter generation.
+ */
+inline fun <reified T> registerParameterType(commandParameterType: CommandParameterType<T>) where T : Any {
+    val type = T::class.createType()
+    val arrayType = Array<T>::class.createType()
+
+    registeredTypes[type.classifier
+        ?: throw IllegalArgumentException("Invalid command parameter type: ${commandParameterType.name}")] =
+        commandParameterType
+
+    registeredTypes[arrayType.classifier
+        ?: throw IllegalArgumentException("Invalid command parameter array type: ${commandParameterType.name}")] =
+        object : CommandParameterType<Array<T>>(
+            name = commandParameterType.name + if (commandParameterType.name.endsWith("s")) "" else "s",
+            values = commandParameterType.values
+        ) {
+            override fun convertOrNull(input: Any) =
+                (input as Collection<*>).map { commandParameterType.convert(it!!) }.toTypedArray()
+        }
+}
 
 /**
  * Returns a new command parameter type based on the [parameter].
  */
 internal fun commandParameterTypeFrom(parameter: KParameter): CommandParameterType<*> {
-    return map[parameter.type.classifier]
+    return registeredTypes[parameter.type.classifier]
         ?: getEnumParameterType(parameter)
         ?: throw UnsupportedParameterException(parameter)
 }
 
-private val map = mapOf<KClassifier, CommandParameterType<*>>(
+@PublishedApi
+internal val registeredTypes = mutableMapOf<KClassifier, CommandParameterType<*>>(
     String::class to STRING,
     Int::class to INTEGER,
     Double::class to DOUBLE,
