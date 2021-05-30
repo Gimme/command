@@ -16,6 +16,7 @@ import kotlin.reflect.full.hasAnnotation
 import kotlin.reflect.full.isSubtypeOf
 import kotlin.reflect.full.memberFunctions
 import kotlin.reflect.full.safeCast
+import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.jvmErasure
 
 private val COMMAND_SENDER_TYPE: KType = CommandSender::class.createType()
@@ -179,6 +180,7 @@ private fun <T> Command<T>.attemptToCallFunction(
         if (arg != null) typedArgsMap[param] = arg
     }
 
+    function.isAccessible = true
     return function.callBy(typedArgsMap)
 }
 
