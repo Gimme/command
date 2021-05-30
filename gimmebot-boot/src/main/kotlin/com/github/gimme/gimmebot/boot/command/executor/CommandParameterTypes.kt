@@ -4,6 +4,8 @@ import com.github.gimme.gimmebot.core.command.parameter.CommandParameterType
 import kotlin.reflect.KClass
 import kotlin.reflect.KClassifier
 import kotlin.reflect.KParameter
+import kotlin.reflect.KTypeProjection
+import kotlin.reflect.KVariance
 import kotlin.reflect.full.createType
 import kotlin.reflect.jvm.jvmErasure
 
@@ -13,7 +15,7 @@ import kotlin.reflect.jvm.jvmErasure
  */
 inline fun <reified T> registerParameterType(commandParameterType: CommandParameterType<T>) where T : Any {
     val type = T::class.createType()
-    val arrayType = Array<T>::class.createType()
+    val arrayType = Array<T>::class.createType(arguments = listOf(KTypeProjection(KVariance.OUT, type)))
 
     registeredTypes[type.classifier
         ?: throw IllegalArgumentException("Invalid command parameter type: ${commandParameterType.name}")] =
