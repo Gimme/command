@@ -6,7 +6,7 @@ import com.github.gimme.gimmebot.boot.command.executor.generateUsage
 import com.github.gimme.gimmebot.boot.command.executor.getFirstCommandExecutorFunction
 import com.github.gimme.gimmebot.boot.command.executor.tryExecuteCommandByReflection
 import com.github.gimme.gimmebot.core.command.BaseCommand
-import com.github.gimme.gimmebot.core.command.Command
+import com.github.gimme.gimmebot.core.command.node.CommandNode
 import com.github.gimme.gimmebot.core.command.parameter.CommandParameterSet
 import com.github.gimme.gimmebot.core.command.sender.CommandSender
 import kotlin.reflect.full.findAnnotation
@@ -22,7 +22,7 @@ import kotlin.reflect.full.findAnnotation
  */
 abstract class FunctionCommand<out T>(
     name: String,
-    parent: Command<*>? = null,
+    parent: CommandNode? = null,
     aliases: Set<String> = setOf(),
     summary: String = "",
     description: String = "",
@@ -35,7 +35,7 @@ abstract class FunctionCommand<out T>(
 ) {
 
     @JvmOverloads
-    constructor(name: String, parent: Command<*>? = null) : this(name, parent, setOf())
+    constructor(name: String, parent: CommandNode? = null) : this(name, parent, setOf())
 
     final override var parameters: CommandParameterSet
     final override var usage: String
