@@ -140,7 +140,7 @@ class FunctionCommandTest {
             }
         }
 
-        assertEquals("c <param one> <param two=2>", command.usage)
+        assertEquals("c <param-one> [param-two=2]", command.usage)
     }
 
     @Test
@@ -151,7 +151,7 @@ class FunctionCommandTest {
             }
         }
 
-        assertEquals("c <param one> <param two=2>", command.usage)
+        assertEquals("c <param-one> [param-two=2]", command.usage)
     }
 
     companion object {
