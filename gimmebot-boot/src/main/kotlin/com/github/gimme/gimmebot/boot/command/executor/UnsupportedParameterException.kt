@@ -7,4 +7,4 @@ import kotlin.reflect.KParameter
  * [com.github.gimme.gimmebot.core.command.parameter.CommandParameter].
  */
 class UnsupportedParameterException(kParameter: KParameter) :
-    RuntimeException("Unsupported parameter \"${kParameter.name}\" with type: ${kParameter.type}")
+    RuntimeException("Unsupported parameter \"${kParameter.name}\" of type: ${kParameter.type}")
