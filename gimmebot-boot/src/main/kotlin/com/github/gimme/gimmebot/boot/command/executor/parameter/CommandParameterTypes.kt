@@ -1,6 +1,5 @@
-package com.github.gimme.gimmebot.boot.command.executor
+package com.github.gimme.gimmebot.boot.command.executor.parameter
 
-import com.github.gimme.gimmebot.boot.command.exceptions.UnsupportedParameterException
 import com.github.gimme.gimmebot.core.command.CommandParameterType
 import kotlin.reflect.KClassifier
 import kotlin.reflect.KParameter

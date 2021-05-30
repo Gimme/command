@@ -1,6 +1,7 @@
 package com.github.gimme.gimmebot.boot.command.executor
 
-import com.github.gimme.gimmebot.boot.command.exceptions.UnsupportedParameterException
+import com.github.gimme.gimmebot.boot.command.executor.parameter.UnsupportedParameterException
+import com.github.gimme.gimmebot.boot.command.executor.parameter.commandParameterTypeFrom
 import com.github.gimme.gimmebot.core.command.Command
 import com.github.gimme.gimmebot.core.command.CommandParameter
 import com.github.gimme.gimmebot.core.command.CommandParameterSet
