@@ -44,8 +44,8 @@ abstract class FunctionCommand<out T>(
         val function = getFirstCommandExecutorFunction()
         val commandExecutor: CommandExecutor = function.findAnnotation()!!
 
-        parameters = generateParameters(function)
-        usage = generateUsage(commandExecutor)
+        parameters = generateParameters(function, commandExecutor)
+        usage = generateUsage()
     }
 
     override fun execute(commandSender: CommandSender, args: List<String>): T {

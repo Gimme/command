@@ -21,9 +21,10 @@ import kotlin.reflect.jvm.jvmErasure
 private val COMMAND_SENDER_TYPE: KType = CommandSender::class.createType()
 
 /**
- * Generates a set of [CommandParameter]s that matches the parameters of the [function].
+ * Generates a set of [CommandParameter]s that matches the parameters of the [function] with default values from
+ * [commandExecutor].
  */
-internal fun generateParameters(function: KFunction<Any?>): CommandParameterSet {
+internal fun generateParameters(function: KFunction<Any?>, commandExecutor: CommandExecutor): CommandParameterSet {
     val usedFlags = mutableSetOf<Char>()
 
     return CommandParameterSet(
@@ -43,6 +44,7 @@ internal fun generateParameters(function: KFunction<Any?>): CommandParameterSet 
                     vararg = param.isVararg,
                     optional = param.isOptional,
                     flags = flags,
+                    defaultValue = commandExecutor.getDefaultValue(param.index)
                 )
             }
             .toList()
@@ -50,13 +52,13 @@ internal fun generateParameters(function: KFunction<Any?>): CommandParameterSet 
 }
 
 /**
- * Generates a "usage string" that matches the [Command.parameters] with default values from [commandExecutor].
+ * Generates a "usage string" that matches the [Command.parameters].
  */
-internal fun Command<*>.generateUsage(commandExecutor: CommandExecutor): String {
+internal fun Command<*>.generateUsage(): String {
     val sb = StringBuilder(name)
 
-    parameters.forEachIndexed { index, parameter ->
-        val defaultValue = commandExecutor.getDefaultValue(index)
+    parameters.forEach { parameter ->
+        val defaultValue = parameter.defaultValue
         sb.append(" <${parameter.displayName}${defaultValue?.let { "=$defaultValue" } ?: ""}>")
     }
 
@@ -222,7 +224,7 @@ private fun mergeArgs(
  * Returns the default value for the parameter at the specified [index], or null if no default value for the specified
  * [index].
  *
- * Empty strings are treated as null (no default value).
+ * Empty strings are treated and returned as null (no default value).
  */
 internal fun CommandExecutor.getDefaultValue(index: Int): String? {
     val value = this.defaultValues.getOrNull(index)
