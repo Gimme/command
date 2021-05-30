@@ -8,10 +8,12 @@ import com.github.gimme.gimmebot.core.command.exception.ErrorCode
  *
  * @property name the display name of this parameter type
  * @property values gets all possible values this parameter type can have, or null if undefined
+ * @property convertOrNull converts the input to this parameter type, or null if failed to convert
  */
-abstract class CommandParameterType<T>(
+class CommandParameterType<T>(
     val name: String,
     val values: (() -> Set<String>)? = null,
+    var convertOrNull: (Any) -> T?
 ) where T : Any {
 
     /**
@@ -21,12 +23,4 @@ abstract class CommandParameterType<T>(
      */
     @Throws(CommandException::class)
     fun convert(input: Any): T = convertOrNull(input) ?: throw ErrorCode.INVALID_ARGUMENT.createException(input)
-
-    /**
-     * Converts the [input] to this parameter type, or null if failed to convert.
-     *
-     * @throws CommandException if the internal conversion failed
-     */
-    @Throws(CommandException::class)
-    abstract fun convertOrNull(input: Any): T?
 }
