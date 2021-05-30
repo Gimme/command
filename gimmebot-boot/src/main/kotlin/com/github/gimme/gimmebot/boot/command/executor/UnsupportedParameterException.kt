@@ -1,4 +1,4 @@
-package com.github.gimme.gimmebot.boot.command.executor.parameter
+package com.github.gimme.gimmebot.boot.command.executor
 
 import kotlin.reflect.KParameter
 import kotlin.reflect.jvm.javaType

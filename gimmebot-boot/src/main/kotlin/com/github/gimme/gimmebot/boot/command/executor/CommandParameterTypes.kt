@@ -1,4 +1,4 @@
-package com.github.gimme.gimmebot.boot.command.executor.parameter
+package com.github.gimme.gimmebot.boot.command.executor
 
 import com.github.gimme.gimmebot.core.command.CommandParameterType
 import kotlin.reflect.KClassifier
@@ -7,9 +7,8 @@ import kotlin.reflect.full.createType
 import kotlin.reflect.jvm.jvmErasure
 
 /**
- * Registers a custom command parameter type. This [T] type can then be safely used in
- * [com.github.gimme.gimmebot.boot.command.executor.CommandExecutor] function declarations for automatic command
- * parameter generation.
+ * Registers a custom command parameter type. This [T] type can then be safely used in [CommandExecutor] function
+ * declarations for automatic command parameter generation.
  */
 inline fun <reified T> registerParameterType(commandParameterType: CommandParameterType<T>) where T : Any {
     val type = T::class.createType()
