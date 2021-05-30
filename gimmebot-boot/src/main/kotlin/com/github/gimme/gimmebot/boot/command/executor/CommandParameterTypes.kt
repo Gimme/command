@@ -21,13 +21,7 @@ inline fun <reified T> registerParameterType(commandParameterType: CommandParame
 
     registeredTypes[arrayType.classifier
         ?: throw IllegalArgumentException("Invalid command parameter array type: ${commandParameterType.name}")] =
-        object : CommandParameterType<Array<T>>(
-            name = commandParameterType.name + if (commandParameterType.name.endsWith("s")) "" else "s",
-            values = commandParameterType.values
-        ) {
-            override fun convertOrNull(input: Any) =
-                (input as Collection<*>).map { commandParameterType.convert(it!!) }.toTypedArray()
-        }
+        commandParameterTypeToArrayType(commandParameterType)
 }
 
 /**
@@ -45,10 +39,7 @@ internal val registeredTypes = mutableMapOf<KClassifier, CommandParameterType<*>
     Int::class to INTEGER,
     Double::class to DOUBLE,
     Boolean::class to BOOLEAN,
-    Array<String>::class to object : CommandParameterType<Array<String>>("Strings") {
-        override fun convertOrNull(input: Any) =
-            (input as Collection<*>).map { STRING.convert(it!!) }.toTypedArray()
-    },
+    Array<String>::class to commandParameterTypeToArrayType(STRING),
     IntArray::class to object : CommandParameterType<IntArray>("Integers") {
         override fun convertOrNull(input: Any) =
             (input as Collection<*>).map { INTEGER.convert(it!!) }.toIntArray()
@@ -89,8 +80,10 @@ private object BOOLEAN : CommandParameterType<Boolean>(
     }
 }
 
-// TODO: support array of enums
-private fun getEnumParameterType(parameter: KParameter): CommandParameterType<Enum<*>>? {
+/**
+ * Returns a [CommandParameterType] for the [parameter] if it is an enum.
+ */
+private fun getEnumParameterType(parameter: KParameter): CommandParameterType<*>? {
     val enumClass: KClass<*> = parameter.type.jvmErasure
     val cls: Class<*>? = Class.forName(enumClass.qualifiedName)
     val enumValues: Set<Enum<*>>? = cls?.enumConstants?.filterIsInstance(Enum::class.java)?.toSet()
@@ -107,5 +100,19 @@ private fun getEnumParameterType(parameter: KParameter): CommandParameterType<En
         ) {
             override fun convertOrNull(input: Any) = convertFunction(input)
         }
+    }
+}
+
+/**
+ * Returns an [Array] version of the [commandParameterType], which can handle vararg parameters.
+ */
+@PublishedApi
+internal inline fun <reified E> commandParameterTypeToArrayType(commandParameterType: CommandParameterType<E>): CommandParameterType<Array<E>> where E : Any {
+    return object : CommandParameterType<Array<E>>(
+        name = commandParameterType.name + if (commandParameterType.name.endsWith("s")) "" else "s",
+        values = commandParameterType.values
+    ) {
+        override fun convertOrNull(input: Any) =
+            (input as Collection<*>).map { commandParameterType.convert(it!!) }.toTypedArray()
     }
 }
