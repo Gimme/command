@@ -56,7 +56,7 @@ object ParameterTypes {
     inline fun <reified T> registerType(
         name: String = T::class.simpleName ?: "?",
         noinline values: (() -> Set<String>)? = null,
-        errorMessage: String? = "Not a \"$name\"",
+        errorMessage: String? = "Not a `$name`",
         crossinline convertOrNull: (String) -> T?,
     ) where T : Any {
         val type = T::class.createType()

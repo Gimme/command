@@ -25,7 +25,7 @@ class SingularParameterType<R>(
      */
     @Throws(CommandException::class)
     fun convert(input: String): R = convertOrNull(input)
-        ?: throw ErrorCode.INVALID_ARGUMENT.createException(input + (errorMessage?.let { " ($it)" } ?: ""))
+        ?: throw ErrorCode.INVALID_ARGUMENT.createException("\"$input\"${(errorMessage?.let { " ($it)" } ?: "")}")
 
     override fun convert(input: Collection<String>): R = convert(input.first())
 }
