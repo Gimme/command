@@ -2,6 +2,7 @@ package com.github.gimme.gimmebot.core.command
 
 import com.github.gimme.gimmebot.core.command.node.BaseCommandNode
 import com.github.gimme.gimmebot.core.command.node.CommandNode
+import com.github.gimme.gimmebot.core.command.parameter.CommandParameterSet
 
 /**
  * A base implementation of command with useful "hashCode" and "equals" methods.

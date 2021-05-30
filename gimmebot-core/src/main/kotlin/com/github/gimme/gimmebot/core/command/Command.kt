@@ -2,6 +2,8 @@ package com.github.gimme.gimmebot.core.command
 
 import com.github.gimme.gimmebot.core.command.exception.CommandException
 import com.github.gimme.gimmebot.core.command.node.CommandNode
+import com.github.gimme.gimmebot.core.command.parameter.CommandParameter
+import com.github.gimme.gimmebot.core.command.parameter.CommandParameterSet
 import com.github.gimme.gimmebot.core.command.sender.CommandSender
 
 /**
@@ -28,6 +30,7 @@ interface Command<out T> : CommandNode {
     @Throws(CommandException::class)
     fun execute(commandSender: CommandSender, args: List<String>): T
 
+    // TODO: handle vararg parameter types
     /**
      * Returns suggestions on the next input word based on already submitted [namedArgs]/[flags] and amount of
      * [orderedArgs] already submitted.
@@ -42,7 +45,7 @@ interface Command<out T> : CommandNode {
         val suggestions = mutableSetOf<String>()
 
         nextParameter?.let {
-            it.defaultValue?.let { defaultValue -> suggestions.add(defaultValue) }
+            it.defaultValue?.value?.let { defaultValue -> suggestions.add(defaultValue) }
             suggestions.addAll(it.suggestions())
         }
         unusedParameters.forEach { suggestions.addAll(it.getFlagAliases()) }

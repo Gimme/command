@@ -1,4 +1,4 @@
-package com.github.gimme.gimmebot.core.command
+package com.github.gimme.gimmebot.core.command.parameter
 
 import com.github.gimme.gimmebot.core.command.exception.CommandException
 import com.github.gimme.gimmebot.core.command.exception.ErrorCode

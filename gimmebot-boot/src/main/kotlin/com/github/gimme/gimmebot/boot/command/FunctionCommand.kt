@@ -7,7 +7,7 @@ import com.github.gimme.gimmebot.boot.command.executor.getFirstCommandExecutorFu
 import com.github.gimme.gimmebot.boot.command.executor.tryExecuteCommandByReflection
 import com.github.gimme.gimmebot.core.command.BaseCommand
 import com.github.gimme.gimmebot.core.command.Command
-import com.github.gimme.gimmebot.core.command.CommandParameterSet
+import com.github.gimme.gimmebot.core.command.parameter.CommandParameterSet
 import com.github.gimme.gimmebot.core.command.sender.CommandSender
 import kotlin.reflect.full.findAnnotation
 

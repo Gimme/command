@@ -1,4 +1,4 @@
-package com.github.gimme.gimmebot.core.command
+package com.github.gimme.gimmebot.core.command.parameter
 
 /**
  * Represents a command parameter, which helps define how arguments can be passed to the command execution function.
@@ -11,7 +11,7 @@ package com.github.gimme.gimmebot.core.command
  * @property vararg       if this is a vararg parameter
  * @property optional     if this parameter is optional
  * @property flags        available shorthand flags representing this parameter
- * @property defaultValue the string representation of the default value used if this parameter is optional
+ * @property defaultValue the default value used if this parameter is optional
  */
 data class CommandParameter(
     val id: String,
@@ -22,5 +22,5 @@ data class CommandParameter(
     val vararg: Boolean = false,
     val optional: Boolean = false,
     val flags: Set<Char> = setOf(),
-    val defaultValue: String? = null,
+    val defaultValue: DefaultValue? = null,
 )

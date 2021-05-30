@@ -1,5 +1,6 @@
 package com.github.gimme.gimmebot.core.command
 
+import com.github.gimme.gimmebot.core.command.parameter.CommandParameterSet
 import com.github.gimme.gimmebot.core.command.sender.CommandSender
 
 val DUMMY_COMMAND_SENDER = object : CommandSender {

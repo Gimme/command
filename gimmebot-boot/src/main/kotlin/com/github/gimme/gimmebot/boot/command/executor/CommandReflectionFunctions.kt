@@ -1,10 +1,11 @@
 package com.github.gimme.gimmebot.boot.command.executor
 
 import com.github.gimme.gimmebot.core.command.Command
-import com.github.gimme.gimmebot.core.command.CommandParameter
-import com.github.gimme.gimmebot.core.command.CommandParameterSet
 import com.github.gimme.gimmebot.core.command.exception.CommandException
 import com.github.gimme.gimmebot.core.command.exception.ErrorCode
+import com.github.gimme.gimmebot.core.command.parameter.CommandParameter
+import com.github.gimme.gimmebot.core.command.parameter.CommandParameterSet
+import com.github.gimme.gimmebot.core.command.parameter.DefaultValue
 import com.github.gimme.gimmebot.core.command.sender.CommandSender
 import org.apache.commons.lang3.StringUtils
 import kotlin.reflect.KFunction
@@ -31,24 +32,24 @@ internal fun generateParameters(function: KFunction<Any?>, commandExecutor: Comm
 
     return CommandParameterSet(
         valueParameters.map { param ->
-                val name = param.name ?: throw UnsupportedParameterException(param)
-                val id = name.splitCamelCase("-")
-                val displayName = name.splitCamelCase(" ")
-                val commandParameterType = commandParameterTypeFrom(param)
-                val flags = generateFlags(id, usedFlags)
-                usedFlags.addAll(flags)
+            val name = param.name ?: throw UnsupportedParameterException(param)
+            val id = name.splitCamelCase("-")
+            val displayName = name.splitCamelCase(" ")
+            val commandParameterType = commandParameterTypeFrom(param)
+            val flags = generateFlags(id, usedFlags)
+            usedFlags.addAll(flags)
 
-                CommandParameter(
-                    id = id,
-                    displayName = displayName,
-                    type = commandParameterType,
-                    suggestions = commandParameterType.values ?: { setOf() },
-                    vararg = param.isVararg,
-                    optional = param.isOptional,
-                    flags = flags,
-                    defaultValue = commandExecutor.getDefaultValue(valueParameters.indexOf(param))
-                )
-            }
+            CommandParameter(
+                id = id,
+                displayName = displayName,
+                type = commandParameterType,
+                suggestions = commandParameterType.values ?: { setOf() },
+                vararg = param.isVararg,
+                optional = param.isOptional,
+                flags = flags,
+                defaultValue = commandExecutor.getDefaultValue(valueParameters.indexOf(param))
+            )
+        }
             .toList()
     )
 }
@@ -60,8 +61,8 @@ internal fun Command<*>.generateUsage(): String {
     val sb = StringBuilder(name)
 
     parameters.forEach { parameter ->
-        val defaultValue = parameter.defaultValue
-        sb.append(" <${parameter.displayName}${defaultValue?.let { "=$defaultValue" } ?: ""}>")
+        val defaultValueRepresentation = parameter.defaultValue?.representation
+        sb.append(" <${parameter.displayName}${defaultValueRepresentation?.let { "=$defaultValueRepresentation" } ?: ""}>")
     }
 
     return sb.toString()
@@ -228,7 +229,11 @@ private fun mergeArgs(
  *
  * Empty strings are treated and returned as null (no default value).
  */
-internal fun CommandExecutor.getDefaultValue(index: Int): String? {
-    val value = this.defaultValues.getOrNull(index)
-    return if (value.isNullOrEmpty()) null else value
+internal fun CommandExecutor.getDefaultValue(index: Int): DefaultValue? {
+    val value = this.defaultValues.getOrNull(index)?.let { if (it.isEmpty()) null else it }
+    val representation = this.defaultValueRepresentations.getOrNull(index)?.let { if (it.isEmpty()) null else it }
+
+    if (representation != null) return DefaultValue(value, representation)
+    if (value != null) return DefaultValue(value, value)
+    return null
 }

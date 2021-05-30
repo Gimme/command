@@ -1,4 +1,4 @@
-package com.github.gimme.gimmebot.core.command
+package com.github.gimme.gimmebot.core.command.parameter
 
 /**
  * Represents a set of [CommandParameter]s.

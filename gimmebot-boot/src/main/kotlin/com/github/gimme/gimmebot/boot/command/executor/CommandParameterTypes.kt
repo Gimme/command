@@ -1,6 +1,6 @@
 package com.github.gimme.gimmebot.boot.command.executor
 
-import com.github.gimme.gimmebot.core.command.CommandParameterType
+import com.github.gimme.gimmebot.core.command.parameter.CommandParameterType
 import kotlin.reflect.KClassifier
 import kotlin.reflect.KParameter
 import kotlin.reflect.full.createType

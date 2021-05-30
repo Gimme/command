@@ -21,8 +21,15 @@ package com.github.gimme.gimmebot.boot.command.executor
 @Target(AnnotationTarget.FUNCTION)
 annotation class CommandExecutor(
     /**
-     * A list of default values to be shown in the command's usage info, where each value corresponds to the command
-     * parameter with the same index.
+     * A list of default values to be used for optional parameters when omitted, where each value corresponds to the
+     * command parameter with the same index.
      */
     vararg val defaultValues: String = [],
-)
+
+    /**
+     * A list of visual representations for the default values to be shown in the command's usage info, where each value
+     * corresponds to the command parameter with the same index.
+     */
+    val defaultValueRepresentations: Array<out String> = [],
+) {
+}
