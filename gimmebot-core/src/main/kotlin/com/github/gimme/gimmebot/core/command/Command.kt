@@ -43,7 +43,7 @@ interface Command<out T> : CommandNode {
 
         nextParameter?.let {
             it.defaultValue?.let { defaultValue -> suggestions.add(defaultValue) }
-            suggestions.addAll(it.suggestions)
+            suggestions.addAll(it.suggestions())
         }
         unusedParameters.forEach { suggestions.addAll(it.getFlagAliases()) }
 

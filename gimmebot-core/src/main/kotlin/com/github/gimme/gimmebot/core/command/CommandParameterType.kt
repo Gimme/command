@@ -7,11 +7,11 @@ import com.github.gimme.gimmebot.core.command.exception.ErrorCode
  * Represents a command parameter type used to manage input argument values.
  *
  * @property name the display name of this parameter type
- * @property values all possible values this parameter type can have, or null if undefined
+ * @property values gets all possible values this parameter type can have, or null if undefined
  */
 abstract class CommandParameterType<T>(
     val name: String,
-    val values: Set<String>? = null,
+    val values: (() -> Set<String>)? = null,
 ) where T : Any {
 
     /**

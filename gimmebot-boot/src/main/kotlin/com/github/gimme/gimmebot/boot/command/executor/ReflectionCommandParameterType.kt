@@ -64,15 +64,14 @@ private object BOOLEAN : CommandParameterType<Boolean>("Boolean") {
 private fun getEnumParameterType(parameter: KParameter): CommandParameterType<String>? {
     val enumClassName = parameter.type.jvmErasure.qualifiedName
     val cls = Class.forName(enumClassName)
-    val enumValues = cls?.enumConstants?.filterIsInstance(Enum::class.java)
+    val enumValues = cls?.enumConstants?.filterIsInstance(Enum::class.java)?.map { it.name }?.toSet()
 
     return enumValues?.let {
         object : CommandParameterType<String>(
             name = parameter.type.jvmErasure.simpleName ?: "Enum",
-            values = enumValues.map { it.name }.toSet()
+            values = { enumValues }
         ) {
-            override fun convertOrNull(input: Any) =
-                enumValues.find { it.name.equals(input.toString(), ignoreCase = true) }?.name
+            override fun convertOrNull(input: Any) = enumValues.find { it.equals(input.toString(), ignoreCase = true) }
         }
     }
 }

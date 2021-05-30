@@ -42,7 +42,7 @@ internal fun generateParameters(function: KFunction<Any?>, commandExecutor: Comm
                     id = id,
                     displayName = displayName,
                     type = commandParameterType,
-                    suggestions = commandParameterType.values ?: setOf(),
+                    suggestions = commandParameterType.values ?: { setOf() },
                     vararg = param.isVararg,
                     optional = param.isOptional,
                     flags = flags,
