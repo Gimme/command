@@ -78,8 +78,12 @@ internal val registeredTypes = mutableMapOf<KClassifier, CommandParameterType<*>
  */
 private fun getEnumParameterType(parameter: KParameter): CommandParameterType<*>? {
     val enumClass: KClass<*> = parameter.type.jvmErasure
-    val cls: Class<*>? = Class.forName(enumClass.qualifiedName)
-    val enumValues: Set<Enum<*>>? = cls?.enumConstants?.filterIsInstance(Enum::class.java)?.toSet()
+    val cls: Class<*> = try {
+        Class.forName(enumClass.qualifiedName)
+    } catch (e: Exception) {
+        return null
+    }
+    val enumValues: Set<Enum<*>>? = cls.enumConstants?.filterIsInstance(Enum::class.java)?.toSet()
 
     return enumValues?.let {
         val name = enumClass.simpleName ?: "<Enum>"
