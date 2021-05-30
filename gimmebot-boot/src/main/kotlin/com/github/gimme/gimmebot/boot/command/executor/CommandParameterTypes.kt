@@ -74,7 +74,10 @@ private object DOUBLE : CommandParameterType<Double>("Number") {
     override fun convertOrNull(input: Any) = input.toString().toDoubleOrNull()
 }
 
-private object BOOLEAN : CommandParameterType<Boolean>("Boolean") {
+private object BOOLEAN : CommandParameterType<Boolean>(
+    name = "Boolean",
+    values = { setOf("true", "false", "1", "0") },
+) {
     override fun convertOrNull(input: Any): Boolean? {
         val s = input.toString()
         return when {
