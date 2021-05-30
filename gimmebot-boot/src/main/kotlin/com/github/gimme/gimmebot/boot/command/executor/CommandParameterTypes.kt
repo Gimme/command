@@ -91,9 +91,10 @@ private fun getEnumParameterType(parameter: KParameter): CommandParameterType<St
     val enumValues = cls?.enumConstants?.filterIsInstance(Enum::class.java)?.map { it.name }?.toSet()
 
     return enumValues?.let {
+        val values = { it }
         object : CommandParameterType<String>(
             name = parameter.type.jvmErasure.simpleName ?: "Enum",
-            values = { enumValues }
+            values = values
         ) {
             override fun convertOrNull(input: Any) = enumValues.find { it.equals(input.toString(), ignoreCase = true) }
         }
