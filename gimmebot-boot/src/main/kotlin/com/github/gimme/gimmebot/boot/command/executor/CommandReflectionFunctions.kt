@@ -34,13 +34,15 @@ internal fun generateParameters(function: KFunction<Any?>, commandExecutor: Comm
                 val name = param.name ?: throw UnsupportedParameterException(param)
                 val id = name.splitCamelCase("-")
                 val displayName = name.splitCamelCase(" ")
+                val commandParameterType = commandParameterTypeFrom(param)
                 val flags = generateFlags(id, usedFlags)
                 usedFlags.addAll(flags)
 
                 CommandParameter(
                     id = id,
                     displayName = displayName,
-                    type = commandParameterTypeFrom(param),
+                    type = commandParameterType,
+                    suggestions = commandParameterType.values ?: setOf(),
                     vararg = param.isVararg,
                     optional = param.isOptional,
                     flags = flags,

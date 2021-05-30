@@ -4,12 +4,16 @@ import com.github.gimme.gimmebot.boot.command.exceptions.UnsupportedParameterExc
 import com.github.gimme.gimmebot.core.command.CommandParameterType
 import kotlin.reflect.KClassifier
 import kotlin.reflect.KParameter
+import kotlin.reflect.jvm.jvmErasure
 
 /**
  * Returns a new command parameter type based on the [parameter].
  */
-internal fun commandParameterTypeFrom(parameter: KParameter): CommandParameterType<*> = map[parameter.type.classifier]
-    ?: throw UnsupportedParameterException(parameter)
+internal fun commandParameterTypeFrom(parameter: KParameter): CommandParameterType<*> {
+    return map[parameter.type.classifier]
+        ?: getEnumParameterType(parameter)
+        ?: throw UnsupportedParameterException(parameter)
+}
 
 private val map = mapOf<KClassifier, CommandParameterType<*>>(
     String::class to STRING,
@@ -53,6 +57,22 @@ private object BOOLEAN : CommandParameterType<Boolean>("Boolean") {
             s.equals("true", true) || s == "1" -> true
             s.equals("false", true) || s == "0" -> false
             else -> null
+        }
+    }
+}
+
+private fun getEnumParameterType(parameter: KParameter): CommandParameterType<String>? {
+    val enumClassName = parameter.type.jvmErasure.qualifiedName
+    val cls = Class.forName(enumClassName)
+    val enumValues = cls?.enumConstants?.filterIsInstance(Enum::class.java)
+
+    return enumValues?.let {
+        object : CommandParameterType<String>(
+            name = parameter.type.jvmErasure.simpleName ?: "Enum",
+            values = enumValues.map { it.name }.toSet()
+        ) {
+            override fun convertOrNull(input: Any) =
+                enumValues.find { it.name.equals(input.toString(), ignoreCase = true) }?.name
         }
     }
 }
