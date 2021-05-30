@@ -26,10 +26,11 @@ private val COMMAND_SENDER_TYPE: KType = CommandSender::class.createType()
 internal fun generateParameters(function: KFunction<Any?>, commandExecutor: CommandExecutor): CommandParameterSet {
     val usedFlags = mutableSetOf<Char>()
 
+    val valueParameters = function.parameters
+        .filter { it.kind == KParameter.Kind.VALUE && !it.type.isSubtypeOf(COMMAND_SENDER_TYPE) }
+
     return CommandParameterSet(
-        function.parameters
-            .filter { it.kind == KParameter.Kind.VALUE && !it.type.isSubtypeOf(COMMAND_SENDER_TYPE) }
-            .map { param ->
+        valueParameters.map { param ->
                 val name = param.name ?: throw UnsupportedParameterException(param)
                 val id = name.splitCamelCase("-")
                 val displayName = name.splitCamelCase(" ")
@@ -45,7 +46,7 @@ internal fun generateParameters(function: KFunction<Any?>, commandExecutor: Comm
                     vararg = param.isVararg,
                     optional = param.isOptional,
                     flags = flags,
-                    defaultValue = commandExecutor.getDefaultValue(param.index)
+                    defaultValue = commandExecutor.getDefaultValue(valueParameters.indexOf(param))
                 )
             }
             .toList()
