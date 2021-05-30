@@ -16,7 +16,7 @@ package com.github.gimme.gimmebot.core.command.parameter
 data class CommandParameter(
     val id: String,
     val displayName: String,
-    val type: CommandParameterType<*>,
+    val type: ParameterType<*>,
     val suggestions: () -> Set<String> = { setOf() },
     val description: String? = null,
     val vararg: Boolean = false,

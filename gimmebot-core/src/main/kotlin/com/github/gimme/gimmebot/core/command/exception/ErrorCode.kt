@@ -26,7 +26,11 @@ enum class ErrorCode(val message: String) {
     TOO_FEW_ARGUMENTS("Too few arguments"),
 
     /** Too many arguments supplied with the command. */
-    TOO_MANY_ARGUMENTS("Too many arguments");
+    TOO_MANY_ARGUMENTS("Too many arguments"),
+
+    /** A required parameter was not supplied with the command. */
+    REQUIRED_PARAMETER("Missing a required parameter"),
+    ;
 
     /** Returns the identifier code. */
     val code: String = name

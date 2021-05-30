@@ -36,7 +36,7 @@ internal fun generateParameters(function: KFunction<Any?>, commandExecutor: Comm
             val name = param.name ?: throw UnsupportedParameterException(param)
             val id = name.splitCamelCase("-")
             val displayName = name.splitCamelCase(" ")
-            val commandParameterType = commandParameterTypeFrom(param)
+            val commandParameterType = ParameterTypes.from(param)
             val flags = generateFlags(id, usedFlags)
             val defaultValue = commandExecutor.getDefaultValue(valueParameters.indexOf(param))
             usedFlags.addAll(flags)
@@ -202,25 +202,35 @@ private fun mergeArgs(
     val unusedNamedArgs = namedArgs.keys.toMutableSet()
 
     command.parameters.forEach { param ->
-        var value: Any? = namedArgs[param.id]
+        val values = mutableListOf<String>()
+        namedArgs[param.id]?.let { values.add(it) }
         unusedNamedArgs.remove(param.id)
 
-        if (value == null) {
+        if (values.isEmpty()) {
             if (param.vararg) {
-                value = orderedArgs.subList(orderedArgsIndex, orderedArgs.size)
-                orderedArgsIndex += value.size
+                values.addAll(orderedArgs.subList(orderedArgsIndex, orderedArgs.size))
+                orderedArgsIndex += values.size
             } else {
-                value = if (orderedArgsIndex >= orderedArgs.size) {
+                if (orderedArgsIndex >= orderedArgs.size) {
                     if (param.optional) {
-                        param.defaultValue?.value
+                        param.defaultValue?.value?.let {
+                            values.add(it)
+                        } ?: run {
+                            mergedArgs.add(null)
+                            return@forEach
+                        }
                     } else throw ErrorCode.TOO_FEW_ARGUMENTS.createException()
                 } else {
-                    orderedArgs[orderedArgsIndex++]
+                    values.add(orderedArgs[orderedArgsIndex++])
                 }
             }
         }
 
-        val typedArg = value?.let { param.type.convert(it) }
+        if (param.type.singular) {
+            if (values.size < 1) throw ErrorCode.REQUIRED_PARAMETER.createException(param.id)
+            if (values.size > 1) throw ErrorCode.TOO_MANY_ARGUMENTS.createException("${values.drop(1)}")
+        }
+        val typedArg = param.type.convert(values)
         mergedArgs.add(typedArg)
     }
 
