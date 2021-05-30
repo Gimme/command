@@ -1,6 +1,7 @@
 package com.github.gimme.gimmebot.boot.command.executor
 
 import com.github.gimme.gimmebot.core.command.parameter.CommandParameterType
+import kotlin.reflect.KClass
 import kotlin.reflect.KClassifier
 import kotlin.reflect.KParameter
 import kotlin.reflect.full.createType
@@ -88,18 +89,23 @@ private object BOOLEAN : CommandParameterType<Boolean>(
     }
 }
 
-private fun getEnumParameterType(parameter: KParameter): CommandParameterType<String>? {
-    val enumClassName = parameter.type.jvmErasure.qualifiedName
-    val cls = Class.forName(enumClassName)
-    val enumValues = cls?.enumConstants?.filterIsInstance(Enum::class.java)?.map { it.name }?.toSet()
+// TODO: support array of enums
+private fun getEnumParameterType(parameter: KParameter): CommandParameterType<Enum<*>>? {
+    val enumClass: KClass<*> = parameter.type.jvmErasure
+    val cls: Class<*>? = Class.forName(enumClass.qualifiedName)
+    val enumValues: Set<Enum<*>>? = cls?.enumConstants?.filterIsInstance(Enum::class.java)?.toSet()
 
     return enumValues?.let {
-        val values = { it }
-        object : CommandParameterType<String>(
-            name = parameter.type.jvmErasure.simpleName ?: "Enum",
+        val name = enumClass.simpleName ?: "<Enum>"
+        val values = enumValues.map { it.name }.toSet().let { { it } }
+        val convertFunction: (Any) -> Enum<*>? =
+            { input: Any -> enumValues.find { it.name.equals(input.toString(), ignoreCase = true) } }
+
+        object : CommandParameterType<Enum<*>>(
+            name = name,
             values = values
         ) {
-            override fun convertOrNull(input: Any) = enumValues.find { it.equals(input.toString(), ignoreCase = true) }
+            override fun convertOrNull(input: Any) = convertFunction(input)
         }
     }
 }
