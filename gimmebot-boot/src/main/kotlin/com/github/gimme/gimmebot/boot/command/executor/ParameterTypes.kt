@@ -48,6 +48,7 @@ object ParameterTypes {
     }
 
     /**
+     * TODO: document parameters
      * Registers a custom command parameter type.
      *
      * This [T] type can then be safely used in [CommandExecutor] function declarations for automatic command parameter
