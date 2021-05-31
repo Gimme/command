@@ -4,6 +4,7 @@ plugins {
     kotlin("jvm") version "1.4.32"
     `java-library`
     `maven-publish`
+    id("org.jetbrains.dokka") version "1.4.32"
 }
 
 group = "com.github.gimme.gimmebot"
@@ -43,7 +44,22 @@ tasks.withType<KotlinCompile> {
 
 publishing {
     publications {
-        create<MavenPublication>("maven") {
+        create<MavenPublication>("main") {
+            val dokkaHtml by tasks.getting(org.jetbrains.dokka.gradle.DokkaTask::class)
+
+            val javadocJar by tasks.creating(Jar::class) {
+                dependsOn(dokkaHtml)
+                archiveClassifier.set("javadoc")
+                from(dokkaHtml.outputDirectory)
+            }
+            val sourcesJar by tasks.creating(Jar::class) {
+                archiveClassifier.set("sources")
+                from(sourceSets["main"].allSource)
+            }
+
+            artifact(javadocJar)
+            artifact(sourcesJar)
+
             from(components["java"])
         }
     }
