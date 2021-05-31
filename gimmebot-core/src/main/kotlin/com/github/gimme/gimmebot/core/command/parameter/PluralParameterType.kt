@@ -6,11 +6,12 @@ package com.github.gimme.gimmebot.core.command.parameter
  * @param R the real type that this represents
  */
 class PluralParameterType<R>(
-    override val name: String,
+    name: String,
     override val values: (() -> Set<String>)? = null,
     private val convertFunction: (Collection<String>) -> R
 ) : ParameterType<R> {
 
+    override val name = "[$name]"
     override val singular = false
     override val errorMessage: String? = null
 

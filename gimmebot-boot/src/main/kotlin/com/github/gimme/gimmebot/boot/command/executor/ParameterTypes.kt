@@ -31,9 +31,9 @@ object ParameterTypes {
 
     @PublishedApi
     internal val registeredTypes = mutableMapOf<KClassifier, ParameterType<*>>(
-        IntArray::class to PluralParameterType("Integers") { it.map { INTEGER.convert(it) }.toIntArray() },
-        DoubleArray::class to PluralParameterType("Numbers") { it.map { DOUBLE.convert(it) }.toDoubleArray() },
-        BooleanArray::class to PluralParameterType("Booleans") { it.map { BOOLEAN.convert(it) }.toBooleanArray() },
+        IntArray::class to PluralParameterType(INTEGER.name) { it.map { INTEGER.convert(it) }.toIntArray() },
+        DoubleArray::class to PluralParameterType(DOUBLE.name) { it.map { DOUBLE.convert(it) }.toDoubleArray() },
+        BooleanArray::class to PluralParameterType(BOOLEAN.name) { it.map { BOOLEAN.convert(it) }.toBooleanArray() },
     )
 
     init {
@@ -118,7 +118,7 @@ object ParameterTypes {
     internal inline fun <reified T> commandParameterTypeToArrayType(singularParameterType: SingularParameterType<T>):
             PluralParameterType<Array<T>> where T : Any {
         return PluralParameterType(
-            name = singularParameterType.name + if (singularParameterType.name.endsWith("s")) "" else "s",
+            name = singularParameterType.name,
             values = singularParameterType.values
         ) { input -> input.map { singularParameterType.convert(it) }.toTypedArray() }
     }
