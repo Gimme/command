@@ -1,7 +1,7 @@
 package com.github.gimme.gimmebot.core.command
 
-import com.github.gimme.gimmebot.core.command.manager.TextCommandManager
 import com.github.gimme.gimmebot.core.command.channel.TextCommandChannel
+import com.github.gimme.gimmebot.core.command.manager.TextCommandManager
 import com.github.gimme.gimmebot.core.command.sender.CommandSender
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.params.ParameterizedTest
@@ -25,7 +25,7 @@ class TextCommandChannelTest {
 
         commandManager.registerCommand(command)
 
-        object : TextCommandChannel() {
+        object : TextCommandChannel(includeConsoleListener = false) {
             override fun onEnable() {
                 parseInput(DUMMY_COMMAND_SENDER, input)
             }

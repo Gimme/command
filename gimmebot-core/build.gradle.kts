@@ -1,7 +1,5 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
-    kotlin("jvm") version "1.4.32"
+    kotlin("jvm") version "1.5.0"
     `java-library`
     `maven-publish`
     id("org.jetbrains.dokka") version "1.4.32"
@@ -9,52 +7,64 @@ plugins {
 
 group = "com.github.gimme.gimmebot"
 version = "0.1.0-SNAPSHOT"
-java.sourceCompatibility = JavaVersion.VERSION_1_8
-java.targetCompatibility = JavaVersion.VERSION_1_8
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
+    // Kotlin
     implementation(kotlin("stdlib-jdk8"))
-    testImplementation(platform("org.junit:junit-bom:5.7.0"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
-    // https://mvnrepository.com/artifact/org.mockito/mockito-core
-    testImplementation("org.mockito:mockito-core:3.6.28")
-    // https://mvnrepository.com/artifact/org.mockito/mockito-inline
-    testImplementation("org.mockito:mockito-inline:3.6.28")
+    implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
+
+    // Logging
     implementation("io.github.microutils:kotlin-logging:2.0.3")
     implementation("org.slf4j:slf4j-simple:1.7.30")
+
+    // Test
+    testImplementation(platform("org.junit:junit-bom:5.7.0"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.mockito:mockito-core:3.6.28")
+    testImplementation("org.mockito:mockito-inline:3.6.28")
+
+    // Other
     implementation("org.yaml:snakeyaml:1.27")
-    // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-core
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.1")
 }
 
 tasks.test {
     useJUnitPlatform()
     testLogging {
-        events("passed", "skipped", "failed")
+        events(
+            org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED,
+            org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED,
+            org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
+        )
     }
 }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "13"
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    kotlinOptions {
+        jvmTarget = "14"
+        allWarningsAsErrors = true
+        freeCompilerArgs = listOf("-progressive")
+    }
 }
 
-java.withSourcesJar()
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    withSourcesJar()
+}
 
 publishing {
     publications {
-        create<MavenPublication>("main") {
+        create<MavenPublication>("maven") {
             val dokkaHtml by tasks.getting(org.jetbrains.dokka.gradle.DokkaTask::class)
-
             val javadocJar by tasks.creating(Jar::class) {
                 dependsOn(dokkaHtml)
                 archiveClassifier.set("javadoc")
                 from(dokkaHtml.outputDirectory)
             }
-
             artifact(javadocJar)
 
             from(components["java"])

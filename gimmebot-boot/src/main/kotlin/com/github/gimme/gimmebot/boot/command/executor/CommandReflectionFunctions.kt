@@ -8,6 +8,7 @@ import com.github.gimme.gimmebot.core.command.parameter.CommandParameterSet
 import com.github.gimme.gimmebot.core.command.parameter.DefaultValue
 import com.github.gimme.gimmebot.core.command.sender.CommandSender
 import org.apache.commons.lang3.StringUtils
+import java.util.*
 import kotlin.reflect.KFunction
 import kotlin.reflect.KParameter
 import kotlin.reflect.KType
@@ -80,8 +81,8 @@ private fun generateFlags(string: String, unavailableFlags: Set<Char> = setOf())
 
     val flags = mutableSetOf<Char>()
 
-    val firstLetterLower = string.first().let { if (it.isUpperCase()) it.toLowerCase() else it }
-    val firstLetterUpper = firstLetterLower.toUpperCase()
+    val firstLetterLower = string.first().let { if (it.isUpperCase()) it.lowercaseChar() else it }
+    val firstLetterUpper = firstLetterLower.uppercaseChar()
 
     if (!unavailableFlags.contains(firstLetterLower)) flags.add(firstLetterLower)
     else if (!unavailableFlags.contains(firstLetterUpper)) flags.add(firstLetterUpper)
@@ -90,11 +91,12 @@ private fun generateFlags(string: String, unavailableFlags: Set<Char> = setOf())
 }
 
 /**
- * Converts this string from camel case to separate lowercase words separated by the specified [separator].
+ * Converts this string from camel case to separate lowercase words (using the [locale]) separated by the specified
+ * [separator].
  */
-internal fun String.splitCamelCase(separator: String): String =
+internal fun String.splitCamelCase(separator: String, locale: Locale = Locale.ROOT): String =
     StringUtils.join(StringUtils.splitByCharacterTypeCamelCase(this), separator)
-        .toLowerCase()
+        .lowercase(locale)
         .replace("$separator $separator", separator)
 
 /**
