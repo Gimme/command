@@ -42,6 +42,8 @@ tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "13"
 }
 
+java.withSourcesJar()
+
 publishing {
     publications {
         create<MavenPublication>("main") {
@@ -52,13 +54,8 @@ publishing {
                 archiveClassifier.set("javadoc")
                 from(dokkaHtml.outputDirectory)
             }
-            val sourcesJar by tasks.creating(Jar::class) {
-                archiveClassifier.set("sources")
-                from(sourceSets["main"].allSource)
-            }
 
             artifact(javadocJar)
-            artifact(sourcesJar)
 
             from(components["java"])
         }
