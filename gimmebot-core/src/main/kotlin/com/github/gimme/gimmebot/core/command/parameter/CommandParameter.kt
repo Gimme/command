@@ -13,7 +13,7 @@ package com.github.gimme.gimmebot.core.command.parameter
  * @property flags        available shorthand flags representing this parameter
  * @property defaultValue the default value used if this parameter is optional
  */
-data class CommandParameter(
+open class CommandParameter(
     val id: String,
     val displayName: String,
     val type: ParameterType<*>,
@@ -23,4 +23,20 @@ data class CommandParameter(
     val optional: Boolean = false,
     val flags: Set<Char> = setOf(),
     val defaultValue: DefaultValue? = null,
-)
+) {
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as CommandParameter
+
+        if (id != other.id) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
+}
