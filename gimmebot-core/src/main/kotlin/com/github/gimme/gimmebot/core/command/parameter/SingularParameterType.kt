@@ -27,5 +27,20 @@ class SingularParameterType<T>(
     fun convert(input: String): T = convertOrNull(input)
         ?: throw ErrorCode.INVALID_ARGUMENT.createException("\"$input\"${(errorMessage?.let { " ($it)" } ?: "")}")
 
-    override fun convert(input: Collection<String>): R = convert(input.first())
+    override fun convert(input: Collection<String>): T = convert(input.first())
+
+    /**
+     * Returns this type in plural form.
+     *
+     * @param S the real type of the plural version
+     * @param convertToType provides a way to convert lists to the specific type of the created [PluralParameterType]
+     */
+    inline fun <reified S> toPlural(
+        crossinline convertToType: (List<T>) -> S
+    ): PluralParameterType<S> {
+        return PluralParameterType(
+            name = this.name,
+            values = this.values
+        ) { input -> convertToType(input.map { this.convert(it) }) }
+    }
 }

@@ -37,7 +37,7 @@ internal fun generateParameters(function: KFunction<Any?>, commandExecutor: Comm
             val name = param.name ?: throw UnsupportedParameterException(param)
             val id = name.splitCamelCase("-")
             val displayName = name.splitCamelCase(" ")
-            val commandParameterType = ParameterTypes.from(param)
+            val commandParameterType = ParameterTypes.get(param.type)
             val flags = generateFlags(id, usedFlags)
             val defaultValue = commandExecutor.getDefaultValue(valueParameters.indexOf(param))
             usedFlags.addAll(flags)
