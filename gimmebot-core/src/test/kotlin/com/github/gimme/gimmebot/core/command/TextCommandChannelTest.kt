@@ -2,11 +2,13 @@ package com.github.gimme.gimmebot.core.command
 
 import com.github.gimme.gimmebot.core.command.channel.TextCommandChannel
 import com.github.gimme.gimmebot.core.command.manager.TextCommandManager
+import com.github.gimme.gimmebot.core.command.parameter.CommandParameter
 import com.github.gimme.gimmebot.core.command.sender.CommandSender
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import kotlin.reflect.full.createType
 
 class TextCommandChannelTest {
 
@@ -15,11 +17,17 @@ class TextCommandChannelTest {
     fun `should pass arguments`(input: String, expectedArgs: List<String>) {
         val commandManager = TextCommandManager()
 
-        var actualArgs: List<String>? = null
+        var actualArgs: Collection<Any?>? = null
 
         val command = object : DefaultBaseCommand("c") {
-            override fun execute(commandSender: CommandSender, args: List<String>) {
-                actualArgs = args
+            init {
+                parameters.addAll(expectedArgs.mapIndexed { index, _ ->
+                    CommandParameter(index.toString(), "", String::class.createType())
+                })
+            }
+
+            override fun execute(commandSender: CommandSender, args: Map<CommandParameter, Any?>) {
+                actualArgs = args.values
             }
         }
 

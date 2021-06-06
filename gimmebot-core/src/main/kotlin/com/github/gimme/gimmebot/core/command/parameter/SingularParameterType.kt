@@ -9,7 +9,7 @@ import com.github.gimme.gimmebot.core.command.exception.ErrorCode
  * @param T the real type that this represents
  * @property convertOrNull converts string input to this parameter type, or returns null if unable to convert
  */
-class SingularParameterType<T>(
+class SingularParameterType<T : Any>(
     override val name: String,
     override val values: (() -> Set<String>)? = null,
     override val errorMessage: String? = "Not a `$name`",
@@ -35,7 +35,7 @@ class SingularParameterType<T>(
      * @param S the real type of the plural version
      * @param convertToType provides a way to convert lists to the specific type of the created [PluralParameterType]
      */
-    inline fun <reified S> toPlural(
+    inline fun <reified S : Any> toPlural(
         crossinline convertToType: (List<T>) -> S
     ): PluralParameterType<S> {
         return PluralParameterType(

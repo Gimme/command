@@ -1,5 +1,6 @@
 package com.github.gimme.gimmebot.core.command
 
+import com.github.gimme.gimmebot.core.command.parameter.CommandParameter
 import com.github.gimme.gimmebot.core.command.parameter.CommandParameterSet
 import com.github.gimme.gimmebot.core.command.sender.CommandSender
 
@@ -13,7 +14,7 @@ val DUMMY_COMMAND = object : DefaultBaseCommand("test") {
     override var usage = ""
     override var parameters = CommandParameterSet(listOf())
 
-    override fun execute(commandSender: CommandSender, args: List<String>) {}
+    override fun execute(commandSender: CommandSender, args: Map<CommandParameter, Any?>) {}
 }
 
 open class DefaultBaseCommand(
@@ -26,5 +27,5 @@ open class DefaultBaseCommand(
     override var usage = ""
     override var parameters = CommandParameterSet()
 
-    override fun execute(commandSender: CommandSender, args: List<String>) {}
+    override fun execute(commandSender: CommandSender, args: Map<CommandParameter, Any?>) {}
 }

@@ -3,6 +3,7 @@ package com.github.gimme.gimmebot.core.command.manager
 import com.github.gimme.gimmebot.core.command.Command
 import com.github.gimme.gimmebot.core.command.CommandSearchResult
 import com.github.gimme.gimmebot.core.command.exception.CommandException
+import com.github.gimme.gimmebot.core.command.parameter.CommandParameter
 import com.github.gimme.gimmebot.core.command.sender.CommandSender
 
 /**
@@ -46,13 +47,12 @@ interface CommandManager<R> {
     fun getLeafCommands(path: List<String>): Set<Command<*>>
 
     /**
-     * Executes the registered [command] with the [arguments] as the given [commandSender] and
-     * returns the response.
+     * Executes the registered [command] with the [args] as the given [commandSender] and returns the response.
      *
      * @throws CommandException if the command execution was unsuccessful
      */
     @Throws(CommandException::class)
-    fun executeCommand(commandSender: CommandSender, command: Command<*>, arguments: List<String> = listOf()): R
+    fun executeCommand(commandSender: CommandSender, command: Command<*>, args: Map<CommandParameter, Any?>): R
 
     /**
      * Adds a listener to commands being registered with this command manager.

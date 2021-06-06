@@ -19,7 +19,7 @@ class HelpCommandTest {
         commandChannel.commandManager.registerCommand(DummyCommand("two"))
         commandChannel.commandManager.registerCommand(DummyCommand("three"))
 
-        val response = HelpCommand(commandChannel).execute(DUMMY_COMMAND_SENDER, listOf())
+        val response = HelpCommand(commandChannel).execute(DUMMY_COMMAND_SENDER, mapOf())
 
         assertEquals( 3, response.size)
         assertEquals("one", response[0].name)

@@ -1,14 +1,14 @@
 package com.github.gimme.gimmebot.boot.command.property
 
-import com.github.gimme.gimmebot.boot.command.executor.ParameterTypes
 import com.github.gimme.gimmebot.boot.command.executor.splitCamelCase
 import com.github.gimme.gimmebot.core.command.BaseCommand
+import com.github.gimme.gimmebot.core.command.ParameterTypes
 import com.github.gimme.gimmebot.core.command.parameter.CommandParameter
 import com.github.gimme.gimmebot.core.command.parameter.CommandParameterSet
 import com.github.gimme.gimmebot.core.command.parameter.DefaultValue
-import com.github.gimme.gimmebot.core.command.parameter.ParameterType
 import com.github.gimme.gimmebot.core.command.sender.CommandSender
 import kotlin.reflect.KProperty
+import kotlin.reflect.KType
 import kotlin.reflect.KTypeProjection
 import kotlin.reflect.full.createType
 import kotlin.reflect.full.isSubtypeOf
@@ -24,13 +24,11 @@ abstract class PropertyCommand<out R>(name: String) : BaseCommand<R>(name) {
     final override var usage: String = "" // TODO
 
     private lateinit var _commandSender: CommandSender
-    private lateinit var _args: Map<String, List<String>>
+    private lateinit var _args: Map<CommandParameter, Any?>
 
-    override fun execute(commandSender: CommandSender, args: List<String>): R { // TODO: named args
+    override fun execute(commandSender: CommandSender, args: Map<CommandParameter, Any?>): R {
         _commandSender = commandSender
-        _args = parameters.mapIndexed { index, commandParameter ->
-            commandParameter.id to listOf(args[index])
-        }.toMap()
+        _args = args
 
         return call()
     }
@@ -53,7 +51,7 @@ abstract class PropertyCommand<out R>(name: String) : BaseCommand<R>(name) {
             val param = ParamDelegate<T>(
                 id = id,
                 displayName = displayName,
-                type = commandParameterType,
+                type = property.returnType,
                 suggestions = commandParameterType.values ?: { setOf() },
                 vararg = property.returnType.isSubtypeOf(ITERABLE_TYPE), // TODO
                 optional = property.returnType.isMarkedNullable,
@@ -72,7 +70,7 @@ abstract class PropertyCommand<out R>(name: String) : BaseCommand<R>(name) {
     private class ParamDelegate<out T>(
         id: String,
         displayName: String,
-        type: ParameterType<*>,
+        type: KType,
         suggestions: () -> Set<String> = { setOf() },
         description: String? = null,
         vararg: Boolean = false,
@@ -85,14 +83,7 @@ abstract class PropertyCommand<out R>(name: String) : BaseCommand<R>(name) {
 
         @Suppress("UNCHECKED_CAST")
         override operator fun getValue(thisRef: PropertyCommand<*>, property: KProperty<*>): T {
-            val value: List<String> = thisRef._args[property.name]
-                ?: when {
-                    optional -> return null as T
-                    vararg -> listOf()
-                    else -> throw IllegalStateException("Missing argument for required parameter") // TODO: command exception
-                }
-
-            return type.convert(value) as T
+            return thisRef._args[this] as T
         }
     }
 

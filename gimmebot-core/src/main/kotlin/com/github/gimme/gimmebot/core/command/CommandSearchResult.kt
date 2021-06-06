@@ -5,6 +5,9 @@ import com.github.gimme.gimmebot.core.command.node.CommandNode
 /**
  * Holds information about the result of a command search.
  *
+ * If a command was found, both [command] and [commandNode] will refer to it. If just a node was found, only
+ * [commandNode] will refer to it and [command] will be null.
+ *
  * @property path the found path to the [command]/[commandNode], or null if nothing found
  * @property command the found command
  * @property commandNode the found commandNode

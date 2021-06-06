@@ -5,6 +5,7 @@ import com.github.gimme.gimmebot.core.command.CommandSearchResult
 import com.github.gimme.gimmebot.core.command.exception.CommandException
 import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandCollection
 import com.github.gimme.gimmebot.core.command.manager.commandcollection.CommandMap
+import com.github.gimme.gimmebot.core.command.parameter.CommandParameter
 import com.github.gimme.gimmebot.core.command.sender.CommandSender
 
 
@@ -44,12 +45,11 @@ open class SimpleCommandManager<R>(private val defaultResponseParser: (Any?) -> 
     override fun executeCommand(
         commandSender: CommandSender,
         command: Command<*>,
-        arguments: List<String>,
+        args: Map<CommandParameter, Any?>,
     ): R {
         val commandNode = executorByCommand[command]
 
-        return commandNode?.execute(commandSender, arguments)
-            ?: defaultResponseParser(command.execute(commandSender, arguments))
+        return commandNode?.execute(commandSender, args) ?: defaultResponseParser(command.execute(commandSender, args))
     }
 
     override fun addRegisterCommandListener(registerCommandListener: CommandManager.RegisterCommandListener) {
@@ -76,7 +76,7 @@ open class SimpleCommandManager<R>(private val defaultResponseParser: (Any?) -> 
          * @throws CommandException if the command execution was unsuccessful
          */
         @Throws(CommandException::class)
-        fun execute(commandSender: CommandSender, args: List<String>): R {
+        fun execute(commandSender: CommandSender, args: Map<CommandParameter, Any?>): R {
             val response = command.execute(commandSender, args)
             return responseParser(response)
         }

@@ -6,6 +6,7 @@ import com.github.gimme.gimmebot.core.command.exception.CommandException
 import com.github.gimme.gimmebot.core.command.exception.ErrorCode
 import com.github.gimme.gimmebot.core.command.manager.CommandManager
 import com.github.gimme.gimmebot.core.command.node.CommandNode
+import com.github.gimme.gimmebot.core.command.parameter.CommandParameter
 import com.github.gimme.gimmebot.core.command.sender.CommandSender
 import com.github.gimme.gimmebot.core.command.sender.ConsoleCommandSender
 import com.github.gimme.gimmebot.core.command.sender.MessageReceiver
@@ -57,11 +58,15 @@ abstract class BaseCommandChannel<R>(
      * @throws CommandException if the command execution was unsuccessful
      */
     @Throws(CommandException::class)
-    protected fun executeCommand(commandSender: CommandSender, commandPath: List<String>, arguments: List<String>): R {
+    protected fun executeCommand(
+        commandSender: CommandSender,
+        commandPath: List<String>,
+        args: Map<CommandParameter, Any?>
+    ): R {
         registeredCommandManagers.forEach {
             val command: Command<*> = it.commandManager.getCommand(commandPath) ?: return@forEach
 
-            return it.executeCommand(commandSender, command, arguments)
+            return it.executeCommand(commandSender, command, args)
         }
 
         throw ErrorCode.NOT_A_COMMAND.createException()
@@ -145,14 +150,14 @@ abstract class BaseCommandChannel<R>(
         val responseWrapper: (T) -> R,
     ) {
         /**
-         * Executes the [command] through this registered [commandManager] converting the
-         * response through the [responseWrapper].
+         * Executes the [command] through this registered [commandManager] converting the response through the
+         * [responseWrapper].
          *
          * @throws CommandException if the command execution was unsuccessful
          */
         @Throws(CommandException::class)
-        fun executeCommand(commandSender: CommandSender, command: Command<*>, arguments: List<String> = listOf()): R {
-            val response = commandManager.executeCommand(commandSender, command, arguments)
+        fun executeCommand(commandSender: CommandSender, command: Command<*>, args: Map<CommandParameter, Any?>): R {
+            val response = commandManager.executeCommand(commandSender, command, args)
             return responseWrapper(response)
         }
     }

@@ -1,5 +1,6 @@
-package com.github.gimme.gimmebot.boot.command.executor
+package com.github.gimme.gimmebot.core.command.exception
 
+import com.github.gimme.gimmebot.core.command.ParameterTypes
 import com.github.gimme.gimmebot.core.command.parameter.ParameterType
 import kotlin.reflect.KType
 

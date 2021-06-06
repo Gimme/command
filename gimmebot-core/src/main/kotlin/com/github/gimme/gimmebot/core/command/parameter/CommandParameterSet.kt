@@ -1,7 +1,7 @@
 package com.github.gimme.gimmebot.core.command.parameter
 
 /**
- * Represents a set of [CommandParameter]s.
+ * Represents an ordered set of [CommandParameter]s.
  *
  * The main purpose of this class is to supply efficient lookup methods.
  */

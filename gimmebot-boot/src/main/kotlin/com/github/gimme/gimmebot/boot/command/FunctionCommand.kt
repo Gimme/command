@@ -7,6 +7,7 @@ import com.github.gimme.gimmebot.boot.command.executor.getFirstCommandExecutorFu
 import com.github.gimme.gimmebot.boot.command.executor.tryExecuteCommandByReflection
 import com.github.gimme.gimmebot.core.command.BaseCommand
 import com.github.gimme.gimmebot.core.command.node.CommandNode
+import com.github.gimme.gimmebot.core.command.parameter.CommandParameter
 import com.github.gimme.gimmebot.core.command.parameter.CommandParameterSet
 import com.github.gimme.gimmebot.core.command.sender.CommandSender
 import kotlin.reflect.full.findAnnotation
@@ -48,7 +49,7 @@ abstract class FunctionCommand<out T>(
         usage = generateUsage()
     }
 
-    override fun execute(commandSender: CommandSender, args: List<String>): T {
-        return tryExecuteCommandByReflection(this, commandSender, args)
+    override fun execute(commandSender: CommandSender, args: Map<CommandParameter, Any?>): T {
+        return tryExecuteCommandByReflection(this, commandSender, listOf() /* TODO */)
     }
 }

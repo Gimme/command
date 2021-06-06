@@ -5,7 +5,7 @@ package com.github.gimme.gimmebot.core.command.parameter
  *
  * @param T the real type that this represents
  */
-class PluralParameterType<T>(
+class PluralParameterType<T : Any>(
     name: String,
     override val values: (() -> Set<String>)? = null,
     private val convertFunction: (Collection<String>) -> T

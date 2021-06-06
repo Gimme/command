@@ -23,12 +23,13 @@ interface Command<out T> : CommandNode {
     var parameters: CommandParameterSet
 
     /**
-     * Executes this command as the given [commandSender] with the given [args] and returns the response.
+     * Executes this command as the [commandSender] with the [args] mapping of parameters to arguments and returns the
+     * result.
      *
      * @throws CommandException if the command execution was unsuccessful
      */
     @Throws(CommandException::class)
-    fun execute(commandSender: CommandSender, args: List<String>): T
+    fun execute(commandSender: CommandSender, args: Map<CommandParameter, Any?>): T
 
     // TODO: handle vararg parameter types
     /**

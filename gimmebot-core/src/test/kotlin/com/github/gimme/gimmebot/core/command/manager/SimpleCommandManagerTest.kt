@@ -1,9 +1,14 @@
 package com.github.gimme.gimmebot.core.command.manager
 
+import com.github.gimme.gimmebot.core.command.Command
 import com.github.gimme.gimmebot.core.command.DUMMY_COMMAND
 import com.github.gimme.gimmebot.core.command.DUMMY_COMMAND_SENDER
 import com.github.gimme.gimmebot.core.command.DefaultBaseCommand
+import com.github.gimme.gimmebot.core.command.parameter.CommandParameter
 import com.github.gimme.gimmebot.core.command.sender.CommandSender
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertIterableEquals
 import org.junit.jupiter.api.Assertions.assertNull
@@ -42,18 +47,15 @@ class SimpleCommandManagerTest {
         "Test",
     )
     fun `should execute command`(commandName: String) {
-        var executed = false
+        val command = mockk<Command<Any>>(relaxed = true)
+        val args = mapOf<CommandParameter, Any?>()
 
-        val command = object : DefaultBaseCommand(commandName) {
-            override fun execute(commandSender: CommandSender, args: List<String>) {
-                executed = true
-            }
-        }
+        every { command.name } returns commandName
 
         commandManager.registerCommand(command)
-        commandManager.executeCommand(DUMMY_COMMAND_SENDER, command)
+        commandManager.executeCommand(DUMMY_COMMAND_SENDER, command, args)
 
-        assertTrue(executed)
+        verify(exactly = 1) { command.execute(DUMMY_COMMAND_SENDER, args) }
     }
 
     @ParameterizedTest
@@ -65,13 +67,13 @@ class SimpleCommandManagerTest {
         var executed = false
 
         val command = object : DefaultBaseCommand(commandName, DefaultBaseCommand(commandParent)) {
-            override fun execute(commandSender: CommandSender, args: List<String>) {
+            override fun execute(commandSender: CommandSender, args: Map<CommandParameter, Any?>) {
                 executed = true
             }
         }
 
         commandManager.registerCommand(command)
-        commandManager.executeCommand(DUMMY_COMMAND_SENDER, command)
+        commandManager.executeCommand(DUMMY_COMMAND_SENDER, command, mapOf())
 
         assertTrue(executed)
     }
@@ -82,22 +84,32 @@ class SimpleCommandManagerTest {
         var childExecuted = false
 
         val parentCommand = object : DefaultBaseCommand("parent") {
-            override fun execute(commandSender: CommandSender, args: List<String>) {
-                assertIterableEquals(listOf("a", "b"), args)
+            override fun execute(commandSender: CommandSender, args: Map<CommandParameter, Any?>) {
+                assertIterableEquals(listOf("a", "b"), args.values)
                 parentExecuted = true
             }
         }
         val childCommand = object : DefaultBaseCommand("child", DefaultBaseCommand("parent")) {
-            override fun execute(commandSender: CommandSender, args: List<String>) {
-                assertIterableEquals(listOf("x", "y"), args)
+            override fun execute(commandSender: CommandSender, args: Map<CommandParameter, Any?>) {
+                assertIterableEquals(listOf("x", "y"), args.values)
                 childExecuted = true
             }
         }
 
         commandManager.registerCommand(parentCommand)
         commandManager.registerCommand(childCommand)
-        commandManager.executeCommand(DUMMY_COMMAND_SENDER, parentCommand, listOf("a", "b"))
-        commandManager.executeCommand(DUMMY_COMMAND_SENDER, childCommand, listOf("x", "y"))
+        commandManager.executeCommand(
+            DUMMY_COMMAND_SENDER, parentCommand, mapOf(
+                mockk<CommandParameter>() to "a",
+                mockk<CommandParameter>() to "b"
+            )
+        )
+        commandManager.executeCommand(
+            DUMMY_COMMAND_SENDER, childCommand, mapOf(
+                mockk<CommandParameter>() to "x",
+                mockk<CommandParameter>() to "y"
+            )
+        )
 
         assertTrue(parentExecuted)
         assertTrue(childExecuted)
@@ -108,8 +120,18 @@ class SimpleCommandManagerTest {
         val commandManager2 = SimpleCommandManager { it }
         commandManager2.registerCommand(childCommand)
         commandManager2.registerCommand(parentCommand)
-        commandManager2.executeCommand(DUMMY_COMMAND_SENDER, childCommand, listOf("x", "y"))
-        commandManager2.executeCommand(DUMMY_COMMAND_SENDER, parentCommand, listOf("a", "b"))
+        commandManager2.executeCommand(
+            DUMMY_COMMAND_SENDER, childCommand, mapOf(
+                mockk<CommandParameter>() to "x",
+                mockk<CommandParameter>() to "y"
+            )
+        )
+        commandManager2.executeCommand(
+            DUMMY_COMMAND_SENDER, parentCommand, mapOf(
+                mockk<CommandParameter>() to "a",
+                mockk<CommandParameter>() to "b"
+            )
+        )
 
         assertTrue(childExecuted)
         assertTrue(parentExecuted)

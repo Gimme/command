@@ -1,5 +1,7 @@
 package com.github.gimme.gimmebot.core.command.parameter
 
+import kotlin.reflect.KType
+
 /**
  * Represents a command parameter, which helps define how arguments can be passed to the command execution function.
  *
@@ -16,7 +18,7 @@ package com.github.gimme.gimmebot.core.command.parameter
 open class CommandParameter(
     val id: String,
     val displayName: String,
-    val type: ParameterType<*>,
+    val type: KType,
     val suggestions: () -> Set<String> = { setOf() },
     val description: String? = null,
     val vararg: Boolean = false,

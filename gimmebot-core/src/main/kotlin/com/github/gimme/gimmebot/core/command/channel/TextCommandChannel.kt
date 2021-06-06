@@ -1,11 +1,13 @@
 package com.github.gimme.gimmebot.core.command.channel
 
 import com.github.gimme.gimmebot.core.command.Command
+import com.github.gimme.gimmebot.core.command.ParameterTypes
 import com.github.gimme.gimmebot.core.command.exception.CommandException
 import com.github.gimme.gimmebot.core.command.exception.ErrorCode
 import com.github.gimme.gimmebot.core.command.exception.IncompleteCommandException
 import com.github.gimme.gimmebot.core.command.manager.CommandManager
 import com.github.gimme.gimmebot.core.command.manager.TextCommandManager
+import com.github.gimme.gimmebot.core.command.parameter.CommandParameter
 import com.github.gimme.gimmebot.core.command.sender.CommandSender
 
 /**
@@ -71,13 +73,32 @@ abstract class TextCommandChannel(
         val commandLabel = commandPath.joinToString(" ")
 
         // Remove command name, leaving only the arguments
-        val argsInput = commandInput.removePrefix(commandLabel)
+        val argsInput = commandInput.removePrefix(commandLabel).removePrefix(" ")
 
-        // Split into words on spaces, ignoring spaces between two quotation marks
-        val args = argsInput.split("\\s(?=(?:[^\"]*\"[^\"]*\")*[^\"]*\$)".toRegex())
-            .map { s -> s.replace("\"", "") }.drop(1)
+        val args = parseArgsInput(argsInput, commandSearchResult.command)
+
+        // TODO: Convert string input to mapped args
 
         return executeCommand(commandSender, commandPath, args)
+    }
+
+    @Throws(CommandException::class)
+    private fun parseArgsInput(argsInput: String, command: Command<*>): Map<CommandParameter, Any?> {
+        // Split into words on spaces, ignoring spaces between two quotation marks
+        val tokens = argsInput.split("\\s(?=(?:[^\"]*\"[^\"]*\")*[^\"]*\$)".toRegex())
+            .map { s -> s.replace("\"", "") }
+
+        // TODO: get named args
+        // TODO: throw CommandException if invalid args (e.g., too few, too many, wrong type)
+
+        return command.parameters
+            .mapIndexed { index, commandParameter ->
+                val token = listOf(tokens[index])
+                val type = commandParameter.type
+                val arg = ParameterTypes.get(type).convert(token)
+                Pair(commandParameter, arg)
+            }
+            .toMap()
     }
 
     /**

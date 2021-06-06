@@ -11,7 +11,7 @@ import com.github.gimme.gimmebot.core.command.exception.CommandException
  * @property singular      if this type represents singular or plural values
  * @property errorMessage  message to be included if an input value is invalid and cannot be converted to this type
  */
-interface ParameterType<T> {
+interface ParameterType<T : Any> {
 
     val name: String
     val values: (() -> Set<String>)?

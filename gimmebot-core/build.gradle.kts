@@ -15,6 +15,7 @@ repositories {
 dependencies {
     // Kotlin
     implementation(kotlin("stdlib-jdk8"))
+    implementation(kotlin("reflect"))
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
 
     // Logging
@@ -24,6 +25,7 @@ dependencies {
     // Test
     testImplementation(platform("org.junit:junit-bom:5.7.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("io.mockk:mockk:1.10.6")
     testImplementation("org.mockito:mockito-core:3.6.28")
     testImplementation("org.mockito:mockito-inline:3.6.28")
 

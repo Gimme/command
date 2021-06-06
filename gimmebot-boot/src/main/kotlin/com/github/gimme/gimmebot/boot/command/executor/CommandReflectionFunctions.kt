@@ -1,6 +1,7 @@
 package com.github.gimme.gimmebot.boot.command.executor
 
 import com.github.gimme.gimmebot.core.command.Command
+import com.github.gimme.gimmebot.core.command.ParameterTypes
 import com.github.gimme.gimmebot.core.command.exception.CommandException
 import com.github.gimme.gimmebot.core.command.exception.ErrorCode
 import com.github.gimme.gimmebot.core.command.parameter.CommandParameter
@@ -45,7 +46,7 @@ internal fun generateParameters(function: KFunction<Any?>, commandExecutor: Comm
             CommandParameter(
                 id = id,
                 displayName = displayName,
-                type = commandParameterType,
+                type = param.type,
                 suggestions = commandParameterType.values ?: { setOf() },
                 vararg = param.isVararg,
                 optional = param.isOptional || defaultValue?.value != null,
@@ -228,11 +229,11 @@ private fun mergeArgs(
             }
         }
 
-        if (param.type.singular) {
+        if (!param.vararg) {
             if (values.size < 1) throw ErrorCode.REQUIRED_PARAMETER.createException(param.id)
             if (values.size > 1) throw ErrorCode.TOO_MANY_ARGUMENTS.createException("${values.drop(1)}")
         }
-        val typedArg = param.type.convert(values)
+        val typedArg = ParameterTypes.get(param.type).convert(values)
         mergedArgs.add(typedArg)
     }
 
