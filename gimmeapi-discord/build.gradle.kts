@@ -1,26 +1,33 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    application
     kotlin("jvm") version "1.4.10"
     `java-library`
     `maven-publish`
+    id("org.jetbrains.dokka") version "1.4.32"
 }
 
 group = "dev.gimme.gimmeapi.discord"
-version = "1.0-SNAPSHOT"
+version = "0.1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
-    jcenter()
+    maven("https://m2.dv8tion.net/releases")
 }
 
 dependencies {
+    // Project
+    api(project(":gimmeapi-core"))
+
+    // Kotlin
     implementation(kotlin("stdlib-jdk8"))
+
+    // Test
     testImplementation(platform("org.junit:junit-bom:5.7.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
-    api(project(":gimmeapi-core"))
-    api("net.dv8tion:JDA:4.2.0_217")
+
+    // Other
+    api("net.dv8tion:JDA:4.3.0_277")
 }
 
 tasks.test {
@@ -30,31 +37,29 @@ tasks.test {
     }
 }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "13"
+tasks.withType<KotlinCompile>() {
+    kotlinOptions {
+        jvmTarget = "14"
+        freeCompilerArgs = listOf("-progressive")
+    }
 }
 
-// Notice the "Kt" in the end, meaning the main is not in the class
-application.mainClassName = "dev.gimme.gimmeapi.discord.MainKt"
-
-tasks.withType<Jar> {
-    // Otherwise you'll get a "No main manifest attribute" error
-    manifest {
-        attributes["Main-Class"] = "dev.gimme.gimmeapi.discord.MainKt"
-    }
-
-    // To add all of the dependencies otherwise a "NoClassDefFoundError" error
-    from(sourceSets.main.get().output)
-
-    dependsOn(configurations.runtimeClasspath)
-    from({
-        configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") }.map { zipTree(it) }
-    })
+java {
+    sourceCompatibility = JavaVersion.VERSION_13
+    withSourcesJar()
 }
 
 publishing {
     publications {
         create<MavenPublication>("maven") {
+            val dokkaHtml by tasks.getting(org.jetbrains.dokka.gradle.DokkaTask::class)
+            val javadocJar by tasks.creating(Jar::class) {
+                dependsOn(dokkaHtml)
+                archiveClassifier.set("javadoc")
+                from(dokkaHtml.outputDirectory)
+            }
+            artifact(javadocJar)
+
             from(components["java"])
         }
     }
