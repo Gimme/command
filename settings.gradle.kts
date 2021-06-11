@@ -1,8 +1,7 @@
 
-rootProject.name = "gimme-bot"
+rootProject.name = "gimme-api"
 
 
-include(":gimmebot-core")
-include(":gimmebot-discord")
-include(":gimmebot-spigot")
-include(":gimmebot-boot")
+include(":gimmeapi-core")
+include(":gimmeapi-boot")
+include(":gimmeapi-discord")
