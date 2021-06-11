@@ -7,7 +7,7 @@ plugins {
     id("org.jetbrains.dokka") version "1.4.32"
 }
 
-group = "dev.gimme.gimmeapi.discord"
+group = "dev.gimme.gimmeapi"
 version = "0.1.0-SNAPSHOT"
 
 repositories {
