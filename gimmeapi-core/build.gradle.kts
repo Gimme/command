@@ -61,14 +61,6 @@ java {
 publishing {
     publications {
         create<MavenPublication>("maven") {
-            val dokkaHtml by tasks.getting(org.jetbrains.dokka.gradle.DokkaTask::class)
-            val javadocJar by tasks.creating(Jar::class) {
-                dependsOn(dokkaHtml)
-                archiveClassifier.set("javadoc")
-                from(dokkaHtml.outputDirectory)
-            }
-            artifact(javadocJar)
-
             from(components["java"])
         }
     }
