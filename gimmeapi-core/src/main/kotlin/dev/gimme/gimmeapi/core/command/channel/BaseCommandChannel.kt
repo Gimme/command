@@ -80,6 +80,10 @@ abstract class BaseCommandChannel<R>(
 
     override fun onRegisterCommand(command: Command<*>) {}
 
+    /**
+     * Returns all leaves of all child branches under the command [path], or an empty set if no command exists under
+     * that [path].
+     */
     protected fun getLeafCommands(path: List<String>): Set<Command<*>> {
         val result = mutableSetOf<Command<*>>()
 
