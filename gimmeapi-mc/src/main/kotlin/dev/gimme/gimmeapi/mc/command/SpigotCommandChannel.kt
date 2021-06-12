@@ -7,6 +7,7 @@ import org.bukkit.command.PluginCommand
 import org.bukkit.command.TabExecutor
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
+import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.event.player.AsyncPlayerChatEvent
@@ -29,11 +30,16 @@ class SpigotCommandChannel(
 
         val registeredPluginCommand = plugin.registerCommand(command)
         pluginCommands[command] = registeredPluginCommand
-        if (enabled) registeredPluginCommand.setExecutor(this)
+        registeredPluginCommand.setExecutor(this)
     }
 
-    override fun onEnable() = pluginCommands.values.forEach { it.setExecutor(this) }
-    override fun onDisable() = pluginCommands.values.forEach { it.setExecutor(null) }
+    override fun onEnable() {
+        plugin.server.pluginManager.registerEvents(this, plugin)
+    }
+
+    override fun onDisable() {
+        HandlerList.unregisterAll(this)
+    }
 
     @EventHandler(priority = EventPriority.LOWEST)
     private fun onChatListener(e: AsyncPlayerChatEvent) {
