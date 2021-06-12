@@ -19,19 +19,19 @@ abstract class GimmePlugin : JavaPlugin() {
     /**
      * The command channel through which command input and output is handled.
      */
-    lateinit var commandChannel: TextCommandChannel
+    lateinit var channel: TextCommandChannel
         private set
 
     final override fun onEnable() {
-        commandChannel = SpigotCommandChannel(this, includeConsoleListener = false)
-        commandManager = commandChannel.commandManager
-        commandChannel.enable()
+        channel = SpigotCommandChannel(this, includeConsoleListener = false)
+        channel.enable()
+        commandManager = channel.commandManager
 
         onStart()
     }
 
     final override fun onDisable() {
-        commandChannel.disable()
+        channel.disable()
 
         onStop()
     }
