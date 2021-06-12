@@ -31,7 +31,6 @@ dependencies {
 
     // Other
     implementation("org.yaml:snakeyaml:1.27")
-    implementation("org.apache.commons:commons-lang3:3.11")
 }
 
 tasks.test {
