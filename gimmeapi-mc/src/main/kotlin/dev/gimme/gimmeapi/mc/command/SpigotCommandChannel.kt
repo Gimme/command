@@ -1,7 +1,7 @@
 package dev.gimme.gimmeapi.mc.command
 
-import dev.gimme.gimmeapi.core.command.Command
-import dev.gimme.gimmeapi.core.command.channel.TextCommandChannel
+import dev.gimme.gimmeapi.command.Command
+import dev.gimme.gimmeapi.command.channel.TextCommandChannel
 import org.bukkit.command.CommandSender
 import org.bukkit.command.PluginCommand
 import org.bukkit.command.TabExecutor

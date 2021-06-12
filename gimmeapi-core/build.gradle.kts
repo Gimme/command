@@ -31,7 +31,6 @@ dependencies {
 
     // Other
     implementation("org.yaml:snakeyaml:1.27")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.1")
 }
 
 tasks.test {

@@ -1,6 +1,6 @@
 package dev.gimme.gimmeapi.mc.command
 
-import dev.gimme.gimmeapi.core.command.Command
+import dev.gimme.gimmeapi.command.Command
 import org.bukkit.command.CommandMap
 import org.bukkit.command.PluginCommand
 import org.bukkit.plugin.Plugin

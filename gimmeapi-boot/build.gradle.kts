@@ -15,6 +15,7 @@ repositories {
 dependencies {
     // Project
     api(project(":gimmeapi-core"))
+    api(project(":gimmeapi-command"))
 
     // Kotlin
     implementation(kotlin("stdlib-jdk8"))

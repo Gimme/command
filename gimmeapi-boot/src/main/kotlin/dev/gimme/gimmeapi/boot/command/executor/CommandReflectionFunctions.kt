@@ -1,13 +1,13 @@
 package dev.gimme.gimmeapi.boot.command.executor
 
-import dev.gimme.gimmeapi.core.command.Command
-import dev.gimme.gimmeapi.core.command.ParameterTypes
-import dev.gimme.gimmeapi.core.command.exception.CommandException
-import dev.gimme.gimmeapi.core.command.exception.ErrorCode
-import dev.gimme.gimmeapi.core.command.parameter.CommandParameter
-import dev.gimme.gimmeapi.core.command.parameter.CommandParameterSet
-import dev.gimme.gimmeapi.core.command.parameter.DefaultValue
-import dev.gimme.gimmeapi.core.command.sender.CommandSender
+import dev.gimme.gimmeapi.command.Command
+import dev.gimme.gimmeapi.command.ParameterTypes
+import dev.gimme.gimmeapi.command.exception.CommandException
+import dev.gimme.gimmeapi.command.exception.ErrorCode
+import dev.gimme.gimmeapi.command.parameter.CommandParameter
+import dev.gimme.gimmeapi.command.parameter.CommandParameterSet
+import dev.gimme.gimmeapi.command.parameter.DefaultValue
+import dev.gimme.gimmeapi.command.sender.CommandSender
 import org.apache.commons.lang3.StringUtils
 import java.util.*
 import kotlin.reflect.KFunction

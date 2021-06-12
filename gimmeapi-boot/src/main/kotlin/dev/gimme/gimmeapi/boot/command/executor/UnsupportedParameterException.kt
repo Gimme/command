@@ -1,6 +1,6 @@
 package dev.gimme.gimmeapi.boot.command.executor
 
-import dev.gimme.gimmeapi.core.command.parameter.CommandParameter
+import dev.gimme.gimmeapi.command.parameter.CommandParameter
 import kotlin.reflect.KParameter
 
 /**

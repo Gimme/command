@@ -5,11 +5,11 @@ import dev.gimme.gimmeapi.boot.command.executor.generateParameters
 import dev.gimme.gimmeapi.boot.command.executor.generateUsage
 import dev.gimme.gimmeapi.boot.command.executor.getFirstCommandExecutorFunction
 import dev.gimme.gimmeapi.boot.command.executor.tryExecuteCommandByReflection
-import dev.gimme.gimmeapi.core.command.BaseCommand
-import dev.gimme.gimmeapi.core.command.node.CommandNode
-import dev.gimme.gimmeapi.core.command.parameter.CommandParameter
-import dev.gimme.gimmeapi.core.command.parameter.CommandParameterSet
-import dev.gimme.gimmeapi.core.command.sender.CommandSender
+import dev.gimme.gimmeapi.command.BaseCommand
+import dev.gimme.gimmeapi.command.node.CommandNode
+import dev.gimme.gimmeapi.command.parameter.CommandParameter
+import dev.gimme.gimmeapi.command.parameter.CommandParameterSet
+import dev.gimme.gimmeapi.command.sender.CommandSender
 import kotlin.reflect.full.findAnnotation
 
 /**

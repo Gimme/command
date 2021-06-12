@@ -1,6 +1,6 @@
 package dev.gimme.gimmeapi.discord
 
-import dev.gimme.gimmeapi.core.command.channel.CommandChannel
+import dev.gimme.gimmeapi.command.channel.CommandChannel
 import dev.gimme.gimmeapi.core.data.requireResource
 import dev.gimme.gimmeapi.core.data.yaml.loadYamlFromResource
 import dev.gimme.gimmeapi.discord.command.ChannelCommandChannel

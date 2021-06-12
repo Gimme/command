@@ -1,8 +1,8 @@
 package dev.gimme.gimmeapi.boot.command
 
 import dev.gimme.gimmeapi.boot.command.executor.CommandExecutor
-import dev.gimme.gimmeapi.core.command.node.CommandNode
-import dev.gimme.gimmeapi.core.command.sender.CommandSender
+import dev.gimme.gimmeapi.command.node.CommandNode
+import dev.gimme.gimmeapi.command.sender.CommandSender
 
 /**
  * Represents a minimal [FunctionCommand] that is set up based on a supplied function.

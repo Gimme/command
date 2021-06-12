@@ -1,7 +1,7 @@
 package dev.gimme.gimmeapi.boot.command.executor
 
-import dev.gimme.gimmeapi.core.command.Command
-import dev.gimme.gimmeapi.core.command.sender.CommandSender
+import dev.gimme.gimmeapi.command.Command
+import dev.gimme.gimmeapi.command.sender.CommandSender
 
 /**
  * Marks a function in a [Command] class as a command executor meaning it gets called when that command gets executed

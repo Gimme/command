@@ -2,7 +2,7 @@ package dev.gimme.gimmeapi.boot.command
 
 import dev.gimme.gimmeapi.boot.command.commands.HelpCommand
 import dev.gimme.gimmeapi.boot.command.executor.CommandExecutor
-import dev.gimme.gimmeapi.core.command.channel.TextCommandChannel
+import dev.gimme.gimmeapi.command.channel.TextCommandChannel
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 

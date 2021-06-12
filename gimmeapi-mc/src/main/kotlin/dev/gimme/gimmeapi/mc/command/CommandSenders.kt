@@ -1,6 +1,6 @@
 package dev.gimme.gimmeapi.mc.command
 
-import dev.gimme.gimmeapi.core.command.sender.CommandSender as GimmeCommandSender
+import dev.gimme.gimmeapi.command.sender.CommandSender as GimmeCommandSender
 import org.bukkit.command.CommandSender
 
 /**

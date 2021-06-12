@@ -1,5 +1,5 @@
 
-import dev.gimme.gimmeapi.core.command.ParameterTypes
+import dev.gimme.gimmeapi.command.ParameterTypes
 import org.junit.jupiter.api.Test
 import kotlin.reflect.KTypeProjection
 import kotlin.reflect.full.createType

@@ -1,6 +1,6 @@
 package dev.gimme.gimmeapi.discord.command
 
-import dev.gimme.gimmeapi.core.command.sender.CommandSender
+import dev.gimme.gimmeapi.command.sender.CommandSender
 import net.dv8tion.jda.api.entities.MessageChannel
 import net.dv8tion.jda.api.entities.User
 

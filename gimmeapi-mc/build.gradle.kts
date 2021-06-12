@@ -21,6 +21,7 @@ dependencies {
     // Project
     api(project(":gimmeapi-core"))
     api(project(":gimmeapi-boot"))
+    api(project(":gimmeapi-command"))
 
     // Spigot
     compileOnly("org.spigotmc:spigot-api:1.16.4-R0.1-SNAPSHOT")

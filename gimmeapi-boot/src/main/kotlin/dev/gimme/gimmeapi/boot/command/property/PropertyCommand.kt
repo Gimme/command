@@ -1,12 +1,12 @@
 package dev.gimme.gimmeapi.boot.command.property
 
 import dev.gimme.gimmeapi.boot.command.executor.splitCamelCase
-import dev.gimme.gimmeapi.core.command.BaseCommand
-import dev.gimme.gimmeapi.core.command.ParameterTypes
-import dev.gimme.gimmeapi.core.command.parameter.CommandParameter
-import dev.gimme.gimmeapi.core.command.parameter.CommandParameterSet
-import dev.gimme.gimmeapi.core.command.parameter.DefaultValue
-import dev.gimme.gimmeapi.core.command.sender.CommandSender
+import dev.gimme.gimmeapi.command.BaseCommand
+import dev.gimme.gimmeapi.command.ParameterTypes
+import dev.gimme.gimmeapi.command.parameter.CommandParameter
+import dev.gimme.gimmeapi.command.parameter.CommandParameterSet
+import dev.gimme.gimmeapi.command.parameter.DefaultValue
+import dev.gimme.gimmeapi.command.sender.CommandSender
 import kotlin.reflect.KProperty
 import kotlin.reflect.KType
 import kotlin.reflect.KTypeProjection

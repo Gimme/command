@@ -2,7 +2,7 @@ package dev.gimme.gimmeapi.boot.command.commands
 
 import dev.gimme.gimmeapi.boot.command.FunctionCommand
 import dev.gimme.gimmeapi.boot.command.executor.CommandExecutor
-import dev.gimme.gimmeapi.core.command.channel.CommandChannel
+import dev.gimme.gimmeapi.command.channel.CommandChannel
 
 /**
  * Displays a list of available commands.

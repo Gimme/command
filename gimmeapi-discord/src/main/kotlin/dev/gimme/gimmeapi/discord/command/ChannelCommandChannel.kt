@@ -1,6 +1,6 @@
 package dev.gimme.gimmeapi.discord.command
 
-import dev.gimme.gimmeapi.core.command.channel.TextCommandChannel
+import dev.gimme.gimmeapi.command.channel.TextCommandChannel
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.hooks.EventListener

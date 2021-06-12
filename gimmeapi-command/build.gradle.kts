@@ -12,6 +12,9 @@ repositories {
 }
 
 dependencies {
+    // Project
+    api(project(":gimmeapi-core"))
+
     // Kotlin
     implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))
@@ -21,6 +24,9 @@ dependencies {
     testImplementation(platform("org.junit:junit-bom:5.7.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("io.mockk:mockk:1.10.6")
+
+    // Other
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.1")
 }
 
 tasks.test {
