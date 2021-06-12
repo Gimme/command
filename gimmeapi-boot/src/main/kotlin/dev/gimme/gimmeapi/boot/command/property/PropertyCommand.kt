@@ -36,38 +36,58 @@ abstract class PropertyCommand<out R>(name: String) : BaseCommand<R>(name) {
     abstract fun call(): R
 
     fun <T: CommandSender> sender(): CommandProperty<T> = SenderProperty()
-    fun <T> param(): ParamProperty<T> = ParamProperty()
+    fun <T> param(): ParamBuilder<T> = ParamBuilder()
 
-    class ParamProperty<out T> : CommandProperty<T> {
+    inner class ParamBuilder<out T> : CommandProperty<T> {
 
-        override operator fun provideDelegate(thisRef: PropertyCommand<*>, property: KProperty<*>): CommandDelegate<T> {
-            val name = property.name
+        private var name: String? = null
+        private var returnType: KType? = null
+
+        override operator fun provideDelegate(thisRef: PropertyCommand<*>, property: KProperty<*>): Param<T> {
+            this.name = property.name
+            this.returnType = property.returnType
+
+            return build()
+        }
+
+        fun setName(name: String): ParamBuilder<T> {
+            this.name = name
+            return this
+        }
+
+        fun setType(type: KType): ParamBuilder<T> {
+            this.returnType = type
+            return this
+        }
+
+        fun build(): Param<T> {
+            val name = name!! // TODO: Error message on null
+            val returnType = returnType!! // TODO: Error message on null
+
             val id = name.splitCamelCase("-")
             val displayName = name.splitCamelCase(" ")
-            val commandParameterType = ParameterTypes.get(property.returnType)
+            val commandParameterType = ParameterTypes.get(returnType)
             val flags = setOf<Char>() // TODO
             val defaultValue: DefaultValue? = null // TODO
 
-            val param = ParamDelegate<T>(
+            val param = Param<T>(
                 id = id,
                 displayName = displayName,
-                type = property.returnType,
+                type = returnType,
                 suggestions = commandParameterType.values ?: { setOf() },
-                vararg = property.returnType.isSubtypeOf(ITERABLE_TYPE), // TODO
-                optional = property.returnType.isMarkedNullable,
+                vararg = returnType.isSubtypeOf(ITERABLE_TYPE), // TODO
+                optional = returnType.isMarkedNullable,
                 flags = flags,
                 defaultValue = defaultValue
             )
-            thisRef.parameters.add(param)
+            parameters.add(param)
             return param
         }
 
-        companion object {
-            private val ITERABLE_TYPE = Iterable::class.createType(listOf(KTypeProjection.STAR))
-        }
+        private val ITERABLE_TYPE = Iterable::class.createType(listOf(KTypeProjection.STAR))
     }
 
-    private class ParamDelegate<out T>(
+    inner class Param<out T>(
         id: String,
         displayName: String,
         type: KType,
@@ -81,10 +101,10 @@ abstract class PropertyCommand<out R>(name: String) : BaseCommand<R>(name) {
         id, displayName, type, suggestions, description, vararg, optional, flags, defaultValue
     ), CommandDelegate<T> {
 
+        override operator fun getValue(thisRef: PropertyCommand<*>, property: KProperty<*>): T = getValue()
+
         @Suppress("UNCHECKED_CAST")
-        override operator fun getValue(thisRef: PropertyCommand<*>, property: KProperty<*>): T {
-            return thisRef._args[this] as T
-        }
+        fun getValue() = _args[this] as T
     }
 
     private class SenderProperty<out T : CommandSender>: CommandProperty<T>, CommandDelegate<T> {
