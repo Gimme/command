@@ -17,7 +17,12 @@ interface CommandManager<R> {
     val commands: Iterable<Command<*>>
 
     /**
-     * Registers the given [command] to be executable through this manager with the specified [responseConverter] to
+     * Registers the given [command] to be executable through this manager.
+     */
+    fun <T> registerCommand(command: Command<T>) = registerCommand(command, null)
+
+    /**
+     * Registers the given [command] to be executable through this manager with an optional [responseConverter] to
      * convert the result of the command execution from [T] to the uniform type [R].
      */
     fun <T> registerCommand(command: Command<T>, responseConverter: ((T) -> R)? = null)

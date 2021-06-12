@@ -19,7 +19,7 @@ interface Enableable {
      *
      * Does nothing If [enabled] is the same as the current value.
      */
-    fun setEnabled(enabled: Boolean): Boolean {
+    private fun setEnabled(enabled: Boolean): Boolean {
         val field = this.enabled
         this.enabled = enabled
 
