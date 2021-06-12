@@ -3,7 +3,6 @@ package dev.gimme.gimmeapi.boot.command
 import dev.gimme.gimmeapi.boot.command.executor.CommandExecutor
 import dev.gimme.gimmeapi.boot.command.executor.UnsupportedParameterException
 import dev.gimme.gimmeapi.boot.command.executor.getDefaultValue
-import dev.gimme.gimmeapi.boot.command.executor.splitCamelCase
 import dev.gimme.gimmeapi.command.BaseCommand
 import dev.gimme.gimmeapi.command.Command
 import dev.gimme.gimmeapi.command.ParameterTypes
@@ -13,6 +12,7 @@ import dev.gimme.gimmeapi.command.node.CommandNode
 import dev.gimme.gimmeapi.command.parameter.CommandParameter
 import dev.gimme.gimmeapi.command.parameter.CommandParameterSet
 import dev.gimme.gimmeapi.command.sender.CommandSender
+import dev.gimme.gimmeapi.core.common.splitCamelCase
 import kotlin.reflect.KFunction
 import kotlin.reflect.KParameter
 import kotlin.reflect.KType

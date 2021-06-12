@@ -27,9 +27,6 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.mockito:mockito-core:3.6.28")
     testImplementation("org.mockito:mockito-inline:3.6.28")
-
-    // Other
-    implementation("org.apache.commons:commons-lang3:3.11")
 }
 
 tasks.test {
