@@ -22,17 +22,13 @@ abstract class BaseCommandChannel<R>(
     includeConsoleListener: Boolean = false,
 ) : CommandChannel<R> {
 
-    /** This medium's registered command managers. */
-    protected val registeredCommandManagers: MutableList<CommandManagerRegistration<*, R>> = mutableListOf()
+    private val registeredCommandManagers: MutableList<CommandManagerRegistration<*, R>> = mutableListOf()
     private val ioListeners: MutableList<MessageReceiver> = mutableListOf()
 
     override val commandManagers: List<CommandManager<*>>
         get() = registeredCommandManagers.map { it.commandManager }
 
-    override var enabled: Boolean = false
-        set(enabled) {
-            field = Enableable.enable(this, enabled)
-        }
+    override var enabled = false
 
     init {
         if (includeConsoleListener) {

@@ -8,14 +8,25 @@ interface Enableable {
     /** If this is enabled. */
     var enabled: Boolean
 
-    /** Enables this. */
-    fun enable() {
-        enabled = true
-    }
+    /** Enables this and returns true if it was previously disabled. */
+    fun enable(): Boolean = setEnabled(true)
 
-    /** Disables this. */
-    fun disable() {
-        enabled = false
+    /** Disables this and returns true if it was previously enabled. */
+    fun disable(): Boolean = setEnabled(false)
+
+    /**
+     * Attempts to enable/disable and returns if the value changed.
+     *
+     * Does nothing If [enabled] is the same as the current value.
+     */
+    fun setEnabled(enabled: Boolean): Boolean {
+        val field = this.enabled
+        this.enabled = enabled
+
+        if (field == enabled) return false
+
+        if (enabled) onEnable() else onDisable()
+        return true
     }
 
     /**
@@ -31,20 +42,4 @@ interface Enableable {
 
     /** Performs logic when disabled. */
     fun onDisable()
-
-    companion object {
-        /**
-         * Attempts to enable/disable, based on [enabled], the given [enableable] and returns the new value.
-         *
-         * Does nothing If [enabled] is the same as the [enableable]'s current value.
-         */
-        fun enable(enableable: Enableable, enabled: Boolean): Boolean {
-            val field = enableable.enabled
-
-            if (field == enabled) return field
-
-            if (enabled) enableable.onEnable() else enableable.onDisable()
-            return enabled
-        }
-    }
 }
