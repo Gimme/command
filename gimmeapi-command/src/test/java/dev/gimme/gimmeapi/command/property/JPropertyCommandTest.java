@@ -74,9 +74,9 @@ class PCmd extends PropertyCommand<Void> {
     @Override
     public Void call() {
         called[0] = true;
-        assertEquals("abc", a.getValue());
-        assertEquals(123, b.getValue());
-        assertIterableEquals(List.of("x"), c.getValue());
+        assertEquals("abc", a.getArg());
+        assertEquals(123, b.getArg());
+        assertIterableEquals(List.of("x"), c.getArg());
         return null;
     }
 }

@@ -145,10 +145,10 @@ abstract class PropertyCommand<out R>(
         defaultValue = defaultValue
     ), CommandDelegate<T> {
 
-        override operator fun getValue(thisRef: PropertyCommand<*>, property: KProperty<*>): T = getValue()
+        override operator fun getValue(thisRef: PropertyCommand<*>, property: KProperty<*>): T = getArg()
 
         @Suppress("UNCHECKED_CAST")
-        fun getValue() = _args[this] as T
+        fun getArg() = _args[this] as T
     }
 
     private class SenderProperty<out T : CommandSender> : CommandProperty<T>, CommandDelegate<T> {

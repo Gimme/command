@@ -77,13 +77,13 @@ class PCmd2 extends PropertyCommand<Void> {
     public Void call() {
         called[0] = true;
 
-        assertEquals("a", a.getValue());
-        assertEquals(1, b.getValue());
-        assertEquals(0.5, c.getValue());
-        assertEquals(true, d.getValue());
-        assertEquals(JDelegatePropertyTest.listInput, e.getValue());
-        assertEquals(JDelegatePropertyTest.listInput, f.getValue());
-        assertEquals(JDelegatePropertyTest.listInput, g.getValue());
+        assertEquals("a", a.getArg());
+        assertEquals(1, b.getArg());
+        assertEquals(0.5, c.getArg());
+        assertEquals(true, d.getArg());
+        assertEquals(JDelegatePropertyTest.listInput, e.getArg());
+        assertEquals(JDelegatePropertyTest.listInput, f.getArg());
+        assertEquals(JDelegatePropertyTest.listInput, g.getArg());
 
         return null;
     }
