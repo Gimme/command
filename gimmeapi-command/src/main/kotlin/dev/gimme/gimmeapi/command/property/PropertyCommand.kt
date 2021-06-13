@@ -58,9 +58,9 @@ abstract class PropertyCommand<out R>(
     @JvmSynthetic
     fun <T : CommandSender> sender(): SenderProperty<T> = SenderProperty(null)
     @JvmSynthetic
-    fun <T : CommandSender> sender(klass: KClass<T>, optional: Boolean = false): SenderDelegate<T> = SenderProperty(klass, optional).provideDelegate()
+    fun <T : CommandSender> sender(klass: KClass<T>, optional: Boolean = false): Sender<T> = SenderProperty(klass, optional).provideDelegate()
     @JvmOverloads
-    fun <T : CommandSender> sender(klass: Class<T>, optional: Boolean = false): SenderDelegate<T> = sender(klass.kotlin, optional)
+    fun <T : CommandSender> sender(klass: Class<T>, optional: Boolean = false): Sender<T> = sender(klass.kotlin, optional)
 
     @JvmSynthetic
     fun <T> param(): ParamBuilder<T> = ParamBuilder(null)
@@ -189,7 +189,7 @@ abstract class PropertyCommand<out R>(
             return provideDelegate()
         }
 
-        fun provideDelegate(): SenderDelegate<T> {
+        fun provideDelegate(): Sender<T> {
             val klass = klass!!
             val optional = optional ?: false
 
@@ -202,11 +202,11 @@ abstract class PropertyCommand<out R>(
                 }
             }
 
-            return SenderDelegate(klass)
+            return Sender(klass)
         }
     }
 
-    inner class SenderDelegate<out T : CommandSender?>(private val klass: KClass<*>) : CommandDelegate<T> {
+    inner class Sender<out T : CommandSender?>(private val klass: KClass<*>) : CommandDelegate<T> {
 
         @JvmSynthetic
         override operator fun getValue(thisRef: PropertyCommand<*>, property: KProperty<*>): T = getValue()
