@@ -128,7 +128,6 @@ abstract class PropertyCommand<out R>(
             val id = name.splitCamelCase("-")
             val displayName = name.splitCamelCase(" ")
             val flags = setOf<Char>() // TODO
-            val defaultValue: DefaultValue? = null // TODO
 
             val type = ParameterTypes.get(klass)
 
