@@ -4,13 +4,13 @@ import dev.gimme.gimmeapi.command.BaseCommand
 import dev.gimme.gimmeapi.command.ParameterTypes
 import dev.gimme.gimmeapi.command.node.CommandNode
 import dev.gimme.gimmeapi.command.parameter.CommandParameter
-import dev.gimme.gimmeapi.command.parameter.CommandParameterSet
 import dev.gimme.gimmeapi.command.parameter.DefaultValue
 import dev.gimme.gimmeapi.command.parameter.ParameterType
 import dev.gimme.gimmeapi.command.sender.CommandSender
 import dev.gimme.gimmeapi.core.common.splitCamelCase
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
+import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.full.isSuperclassOf
 import kotlin.reflect.jvm.jvmErasure
 
@@ -36,8 +36,12 @@ abstract class PropertyCommand<out R>(
     @JvmOverloads
     constructor(name: String, parent: CommandNode? = null) : this(name, parent, setOf())
 
-    final override var parameters: CommandParameterSet = CommandParameterSet()
     final override var usage: String = "" // TODO
+
+    private var requiredSender: KClass<out CommandSender>? = null
+    private var optionalSenders: MutableSet<KClass<out CommandSender>>? = null
+    final override val senderTypes: Set<KClass<out CommandSender>>?
+        get() = requiredSender?.let { setOf(it) } ?: optionalSenders
 
     private lateinit var _commandSender: CommandSender
     private lateinit var _args: Map<CommandParameter, Any?>
@@ -51,7 +55,10 @@ abstract class PropertyCommand<out R>(
 
     abstract fun call(): R
 
-    fun <T : CommandSender> sender(): SenderProperty<T> = SenderProperty()
+    @JvmSynthetic
+    fun <T : CommandSender> sender(): SenderProperty<T> = SenderProperty(null)
+    fun <T : CommandSender> sender(klass: KClass<T>): SenderProperty<T> = SenderProperty(klass)
+    fun <T : CommandSender> sender(klass: Class<T>): SenderProperty<T> = SenderProperty(klass.kotlin)
 
     @JvmSynthetic
     fun <T> param(): ParamBuilder<T> = ParamBuilder(null)
@@ -65,6 +72,18 @@ abstract class PropertyCommand<out R>(
         private var name: String? = null
         private var defaultValue: DefaultValue? = null
         private var form: CommandParameter.Form? = null
+
+        fun name(name: String) = apply { this.name = name }
+
+        /** @see DefaultValue */
+        fun default(value: String?, representation: String? = value) =
+            apply { this.defaultValue = DefaultValue(value, representation) }
+
+        /** @see DefaultValue */
+        @JvmOverloads
+        fun defaultValue(value: String?, representation: String? = value) = default(value, representation)
+
+        private fun form(form: CommandParameter.Form) = apply { this.form = form }
 
         @JvmSynthetic
         override operator fun provideDelegate(thisRef: PropertyCommand<*>, property: KProperty<*>): Param<T> {
@@ -96,18 +115,6 @@ abstract class PropertyCommand<out R>(
 
             return build()
         }
-
-        fun name(name: String) = apply { this.name = name }
-
-        /** @see DefaultValue */
-        fun default(value: String?, representation: String? = value) =
-            apply { this.defaultValue = DefaultValue(value, representation) }
-
-        /** @see DefaultValue */
-        @JvmOverloads
-        fun defaultValue(value: String?, representation: String? = value) = default(value, representation)
-
-        private fun form(form: CommandParameter.Form) = apply { this.form = form }
 
         fun build() = buildOfType<T>()
         fun buildList(): Param<List<T>> = form(CommandParameter.Form.LIST).buildOfType()
@@ -166,23 +173,56 @@ abstract class PropertyCommand<out R>(
         fun getArg() = _args[this] as T
     }
 
-    inner class SenderProperty<out T : CommandSender> : CommandProperty<T>, CommandDelegate<T> {
+    inner class SenderProperty<out T : CommandSender> internal constructor(
+        private var klass: KClass<T>?
+    ) : CommandProperty<T> {
 
-        @JvmSynthetic
-        override operator fun provideDelegate(thisRef: PropertyCommand<*>, property: KProperty<*>): CommandDelegate<T> {
+        private var optional: Boolean? = null
+
+        fun optional(): SenderProperty<T> {
+            optional = true
             return this
         }
 
         @JvmSynthetic
-        override operator fun getValue(thisRef: PropertyCommand<*>, property: KProperty<*>): T {
-            // TODO: If value is subtype of T, return value as T.
-            //       Else, return null if optional; throw command exception if required.
+        override operator fun provideDelegate(thisRef: PropertyCommand<*>, property: KProperty<*>): CommandDelegate<T> {
+            @Suppress("UNCHECKED_CAST")
+            klass = property.returnType.jvmErasure as KClass<T>
+            optional = property.returnType.isMarkedNullable
 
-            return getValue()
+            return build()
         }
 
-        @Suppress("UNCHECKED_CAST")
-        fun getValue() = _commandSender as T
+        fun build(): SenderDelegate<T> {
+            val klass = klass!!
+            val optional = optional ?: false
+
+            if (!optional) {
+                if (requiredSender != null) throw IllegalStateException("Only one sender type can be required (non-null)") // TODO: exception type
+                requiredSender = klass
+            } else {
+                optionalSenders?.add(klass) ?: run {
+                    optionalSenders = mutableSetOf(klass)
+                }
+            }
+
+            return SenderDelegate(klass)
+        }
+    }
+
+    inner class SenderDelegate<out T : CommandSender?>(private val klass: KClass<*>) : CommandDelegate<T> {
+
+        @JvmSynthetic
+        override operator fun getValue(thisRef: PropertyCommand<*>, property: KProperty<*>): T = getValue()
+
+        fun getValue(): T {
+            @Suppress("UNCHECKED_CAST")
+            return if (_commandSender::class.isSubclassOf(klass)) {
+                _commandSender as T
+            } else {
+                null as T
+            }
+        }
     }
 }
 

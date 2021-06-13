@@ -81,17 +81,17 @@ internal class DelegatePropertyTest {
         val command = object : PropertyCommand<Unit>("test-command") {
 
             val senderSuper: CommandSender by sender()
-            val senderSub1: Sender1 by sender()
-            // TODO: val senderSub2: Sender2? by sender()
+            val senderSub1: Sender1? by sender()
+            val senderSub2: Sender2? by sender()
 
             override fun call() {
                 called = true
 
                 assertEquals(commandSender, senderSuper)
                 assertEquals(commandSender, senderSub1)
-                assertEquals("sender1", senderSub1.name)
-                assertEquals(senderSub1.name, senderSuper.name)
-                // TODO: assertNull(senderSub2)
+                assertEquals("sender1", senderSub1!!.name)
+                assertEquals(senderSub1!!.name, senderSuper.name)
+                assertNull(senderSub2)
             }
         }
 

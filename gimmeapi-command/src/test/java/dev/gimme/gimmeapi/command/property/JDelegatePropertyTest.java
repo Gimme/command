@@ -45,28 +45,6 @@ class JDelegatePropertyTest {
 
     @Test
     void converts_delegate_properties_to_command_senders() {
-        class Sender1 implements CommandSender {
-            @NotNull
-            @Override
-            public String getName() {
-                return "sender1";
-            }
-
-            @Override
-            public void sendMessage(@NotNull String message) {
-            }
-        }
-        class Sender2 implements CommandSender {
-            @NotNull
-            @Override
-            public String getName() {
-                return "sender2";
-            }
-
-            @Override
-            public void sendMessage(@NotNull String message) {
-            }
-        }
 
 
         var commandSender = new Sender1();
@@ -75,9 +53,9 @@ class JDelegatePropertyTest {
 
         var command = new PropertyCommand<Void>("test-command") {
 
-            private final SenderProperty<CommandSender> senderSuper = sender();
-            private final SenderProperty<Sender1> senderSub1 = sender();
-            // TODO: private final SenderProperty<Sender2> senderSub2 = sender();
+            private final SenderDelegate<CommandSender> senderSuper = sender(CommandSender.class).build();
+            private final SenderDelegate<Sender1> senderSub1 = sender(Sender1.class).optional().build();
+            private final SenderDelegate<Sender2> senderSub2 = sender(Sender2.class).optional().build();
 
             @Override
             public Void call() {
@@ -85,9 +63,9 @@ class JDelegatePropertyTest {
 
                 assertEquals(commandSender, senderSuper.getValue());
                 assertEquals(commandSender, senderSub1.getValue());
-                assertEquals("sender1", requireNonNull(senderSub1.getValue()).getName());
-                assertEquals(senderSub1.getValue().getName(), requireNonNull(senderSuper.getValue()).getName());
-                // TODO: assertNull(senderSub2.getValue());
+                assertEquals("sender1", senderSub1.getValue().getName());
+                assertEquals(senderSub1.getValue().getName(), senderSuper.getValue().getName());
+                assertNull(senderSub2.getValue());
 
                 return null;
             }
@@ -156,5 +134,29 @@ class DelegateTestCommand extends PropertyCommand<Void> {
         assertIterableEquals(listInput, iterable.getArg());
 
         return null;
+    }
+}
+
+class Sender1 implements CommandSender {
+    @NotNull
+    @Override
+    public String getName() {
+        return "sender1";
+    }
+
+    @Override
+    public void sendMessage(@NotNull String message) {
+    }
+}
+
+class Sender2 implements CommandSender {
+    @NotNull
+    @Override
+    public String getName() {
+        return "sender2";
+    }
+
+    @Override
+    public void sendMessage(@NotNull String message) {
     }
 }
