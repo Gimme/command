@@ -63,56 +63,59 @@ abstract class PropertyCommand<out R>(
     ) : CommandProperty<T> {
 
         private var name: String? = null
-        private var vararg: Boolean? = null
         private var optional: Boolean? = null
+        private var form: CommandParameter.Form? = null
 
         override operator fun provideDelegate(thisRef: PropertyCommand<*>, property: KProperty<*>): Param<T> {
             if (name == null) name(property.name)
-            val isList = property.returnType.jvmErasure.isSuperclassOf(List::class)
+
+            val jvmErasure = property.returnType.jvmErasure
+            val form = when {
+                jvmErasure.isSuperclassOf(List::class) -> CommandParameter.Form.LIST
+                jvmErasure.isSuperclassOf(Set::class) -> CommandParameter.Form.SET
+                else -> CommandParameter.Form.VALUE
+            }
+            form(form)
+
             if (klass == null) {
-                klass = if (isList) {
+                klass = if (form.isCollection) {
                     property.returnType.arguments.firstOrNull()?.type?.jvmErasure
                         ?: throw RuntimeException("Unsupported parameter type: ${property.returnType}") // TODO: exception type
                 } else {
-                    property.returnType.jvmErasure
+                    jvmErasure
                 }
             }
-            if (vararg == null) vararg(isList)
             if (optional == null && property.returnType.isMarkedNullable) optional()
 
             return build()
         }
 
         fun name(name: String) = apply { this.name = name }
-        fun vararg(vararg: Boolean) = apply { this.vararg = vararg }
         fun optional() = apply { this.optional = true }
+        fun form(form: CommandParameter.Form) = apply { this.form = form }
 
         fun build() = buildOfType<T>()
-        fun buildList(): Param<List<T>> {
-            vararg = true
-
-            return buildOfType()
-        }
+        fun buildList(): Param<List<T>> = form(CommandParameter.Form.LIST).buildOfType()
+        fun buildSet(): Param<Set<T>> = form(CommandParameter.Form.SET).buildOfType()
 
         private fun <S> buildOfType(): Param<S> {
             val name = name!! // TODO: Error message on null
             val klass = klass!! // TODO: Error message on null
-            val vararg = vararg ?: false
+            val form = form ?: CommandParameter.Form.VALUE
+            val optional = optional ?: false
 
             val id = name.splitCamelCase("-")
             val displayName = name.splitCamelCase(" ")
             val flags = setOf<Char>() // TODO
             val defaultValue: DefaultValue? = null // TODO
-            val isOptional = optional ?: vararg
 
-            val type = ParameterTypes.get(klass)
+            val type = ParameterTypes.get(klass).copy(nullable = optional)
 
             val param = Param<S>(
                 id = id,
                 displayName = displayName,
                 type = type,
-                vararg = vararg,
-                optional = isOptional, // TODO: check if default value exists?
+                form = form,
                 suggestions = type.values ?: { setOf() },
                 description = null, // TODO
                 flags = flags,
@@ -127,8 +130,7 @@ abstract class PropertyCommand<out R>(
         id: String,
         displayName: String,
         type: ParameterType<*>,
-        vararg: Boolean,
-        optional: Boolean,
+        form: Form,
         suggestions: () -> Set<String>,
         description: String?,
         flags: Set<Char>,
@@ -137,10 +139,9 @@ abstract class PropertyCommand<out R>(
         id = id,
         displayName = displayName,
         type = type,
+        form = form,
         suggestions = suggestions,
         description = description,
-        vararg = vararg,
-        optional = optional,
         flags = flags,
         defaultValue = defaultValue
     ), CommandDelegate<T> {

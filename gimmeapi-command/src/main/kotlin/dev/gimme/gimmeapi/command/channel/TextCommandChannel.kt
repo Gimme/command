@@ -8,6 +8,7 @@ import dev.gimme.gimmeapi.command.exception.IncompleteCommandException
 import dev.gimme.gimmeapi.command.manager.CommandManager
 import dev.gimme.gimmeapi.command.manager.TextCommandManager
 import dev.gimme.gimmeapi.command.parameter.CommandParameter
+import dev.gimme.gimmeapi.command.parameter.ParameterType
 import dev.gimme.gimmeapi.command.sender.CommandSender
 
 /**
@@ -90,13 +91,19 @@ abstract class TextCommandChannel(
 
         // TODO: get named args
         // TODO: throw CommandException if invalid args (e.g., too few, too many, wrong type)
+        // TODO: if arg is missing: if optional, supply null, else throw CommandException: missing required
+        // TODO: handle vararg
 
         return command.parameters
             .mapIndexed { index, commandParameter ->
                 val token = tokens[index]
                 val type = commandParameter.type
                 val value = type.parser(token)
-                val arg = if (commandParameter.vararg) listOf(value) else value
+                val arg = when(commandParameter.form) {
+                    CommandParameter.Form.LIST -> listOf(value)
+                    CommandParameter.Form.SET -> setOf(value)
+                    else -> value
+                }
                 Pair(commandParameter, arg)
             }
             .toMap()

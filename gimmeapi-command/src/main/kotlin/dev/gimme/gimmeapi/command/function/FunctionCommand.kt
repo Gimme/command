@@ -110,23 +110,27 @@ abstract class FunctionCommand<out T>(
                 val defaultValue = commandExecutorAnnotation.getDefaultValue(valueParameters.indexOf(param))
                 usedFlags.addAll(flags)
 
-                val vararg = param.isVararg || param.type.jvmErasure.isSuperclassOf(List::class)
-                val klass: KClass<*> = if (vararg) {
+                val jvmErasure = param.type.jvmErasure
+                val form = when {
+                    jvmErasure.isSuperclassOf(List::class) -> CommandParameter.Form.LIST
+                    jvmErasure.isSuperclassOf(Set::class) -> CommandParameter.Form.SET
+                    else -> CommandParameter.Form.VALUE
+                }
+                val klass: KClass<*> = if (form != CommandParameter.Form.VALUE) {
                     param.type.arguments.firstOrNull()?.type?.jvmErasure
                         ?: throw RuntimeException("Unsupported parameter type: ${param.type}") // TODO: exception type
                 } else {
-                    param.type.jvmErasure
+                    jvmErasure
                 }
                 val optional = param.isOptional || defaultValue?.value != null
 
-                val type = ParameterTypes.get(klass)
+                val type = ParameterTypes.get(klass).copy(nullable = optional)
 
                 CommandParameter(
                     id = id,
                     displayName = displayName,
                     type = type,
-                    vararg = vararg,
-                    optional = optional,
+                    form = form,
                     suggestions = type.values ?: { setOf() },
                     flags = flags,
                     defaultValue = defaultValue

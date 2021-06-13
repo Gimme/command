@@ -26,9 +26,12 @@ internal class PropertyCommandTest {
         var called = false
 
         val commandName = "k"
-        val arg1 = "abc"
-        val arg2 = 123
-        val arg3 = 1.3
+        val args = listOf(
+            "abc",
+            123,
+            1.3,
+            "x",
+        )
 
         val command = object : PropertyCommand<Unit>(commandName) {
 
@@ -38,16 +41,19 @@ internal class PropertyCommandTest {
                 .name("bb")
                 .build()
 
-            val c: List<Double> by param<List<Double>>().name("c")
+            val list: List<Double> by param<List<Double>>().name("c")
+
+            val set: Set<String> by param()
 
             override fun call() {
                 called = true
 
                 assertAll(
                     { assertEquals(sender, sender) },
-                    { assertEquals(arg1, a) },
-                    { assertEquals(arg2, b.getArg()) },
-                    { assertEquals(listOf(arg3), c) },
+                    { assertEquals(args[0], a) },
+                    { assertEquals(args[1], b.getArg()) },
+                    { assertEquals(listOf(args[2]), list) },
+                    { assertEquals(setOf(args[3]), set) },
                 )
             }
         }
@@ -55,12 +61,13 @@ internal class PropertyCommandTest {
         assertFalse(called)
 
         channel.commandManager.registerCommand(command)
-        channel.parseInput(sender, "$commandName $arg1 $arg2 $arg3")
+        channel.parseInput(sender, "$commandName ${args.joinToString(" ")}")
 
         assertTrue(called)
 
         assertNotNull(command.parameters["a"])
         assertNotNull(command.parameters["bb"])
         assertNotNull(command.parameters["c"])
+        assertNotNull(command.parameters["set"])
     }
 }

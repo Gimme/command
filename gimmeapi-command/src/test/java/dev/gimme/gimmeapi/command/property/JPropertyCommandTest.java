@@ -7,6 +7,9 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -26,17 +29,22 @@ class JPropertyCommandTest {
         }
     };
 
+    static List<Object> args = List.of(
+            "abc",
+            123,
+            "a",
+            "x"
+    );
+
     @Test
     void test() {
         String commandName = "k";
         CommandSender sender = UtilsKt.getDUMMY_COMMAND_SENDER();
         PCmd command = new PCmd(commandName);
 
-        String arg1 = "abc";
-        int arg2 = 123;
-        String arg3 = "x";
-
-        String input = commandName + " " + arg1 + " " + arg2 + " " + arg3;
+        String input = commandName + " " + args.stream()
+                .map(Object::toString)
+                .collect(Collectors.joining(" "));
 
         assertFalse(command.called[0]);
 
@@ -47,7 +55,8 @@ class JPropertyCommandTest {
 
         assertNotNull(command.getParameters().get("a"));
         assertNotNull(command.getParameters().get("bb"));
-        assertNotNull(command.getParameters().get("c"));
+        assertNotNull(command.getParameters().get("list"));
+        assertNotNull(command.getParameters().get("set"));
     }
 }
 
@@ -63,9 +72,13 @@ class PCmd extends PropertyCommand<Void> {
             .name("bb")
             .build();
 
-    private final Param<List<String>> c = param(String.class)
-            .name("c")
+    private final Param<List<String>> list = param(String.class)
+            .name("list")
             .buildList();
+
+    private final Param<Set<String>> set = param(String.class)
+            .name("set")
+            .buildSet();
 
     PCmd(@NotNull String name) {
         super(name);
@@ -74,9 +87,14 @@ class PCmd extends PropertyCommand<Void> {
     @Override
     public Void call() {
         called[0] = true;
-        assertEquals("abc", a.getArg());
-        assertEquals(123, b.getArg());
-        assertIterableEquals(List.of("x"), c.getArg());
+
+        var args = JPropertyCommandTest.args;
+
+        assertEquals(args.get(0), a.getArg());
+        assertEquals(args.get(1), b.getArg());
+        assertIterableEquals(List.of(args.get(2)), list.getArg());
+        assertIterableEquals(Set.of(args.get(3)), set.getArg());
+
         return null;
     }
 }
