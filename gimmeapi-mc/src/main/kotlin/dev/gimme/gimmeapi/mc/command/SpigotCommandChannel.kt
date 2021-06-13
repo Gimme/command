@@ -25,6 +25,10 @@ class SpigotCommandChannel(
 
     private var pluginCommands = mutableMapOf<Command<*>, PluginCommand>()
 
+    init {
+        enable()
+    }
+
     override fun onRegisterCommand(command: Command<*>) {
         super.onRegisterCommand(command)
 
