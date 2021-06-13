@@ -66,6 +66,7 @@ abstract class PropertyCommand<out R>(
         private var defaultValue: DefaultValue? = null
         private var form: CommandParameter.Form? = null
 
+        @JvmSynthetic
         override operator fun provideDelegate(thisRef: PropertyCommand<*>, property: KProperty<*>): Param<T> {
             if (name == null) name(property.name)
 
@@ -167,10 +168,12 @@ abstract class PropertyCommand<out R>(
 
     private class SenderProperty<out T : CommandSender> : CommandProperty<T>, CommandDelegate<T> {
 
+        @JvmSynthetic
         override operator fun provideDelegate(thisRef: PropertyCommand<*>, property: KProperty<*>): CommandDelegate<T> {
             return this
         }
 
+        @JvmSynthetic
         override operator fun getValue(thisRef: PropertyCommand<*>, property: KProperty<*>): T {
             val value: CommandSender = thisRef._commandSender
 
