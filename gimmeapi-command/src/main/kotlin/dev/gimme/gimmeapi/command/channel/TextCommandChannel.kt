@@ -118,8 +118,16 @@ abstract class TextCommandChannel(
      */
     fun autocomplete(input: String): Set<String> {
         val words = input.split(" ")
-        val completedWords = words.dropLast(1)
-        val currentWord = words.last()
+        return autocomplete(words)
+    }
+
+    /**
+     * Returns all possible completions to the last element in the [input] that fits the expected input of a registered
+     * command.
+     */
+    fun autocomplete(input: List<String>): Set<String> {
+        val completedWords = input.dropLast(1)
+        val currentWord = input.last()
 
         val suggestions = mutableSetOf<String>()
 

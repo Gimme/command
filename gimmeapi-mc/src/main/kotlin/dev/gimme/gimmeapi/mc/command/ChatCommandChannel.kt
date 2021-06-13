@@ -60,7 +60,9 @@ class ChatCommandChannel(
         alias: String,
         args: Array<out String>
     ): MutableList<String> {
-        return mutableListOf() // TODO
+        val input = mutableListOf(alias)
+        input.addAll(args)
+        return autocomplete(input).toMutableList()
     }
 
     override fun onCommand(
@@ -71,8 +73,6 @@ class ChatCommandChannel(
     ): Boolean {
         val input = StringBuilder(label)
         args.forEach { input.append(" $it") }
-
-        println("INPUT: $input") // TODO: remove
 
         return parseInput(sender.asBotCommandSender(), input.toString())
     }
