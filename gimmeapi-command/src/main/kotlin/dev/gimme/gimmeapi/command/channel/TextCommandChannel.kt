@@ -91,7 +91,8 @@ abstract class TextCommandChannel(
 
         // TODO: get named args
         // TODO: throw CommandException if invalid args (e.g., too few, too many, wrong type)
-        // TODO: if arg is missing: if optional, supply null, else throw CommandException: missing required
+        // TODO: if arg is missing: if optional, supply default value, else throw CommandException: missing required
+        // TODO: default values in case of collections should accept empty "" or null for 0 and spaced "a b" for multiple values
         // TODO: handle vararg
 
         return command.parameters

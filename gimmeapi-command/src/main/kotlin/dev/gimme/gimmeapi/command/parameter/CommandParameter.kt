@@ -26,7 +26,7 @@ open class CommandParameter(
     /**
      * If this parameter is optional.
      */
-    val optional: Boolean get() = type.nullable || defaultValue?.value != null
+    val optional: Boolean get() = defaultValue != null
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

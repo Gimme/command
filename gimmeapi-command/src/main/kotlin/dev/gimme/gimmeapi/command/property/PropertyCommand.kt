@@ -63,7 +63,7 @@ abstract class PropertyCommand<out R>(
     ) : CommandProperty<T> {
 
         private var name: String? = null
-        private var optional: Boolean? = null
+        private var defaultValue: DefaultValue? = null
         private var form: CommandParameter.Form? = null
 
         override operator fun provideDelegate(thisRef: PropertyCommand<*>, property: KProperty<*>): Param<T> {
@@ -85,14 +85,28 @@ abstract class PropertyCommand<out R>(
                     jvmErasure
                 }
             }
-            if (optional == null && property.returnType.isMarkedNullable) optional()
+            if (defaultValue == null && property.returnType.isMarkedNullable) default(null)
+
+            defaultValue?.let { defaultValue ->
+                if (!property.returnType.isMarkedNullable && defaultValue.value == null) {
+                    throw IllegalStateException("Parameter \"$name\" has a null default value for a type marked as non-nullable") // TODO: exception type
+                }
+            }
 
             return build()
         }
 
         fun name(name: String) = apply { this.name = name }
-        fun optional() = apply { this.optional = true }
-        fun form(form: CommandParameter.Form) = apply { this.form = form }
+
+        /** @see DefaultValue */
+        fun default(value: String?, representation: String? = value) =
+            apply { this.defaultValue = DefaultValue(value, representation) }
+
+        /** @see DefaultValue */
+        @JvmOverloads
+        fun defaultValue(value: String?, representation: String? = value) = default(value, representation)
+
+        private fun form(form: CommandParameter.Form) = apply { this.form = form }
 
         fun build() = buildOfType<T>()
         fun buildList(): Param<List<T>> = form(CommandParameter.Form.LIST).buildOfType()
@@ -102,14 +116,13 @@ abstract class PropertyCommand<out R>(
             val name = name!! // TODO: Error message on null
             val klass = klass!! // TODO: Error message on null
             val form = form ?: CommandParameter.Form.VALUE
-            val optional = optional ?: false
 
             val id = name.splitCamelCase("-")
             val displayName = name.splitCamelCase(" ")
             val flags = setOf<Char>() // TODO
             val defaultValue: DefaultValue? = null // TODO
 
-            val type = ParameterTypes.get(klass).copy(nullable = optional)
+            val type = ParameterTypes.get(klass)
 
             val param = Param<S>(
                 id = id,

@@ -122,9 +122,12 @@ abstract class FunctionCommand<out T>(
                 } else {
                     jvmErasure
                 }
-                val optional = param.isOptional || defaultValue?.value != null
 
-                val type = ParameterTypes.get(klass).copy(nullable = optional)
+                val type = ParameterTypes.get(klass)
+
+                if (!param.type.isMarkedNullable && defaultValue != null && defaultValue.value == null) {
+                    throw IllegalStateException("Parameter \"$id\" has a null default value for a type marked as non-nullable") // TODO: exception type
+                }
 
                 CommandParameter(
                     id = id,
