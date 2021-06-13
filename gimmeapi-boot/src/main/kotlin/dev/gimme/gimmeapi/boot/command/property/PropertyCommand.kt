@@ -127,7 +127,7 @@ abstract class PropertyCommand<out R>(
                 flags = flags,
                 defaultValue = defaultValue
             )
-            parameters.add(param)
+            if (!parameters.add(param)) throw RuntimeException("A parameter with the name \"${param.id}\" has already exists") // TODO: exception type
             return param
         }
     }
