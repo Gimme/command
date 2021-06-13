@@ -5,6 +5,7 @@ import dev.gimme.gimmeapi.command.channel.TextCommandChannel
 import org.junit.jupiter.api.Assertions.assertAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
@@ -58,8 +59,8 @@ internal class PropertyCommandTest {
 
         assertTrue(called)
 
-        assertTrue(command.parameters["a"] != null)
-        assertTrue(command.parameters["bb"] != null)
-        assertTrue(command.parameters["c"] != null)
+        assertNotNull(command.parameters["a"])
+        assertNotNull(command.parameters["bb"])
+        assertNotNull(command.parameters["c"])
     }
 }

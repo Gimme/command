@@ -2,6 +2,7 @@ package dev.gimme.gimmeapi.command.property
 
 import dev.gimme.gimmeapi.command.DUMMY_COMMAND_SENDER
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
@@ -49,6 +50,7 @@ internal class DelegatePropertyTest {
             .plus( Pair(command.parameters["iterable"]!!, listInput))
             .toMap()
 
+        assertFalse(called)
         command.execute(DUMMY_COMMAND_SENDER, input)
         assertTrue(called)
     }

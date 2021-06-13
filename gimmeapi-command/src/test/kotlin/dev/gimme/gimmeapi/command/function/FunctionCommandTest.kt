@@ -6,6 +6,7 @@ import dev.gimme.gimmeapi.command.sender.CommandSender
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
@@ -50,8 +51,8 @@ internal class FunctionCommandTest {
 
         assertTrue(called)
 
-        assertTrue(command.parameters["a"] != null)
-        assertTrue(command.parameters["b"] != null)
+        assertNotNull(command.parameters["a"])
+        assertNotNull(command.parameters["b"])
     }
 }
 

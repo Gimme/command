@@ -11,6 +11,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class JPropertyCommandTest {
@@ -43,6 +44,10 @@ class JPropertyCommandTest {
         channel.parseInput(sender, input);
 
         assertTrue(command.called[0]);
+
+        assertNotNull(command.getParameters().get("a"));
+        assertNotNull(command.getParameters().get("bb"));
+        assertNotNull(command.getParameters().get("c"));
     }
 }
 
@@ -55,7 +60,7 @@ class PCmd extends PropertyCommand<Void> {
             .build();
 
     private final Param<Integer> b = param(Integer.class)
-            .name("b")
+            .name("bb")
             .build();
 
     private final Param<List<String>> c = param(String.class)
