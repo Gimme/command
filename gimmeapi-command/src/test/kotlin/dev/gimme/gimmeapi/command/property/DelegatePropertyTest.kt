@@ -10,7 +10,10 @@ internal class DelegatePropertyTest {
 
     @Test
     fun `Converts delegate properties to parameters that take arguments`() {
+        val listInput = listOf("a", "b")
+
         var called = false
+
         val command = object : PropertyCommand<Unit>("test-command") {
 
             val string: String by param()
@@ -28,6 +31,9 @@ internal class DelegatePropertyTest {
                     { assertEquals(1, int) },
                     { assertEquals(0.5, double) },
                     { assertEquals(true, boolean) },
+                    { assertEquals(listInput, list) },
+                    { assertEquals(listInput, collection) },
+                    { assertEquals(listInput, iterable) },
                 )
             }
         }
@@ -38,6 +44,9 @@ internal class DelegatePropertyTest {
             "boolean" to true,
         )
             .map { Pair(command.parameters[it.key]!!, it.value) }
+            .plus( Pair(command.parameters["list"]!!, listInput))
+            .plus( Pair(command.parameters["collection"]!!, listInput))
+            .plus( Pair(command.parameters["iterable"]!!, listInput))
             .toMap()
 
         command.execute(DUMMY_COMMAND_SENDER, input)
