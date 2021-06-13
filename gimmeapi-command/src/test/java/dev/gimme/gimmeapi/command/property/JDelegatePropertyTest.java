@@ -2,6 +2,8 @@ package dev.gimme.gimmeapi.command.property;
 
 import dev.gimme.gimmeapi.command.UtilsKt;
 import dev.gimme.gimmeapi.command.parameter.CommandParameter;
+import dev.gimme.gimmeapi.command.sender.CommandSender;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
@@ -13,6 +15,7 @@ import static java.util.Objects.requireNonNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class JDelegatePropertyTest {
@@ -38,6 +41,61 @@ class JDelegatePropertyTest {
         assertFalse(command.called[0]);
         command.execute(UtilsKt.getDUMMY_COMMAND_SENDER(), input);
         assertTrue(command.called[0]);
+    }
+
+    @Test
+    void converts_delegate_properties_to_command_senders() {
+        class Sender1 implements CommandSender {
+            @NotNull
+            @Override
+            public String getName() {
+                return "sender1";
+            }
+
+            @Override
+            public void sendMessage(@NotNull String message) {
+            }
+        }
+        class Sender2 implements CommandSender {
+            @NotNull
+            @Override
+            public String getName() {
+                return "sender2";
+            }
+
+            @Override
+            public void sendMessage(@NotNull String message) {
+            }
+        }
+
+
+        var commandSender = new Sender1();
+
+        final boolean[] called = {false};
+
+        var command = new PropertyCommand<Void>("test-command") {
+
+            private final SenderProperty<CommandSender> senderSuper = sender();
+            private final SenderProperty<Sender1> senderSub1 = sender();
+            // TODO: private final SenderProperty<Sender2> senderSub2 = sender();
+
+            @Override
+            public Void call() {
+                called[0] = true;
+
+                assertEquals(commandSender, senderSuper.getValue());
+                assertEquals(commandSender, senderSub1.getValue());
+                assertEquals("sender1", requireNonNull(senderSub1.getValue()).getName());
+                assertEquals(senderSub1.getValue().getName(), requireNonNull(senderSuper.getValue()).getName());
+                // TODO: assertNull(senderSub2.getValue());
+
+                return null;
+            }
+        };
+
+        assertFalse(called[0]);
+        command.execute(commandSender, Map.of());
+        assertTrue(called[0]);
     }
 }
 

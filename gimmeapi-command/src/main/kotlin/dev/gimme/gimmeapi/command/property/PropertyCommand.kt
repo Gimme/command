@@ -51,7 +51,7 @@ abstract class PropertyCommand<out R>(
 
     abstract fun call(): R
 
-    fun <T : CommandSender> sender(): CommandProperty<T> = SenderProperty()
+    fun <T : CommandSender> sender(): SenderProperty<T> = SenderProperty()
 
     @JvmSynthetic
     fun <T> param(): ParamBuilder<T> = ParamBuilder(null)
@@ -166,7 +166,7 @@ abstract class PropertyCommand<out R>(
         fun getArg() = _args[this] as T
     }
 
-    private class SenderProperty<out T : CommandSender> : CommandProperty<T>, CommandDelegate<T> {
+    inner class SenderProperty<out T : CommandSender> : CommandProperty<T>, CommandDelegate<T> {
 
         @JvmSynthetic
         override operator fun provideDelegate(thisRef: PropertyCommand<*>, property: KProperty<*>): CommandDelegate<T> {
@@ -175,14 +175,14 @@ abstract class PropertyCommand<out R>(
 
         @JvmSynthetic
         override operator fun getValue(thisRef: PropertyCommand<*>, property: KProperty<*>): T {
-            val value: CommandSender = thisRef._commandSender
-
             // TODO: If value is subtype of T, return value as T.
             //       Else, return null if optional; throw command exception if required.
 
-            @Suppress("UNCHECKED_CAST")
-            return value as T
+            return getValue()
         }
+
+        @Suppress("UNCHECKED_CAST")
+        fun getValue() = _commandSender as T
     }
 }
 

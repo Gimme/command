@@ -1,8 +1,10 @@
 package dev.gimme.gimmeapi.command.property
 
 import dev.gimme.gimmeapi.command.DUMMY_COMMAND_SENDER
+import dev.gimme.gimmeapi.command.sender.CommandSender
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
@@ -55,6 +57,46 @@ internal class DelegatePropertyTest {
 
         assertFalse(called)
         command.execute(DUMMY_COMMAND_SENDER, input)
+        assertTrue(called)
+    }
+
+    @Test
+    fun `Converts delegate properties to command senders`() {
+        open class Sender1 : CommandSender {
+            override val name = "sender1"
+
+            override fun sendMessage(message: String) {}
+        }
+        open class Sender2 : CommandSender {
+            override val name = "sender2"
+
+            override fun sendMessage(message: String) {}
+        }
+
+
+        val commandSender = Sender1()
+
+        var called = false
+
+        val command = object : PropertyCommand<Unit>("test-command") {
+
+            val senderSuper: CommandSender by sender()
+            val senderSub1: Sender1 by sender()
+            // TODO: val senderSub2: Sender2? by sender()
+
+            override fun call() {
+                called = true
+
+                assertEquals(commandSender, senderSuper)
+                assertEquals(commandSender, senderSub1)
+                assertEquals("sender1", senderSub1.name)
+                assertEquals(senderSub1.name, senderSuper.name)
+                // TODO: assertNull(senderSub2)
+            }
+        }
+
+        assertFalse(called)
+        command.execute(commandSender, mapOf())
         assertTrue(called)
     }
 }
