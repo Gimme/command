@@ -52,7 +52,7 @@ abstract class FunctionCommand<out T>(
 
     private val commandExecutorFunction: KFunction<T> = getFirstCommandExecutorFunction()
     private val commandExecutorAnnotation: CommandExecutor = commandExecutorFunction.findAnnotation()!!
-    private val COMMAND_SENDER_TYPE: KType = CommandSender::class.createType()
+    private val baseCommandSenderType: KType = CommandSender::class.createType()
 
     final override var parameters: CommandParameterSet = generateParameters()
     final override var usage: String = generateUsage()
@@ -76,7 +76,7 @@ abstract class FunctionCommand<out T>(
 
         // Inject command sender
         params
-            .filter { it.type.isSubtypeOf(COMMAND_SENDER_TYPE) }
+            .filter { it.type.isSubtypeOf(baseCommandSenderType) }
             .forEach { senderParam ->
                 typedArgsMap[senderParam] = senderParam.type.jvmErasure.safeCast(commandSender)
                     ?: throw ErrorCode.INCOMPATIBLE_SENDER.createException()
@@ -99,7 +99,7 @@ abstract class FunctionCommand<out T>(
         val usedFlags = mutableSetOf<Char>()
 
         val valueParameters = commandExecutorFunction.parameters
-            .filter { it.kind == KParameter.Kind.VALUE && !it.type.isSubtypeOf(COMMAND_SENDER_TYPE) }
+            .filter { it.kind == KParameter.Kind.VALUE && !it.type.isSubtypeOf(baseCommandSenderType) }
 
         return CommandParameterSet(
             valueParameters.map { param ->
