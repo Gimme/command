@@ -42,7 +42,7 @@ abstract class PropertyCommand<out R>(
     private lateinit var _commandSender: CommandSender
     private lateinit var _args: Map<CommandParameter, Any?>
 
-    override fun execute(commandSender: CommandSender, args: Map<CommandParameter, Any?>): R {
+    override fun executeCommand(commandSender: CommandSender, args: Map<CommandParameter, Any?>): R {
         _commandSender = commandSender
         _args = args
 

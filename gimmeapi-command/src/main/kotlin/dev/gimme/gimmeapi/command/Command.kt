@@ -5,6 +5,7 @@ import dev.gimme.gimmeapi.command.node.CommandNode
 import dev.gimme.gimmeapi.command.parameter.CommandParameter
 import dev.gimme.gimmeapi.command.parameter.CommandParameterSet
 import dev.gimme.gimmeapi.command.sender.CommandSender
+import kotlin.reflect.KClass
 
 /**
  * Represents an executable command.
@@ -14,6 +15,7 @@ import dev.gimme.gimmeapi.command.sender.CommandSender
  * @property description a detailed description of this command
  * @property usage       information of how to use the command
  * @property parameters  this command's parameters
+ * @property senderTypes the only types of senders allowed to execute this command, or null if no limitation
  */
 interface Command<out T> : CommandNode {
 
@@ -21,10 +23,13 @@ interface Command<out T> : CommandNode {
     var description: String
     var usage: String
     var parameters: CommandParameterSet
+    val senderTypes: Set<KClass<out CommandSender>>?
 
     /**
      * Executes this command as the [commandSender] with the [args] mapping of parameters to arguments and returns the
      * result.
+     *
+     * The [commandSender] has to be a valid subtype of any of the [senderTypes].
      *
      * @throws CommandException if the command execution was unsuccessful
      */

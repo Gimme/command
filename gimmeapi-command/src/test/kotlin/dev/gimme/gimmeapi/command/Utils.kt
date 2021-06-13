@@ -3,6 +3,7 @@ package dev.gimme.gimmeapi.command
 import dev.gimme.gimmeapi.command.parameter.CommandParameter
 import dev.gimme.gimmeapi.command.parameter.CommandParameterSet
 import dev.gimme.gimmeapi.command.sender.CommandSender
+import kotlin.reflect.KClass
 
 val DUMMY_COMMAND_SENDER = object : CommandSender {
     override val name = "dummy"
@@ -26,6 +27,7 @@ open class DefaultBaseCommand(
     override var description: String = ""
     override var usage = ""
     override var parameters = CommandParameterSet()
+    override var senderTypes: Set<KClass<out CommandSender>>? = null
 
     override fun execute(commandSender: CommandSender, args: Map<CommandParameter, Any?>) {}
 }

@@ -66,7 +66,7 @@ abstract class FunctionCommand<out T>(
      * @throws CommandException if the command execution was unsuccessful
      */
     @Throws(CommandException::class)
-    override fun execute(commandSender: CommandSender, args: Map<CommandParameter, Any?>): T {
+    override fun executeCommand(commandSender: CommandSender, args: Map<CommandParameter, Any?>): T {
         val function = commandExecutorFunction
 
         val params: List<KParameter> = function.parameters
