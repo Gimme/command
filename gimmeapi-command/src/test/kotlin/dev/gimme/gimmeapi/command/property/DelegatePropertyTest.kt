@@ -46,11 +46,11 @@ internal class DelegatePropertyTest {
             "double" to 0.5,
             "boolean" to true,
         )
-            .map { Pair(command.parameters[it.key]!!, it.value) }
-            .plus( Pair(command.parameters["list"]!!, listInput))
-            .plus( Pair(command.parameters["set"]!!, listInput.toSet()))
-            .plus( Pair(command.parameters["collection"]!!, listInput))
-            .plus( Pair(command.parameters["iterable"]!!, listInput))
+            .map { command.parameters[it.key]!! to it.value }
+            .plus( command.parameters["list"]!! to listInput)
+            .plus( command.parameters["set"]!! to listInput.toSet())
+            .plus( command.parameters["collection"]!! to listInput)
+            .plus( command.parameters["iterable"]!! to listInput)
             .toMap()
 
         assertFalse(called)
