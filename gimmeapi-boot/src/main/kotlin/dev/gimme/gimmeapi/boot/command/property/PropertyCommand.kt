@@ -5,13 +5,13 @@ import dev.gimme.gimmeapi.command.ParameterTypes
 import dev.gimme.gimmeapi.command.parameter.CommandParameter
 import dev.gimme.gimmeapi.command.parameter.CommandParameterSet
 import dev.gimme.gimmeapi.command.parameter.DefaultValue
+import dev.gimme.gimmeapi.command.parameter.ParameterType
 import dev.gimme.gimmeapi.command.sender.CommandSender
 import dev.gimme.gimmeapi.core.common.splitCamelCase
+import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
-import kotlin.reflect.KType
-import kotlin.reflect.KTypeProjection
-import kotlin.reflect.full.createType
-import kotlin.reflect.full.isSubtypeOf
+import kotlin.reflect.full.isSuperclassOf
+import kotlin.reflect.jvm.jvmErasure
 
 /**
  * TODO
@@ -35,17 +35,29 @@ abstract class PropertyCommand<out R>(name: String) : BaseCommand<R>(name) {
 
     abstract fun call(): R
 
-    fun <T: CommandSender> sender(): CommandProperty<T> = SenderProperty()
+    fun <T : CommandSender> sender(): CommandProperty<T> = SenderProperty()
     fun <T> param(): ParamBuilder<T> = ParamBuilder()
 
     inner class ParamBuilder<out T> : CommandProperty<T> {
 
         private var name: String? = null
-        private var returnType: KType? = null
+        private var klass: KClass<*>? = null
+        private var vararg: Boolean? = null
+        private var optional: Boolean? = null
 
         override operator fun provideDelegate(thisRef: PropertyCommand<*>, property: KProperty<*>): Param<T> {
-            this.name = property.name
-            this.returnType = property.returnType
+            if (name == null) setName(property.name)
+            val isList = property.returnType.jvmErasure.isSuperclassOf(List::class)
+            if (klass == null) {
+                klass = if (isList) {
+                    property.returnType.arguments.firstOrNull()?.type?.jvmErasure
+                        ?: throw RuntimeException("Unsupported parameter type: ${property.returnType}") // TODO: exception type
+                } else {
+                    property.returnType.jvmErasure
+                }
+            }
+            if (vararg == null) setVararg(isList)
+            if (optional == null) setOptional(property.returnType.isMarkedNullable)
 
             return build()
         }
@@ -55,50 +67,75 @@ abstract class PropertyCommand<out R>(name: String) : BaseCommand<R>(name) {
             return this
         }
 
-        fun setType(type: KType): ParamBuilder<T> {
-            this.returnType = type
+        fun setType(type: KClass<*>): ParamBuilder<T> {
+            this.klass = type
+            return this
+        }
+
+        fun setType(type: Class<*>): ParamBuilder<T> {
+            this.klass = type.kotlin
+            return this
+        }
+
+        fun setVararg(vararg: Boolean): ParamBuilder<T> {
+            this.vararg = vararg
+            return this
+        }
+
+        fun setOptional(optional: Boolean): ParamBuilder<T> {
+            this.optional = optional
             return this
         }
 
         fun build(): Param<T> {
             val name = name!! // TODO: Error message on null
-            val returnType = returnType!! // TODO: Error message on null
+            val klass = klass!! // TODO: Error message on null
+            val vararg = vararg ?: false
 
             val id = name.splitCamelCase("-")
             val displayName = name.splitCamelCase(" ")
-            val commandParameterType = ParameterTypes.get(returnType)
             val flags = setOf<Char>() // TODO
             val defaultValue: DefaultValue? = null // TODO
+            val isOptional = optional ?: vararg
+
+            val type = ParameterTypes.get(klass)
 
             val param = Param<T>(
                 id = id,
                 displayName = displayName,
-                type = returnType,
-                suggestions = commandParameterType.values ?: { setOf() },
-                vararg = returnType.isSubtypeOf(ITERABLE_TYPE), // TODO
-                optional = returnType.isMarkedNullable,
+                type = type,
+                vararg = vararg,
+                optional = isOptional, // TODO: check if default value exists?
+                suggestions = type.values ?: { setOf() },
+                description = null, // TODO
                 flags = flags,
                 defaultValue = defaultValue
             )
             parameters.add(param)
             return param
         }
-
-        private val ITERABLE_TYPE = Iterable::class.createType(listOf(KTypeProjection.STAR))
     }
 
     inner class Param<out T>(
         id: String,
         displayName: String,
-        type: KType,
-        suggestions: () -> Set<String> = { setOf() },
-        description: String? = null,
-        vararg: Boolean = false,
-        optional: Boolean = false,
-        flags: Set<Char> = setOf(),
-        defaultValue: DefaultValue? = null,
+        type: ParameterType<*>,
+        vararg: Boolean,
+        optional: Boolean,
+        suggestions: () -> Set<String>,
+        description: String?,
+        flags: Set<Char>,
+        defaultValue: DefaultValue?,
     ) : CommandParameter(
-        id, displayName, type, suggestions, description, vararg, optional, flags, defaultValue
+        id = id,
+        displayName = displayName,
+        type = type,
+        suggestions = suggestions,
+        description = description,
+        vararg = vararg,
+        optional = optional,
+        flags = flags,
+        defaultValue = defaultValue
     ), CommandDelegate<T> {
 
         override operator fun getValue(thisRef: PropertyCommand<*>, property: KProperty<*>): T = getValue()
@@ -107,7 +144,7 @@ abstract class PropertyCommand<out R>(name: String) : BaseCommand<R>(name) {
         fun getValue() = _args[this] as T
     }
 
-    private class SenderProperty<out T : CommandSender>: CommandProperty<T>, CommandDelegate<T> {
+    private class SenderProperty<out T : CommandSender> : CommandProperty<T>, CommandDelegate<T> {
 
         override operator fun provideDelegate(thisRef: PropertyCommand<*>, property: KProperty<*>): CommandDelegate<T> {
             return this

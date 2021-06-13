@@ -13,6 +13,7 @@ import dev.gimme.gimmeapi.command.parameter.CommandParameter
 import dev.gimme.gimmeapi.command.parameter.CommandParameterSet
 import dev.gimme.gimmeapi.command.sender.CommandSender
 import dev.gimme.gimmeapi.core.common.splitCamelCase
+import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.KParameter
 import kotlin.reflect.KType
@@ -20,6 +21,7 @@ import kotlin.reflect.full.createType
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.hasAnnotation
 import kotlin.reflect.full.isSubtypeOf
+import kotlin.reflect.full.isSuperclassOf
 import kotlin.reflect.full.memberFunctions
 import kotlin.reflect.full.safeCast
 import kotlin.reflect.jvm.isAccessible
@@ -107,23 +109,32 @@ abstract class FunctionCommand<out T>(
                 val name = param.name ?: throw UnsupportedParameterException(param)
                 val id = name.splitCamelCase("-")
                 val displayName = name.splitCamelCase(" ")
-                val commandParameterType = ParameterTypes.get(param.type)
                 val flags = generateFlags(id, usedFlags)
                 val defaultValue = commandExecutorAnnotation.getDefaultValue(valueParameters.indexOf(param))
                 usedFlags.addAll(flags)
 
+                val vararg = param.isVararg || param.type.jvmErasure.isSuperclassOf(List::class)
+                val klass: KClass<*> = if (vararg) {
+                    param.type.arguments.firstOrNull()?.type?.jvmErasure
+                        ?: throw RuntimeException("Unsupported parameter type: ${param.type}") // TODO: exception type
+                } else {
+                    param.type.jvmErasure
+                }
+                val optional = param.isOptional || defaultValue?.value != null
+
+                val type = ParameterTypes.get(klass)
+
                 CommandParameter(
                     id = id,
                     displayName = displayName,
-                    type = param.type,
-                    suggestions = commandParameterType.values ?: { setOf() },
-                    vararg = param.isVararg,
-                    optional = param.isOptional || defaultValue?.value != null,
+                    type = type,
+                    vararg = vararg,
+                    optional = optional,
+                    suggestions = type.values ?: { setOf() },
                     flags = flags,
                     defaultValue = defaultValue
                 )
-            }
-                .toList()
+            }.toList()
         )
     }
 

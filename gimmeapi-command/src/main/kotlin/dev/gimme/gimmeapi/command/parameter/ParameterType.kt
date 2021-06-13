@@ -1,28 +1,15 @@
 package dev.gimme.gimmeapi.command.parameter
 
-import dev.gimme.gimmeapi.command.exception.CommandException
-
 /**
- * Represents a command parameter type used to handle input argument values.
+ * Represents a command parameter type.
  *
  * @param T                the real type that this represents
- * @property name          the display name of this parameter type
- * @property values        returns all possible values this parameter type can have, or null if undefined
- * @property singular      if this type represents singular or plural values
- * @property errorMessage  message to be included if an input value is invalid and cannot be converted to this type
+ * @property name          the display-name of this type
+ * @property values        returns all possible values this type can have (in string form), or null if undefined
+ * @property parser        converts string to this parameter type, or throws an exception if it could not be converted
  */
-interface ParameterType<T : Any> {
-
-    val name: String
-    val values: (() -> Set<String>)?
-    val singular: Boolean
-    val errorMessage: String?
-
-    /**
-     * Converts the [input] to this parameter type.
-     *
-     * @throws CommandException if the [input] is invalid
-     */
-    @Throws(CommandException::class)
-    fun convert(input: Collection<String>): T
-}
+class ParameterType<T : Any>(
+    val name: String,
+    val values: (() -> Set<String>)? = null,
+    val parser: (String) -> T,
+)

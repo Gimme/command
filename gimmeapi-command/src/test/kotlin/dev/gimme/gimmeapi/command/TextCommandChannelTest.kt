@@ -22,7 +22,7 @@ class TextCommandChannelTest {
         val command = object : DefaultBaseCommand("c") {
             init {
                 parameters.addAll(expectedArgs.mapIndexed { index, _ ->
-                    CommandParameter(index.toString(), "", String::class.createType())
+                    CommandParameter(index.toString(), "", ParameterTypes.get(String::class))
                 })
             }
 

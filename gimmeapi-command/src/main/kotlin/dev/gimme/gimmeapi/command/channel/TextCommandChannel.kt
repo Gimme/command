@@ -93,9 +93,10 @@ abstract class TextCommandChannel(
 
         return command.parameters
             .mapIndexed { index, commandParameter ->
-                val token = listOf(tokens[index])
+                val token = tokens[index]
                 val type = commandParameter.type
-                val arg = ParameterTypes.get(type).convert(token)
+                val value = type.parser(token)
+                val arg = if (commandParameter.vararg) listOf(value) else value
                 Pair(commandParameter, arg)
             }
             .toMap()

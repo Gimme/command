@@ -1,8 +1,63 @@
 package dev.gimme.gimmeapi.boot.command
 
+import dev.gimme.gimmeapi.boot.command.executor.CommandExecutor
+import dev.gimme.gimmeapi.command.channel.TextCommandChannel
+import dev.gimme.gimmeapi.command.sender.CommandSender
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
+
+internal class FunctionCommandTest {
+
+    private val sender = DUMMY_COMMAND_SENDER
+
+    private val channel = object : TextCommandChannel() {
+        override fun onEnable() {
+        }
+
+        override fun onDisable() {
+        }
+    }
+
+    @Test
+    fun test() {
+        var called = false
+
+        val commandName = "k"
+        val arg1 = "abc"
+        val arg2 = 123
+
+        val command = object : FunctionCommand<Any?>(commandName) {
+
+            @CommandExecutor
+            private fun call(sender: CommandSender, a: String, b: Int) {
+                called = true
+
+                Assertions.assertAll(
+                    { assertEquals(sender, sender) },
+                    { assertEquals(arg1, a) },
+                    { assertEquals(arg2, b) },
+                )
+            }
+        }
+
+        assertFalse(called)
+
+        channel.commandManager.registerCommand(command)
+        channel.parseInput(sender, "$commandName $arg1 $arg2")
+
+        assertTrue(called)
+
+        assertTrue(command.parameters["a"] != null)
+        assertTrue(command.parameters["b"] != null)
+    }
+}
+
 /* TODO
 @Suppress("UNUSED_PARAMETER")
-class FunctionCommandTest {
+class JFunctionCommandTest {
 
     @Test
     fun `should execute reflection command with all types`() {

@@ -18,7 +18,6 @@ internal class DelegatePropertyTest {
             val double: Double by param()
             val boolean: Boolean by param()
             val list: List<String> by param()
-            val set: Set<String> by param()
             val collection: Collection<String> by param()
             val iterable: Iterable<String> by param()
 
