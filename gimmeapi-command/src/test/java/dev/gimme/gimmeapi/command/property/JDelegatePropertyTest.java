@@ -53,9 +53,9 @@ class JDelegatePropertyTest {
 
         var command = new PropertyCommand<Void>("test-command") {
 
-            private final SenderDelegate<CommandSender> senderSuper = sender(CommandSender.class).build();
-            private final SenderDelegate<Sender1> senderSub1 = sender(Sender1.class).optional().build();
-            private final SenderDelegate<Sender2> senderSub2 = sender(Sender2.class).optional().build();
+            private final SenderDelegate<CommandSender> senderSuper = sender(CommandSender.class);
+            private final SenderDelegate<Sender1> senderSub1 = sender(Sender1.class, true);
+            private final SenderDelegate<Sender2> senderSub2 = sender(Sender2.class, true);
 
             @Override
             public Void call() {
