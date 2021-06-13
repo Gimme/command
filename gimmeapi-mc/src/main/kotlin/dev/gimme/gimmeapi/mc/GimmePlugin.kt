@@ -2,7 +2,7 @@ package dev.gimme.gimmeapi.mc
 
 import dev.gimme.gimmeapi.command.channel.TextCommandChannel
 import dev.gimme.gimmeapi.command.manager.CommandManager
-import dev.gimme.gimmeapi.mc.command.SpigotCommandChannel
+import dev.gimme.gimmeapi.mc.command.ChatCommandChannel
 import org.bukkit.plugin.java.JavaPlugin
 
 /**
@@ -23,7 +23,7 @@ abstract class GimmePlugin : JavaPlugin() {
         private set
 
     final override fun onEnable() {
-        channel = SpigotCommandChannel(this, includeConsoleListener = false)
+        channel = ChatCommandChannel(this, includeConsoleListener = false)
         channel.enable()
         commandManager = channel.commandManager
 

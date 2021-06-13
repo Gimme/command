@@ -15,7 +15,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent
 /**
  * Handles input/output through Minecraft chat.
  */
-class SpigotCommandChannel(
+class ChatCommandChannel(
     private val plugin: JavaPlugin,
     includeConsoleListener: Boolean = true,
 ) : TextCommandChannel(
