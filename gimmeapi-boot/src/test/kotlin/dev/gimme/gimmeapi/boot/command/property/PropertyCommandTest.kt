@@ -31,15 +31,13 @@ internal class PropertyCommandTest {
 
         val command = object : PropertyCommand<Unit>(commandName) {
 
-            val a: String by param()
+            val a: String? by param()
 
-            val b: Param<Int> = param<Int>()
-                .setName("bb")
-                .setType(Int::class)
+            val b: Param<Int?> = param(Int::class)
+                .name("bb")
                 .build()
 
-            val c: Double by param<Double>()
-                .setName("ccc")
+            val c: List<Double> by param<List<Double>>().name("c")
 
             override fun call() {
                 called = true
@@ -48,7 +46,7 @@ internal class PropertyCommandTest {
                     { assertEquals(sender, sender) },
                     { assertEquals(arg1, a) },
                     { assertEquals(arg2, b.getValue()) },
-                    { assertEquals(arg3, c) },
+                    { assertEquals(listOf(arg3), c) },
                 )
             }
         }
@@ -62,6 +60,6 @@ internal class PropertyCommandTest {
 
         assertTrue(command.parameters["a"] != null)
         assertTrue(command.parameters["bb"] != null)
-        assertTrue(command.parameters["ccc"] != null)
+        assertTrue(command.parameters["c"] != null)
     }
 }

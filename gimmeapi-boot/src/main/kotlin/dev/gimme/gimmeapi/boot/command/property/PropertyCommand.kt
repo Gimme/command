@@ -52,17 +52,22 @@ abstract class PropertyCommand<out R>(
     abstract fun call(): R
 
     fun <T : CommandSender> sender(): CommandProperty<T> = SenderProperty()
-    fun <T> param(): ParamBuilder<T> = ParamBuilder()
 
-    inner class ParamBuilder<out T> : CommandProperty<T> {
+    @JvmSynthetic
+    fun <T> param(): ParamBuilder<T> = ParamBuilder(null)
+    fun <T : Any> param(klass: KClass<T>): ParamBuilder<T> = ParamBuilder(klass)
+    fun <T : Any> param(klass: Class<T>): ParamBuilder<T> = ParamBuilder(klass.kotlin)
+
+    inner class ParamBuilder<out T> internal constructor(
+        private var klass: KClass<*>?
+    ) : CommandProperty<T> {
 
         private var name: String? = null
-        private var klass: KClass<*>? = null
         private var vararg: Boolean? = null
         private var optional: Boolean? = null
 
         override operator fun provideDelegate(thisRef: PropertyCommand<*>, property: KProperty<*>): Param<T> {
-            if (name == null) setName(property.name)
+            if (name == null) name(property.name)
             val isList = property.returnType.jvmErasure.isSuperclassOf(List::class)
             if (klass == null) {
                 klass = if (isList) {
@@ -72,38 +77,24 @@ abstract class PropertyCommand<out R>(
                     property.returnType.jvmErasure
                 }
             }
-            if (vararg == null) setVararg(isList)
-            if (optional == null) setOptional(property.returnType.isMarkedNullable)
+            if (vararg == null) vararg(isList)
+            if (optional == null && property.returnType.isMarkedNullable) optional()
 
             return build()
         }
 
-        fun setName(name: String): ParamBuilder<T> {
-            this.name = name
-            return this
+        fun name(name: String) = apply { this.name = name }
+        fun vararg(vararg: Boolean) = apply { this.vararg = vararg }
+        fun optional() = apply { this.optional = true }
+
+        fun build() = buildOfType<T>()
+        fun buildList(): Param<List<T>> {
+            vararg = true
+
+            return buildOfType()
         }
 
-        fun setType(type: KClass<*>): ParamBuilder<T> {
-            this.klass = type
-            return this
-        }
-
-        fun setType(type: Class<*>): ParamBuilder<T> {
-            this.klass = type.kotlin
-            return this
-        }
-
-        fun setVararg(vararg: Boolean): ParamBuilder<T> {
-            this.vararg = vararg
-            return this
-        }
-
-        fun setOptional(optional: Boolean): ParamBuilder<T> {
-            this.optional = optional
-            return this
-        }
-
-        fun build(): Param<T> {
+        private fun <S> buildOfType(): Param<S> {
             val name = name!! // TODO: Error message on null
             val klass = klass!! // TODO: Error message on null
             val vararg = vararg ?: false
@@ -116,7 +107,7 @@ abstract class PropertyCommand<out R>(
 
             val type = ParameterTypes.get(klass)
 
-            val param = Param<T>(
+            val param = Param<S>(
                 id = id,
                 displayName = displayName,
                 type = type,
