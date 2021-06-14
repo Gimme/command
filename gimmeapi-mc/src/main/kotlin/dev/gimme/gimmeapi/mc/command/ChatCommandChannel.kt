@@ -45,15 +45,6 @@ class ChatCommandChannel(
         HandlerList.unregisterAll(this)
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
-    private fun onChatListener(e: AsyncPlayerChatEvent) {
-        val sender = e.player.asBotCommandSender()
-
-        if (!parseInput(sender, e.message)) return
-
-        e.isCancelled = true
-    }
-
     override fun onTabComplete(
         sender: CommandSender,
         command: org.bukkit.command.Command,
@@ -74,6 +65,6 @@ class ChatCommandChannel(
         val input = StringBuilder(label)
         args.forEach { input.append(" $it") }
 
-        return parseInput(sender.asBotCommandSender(), input.toString())
+        return parseInput(sender.asGimmeCommandSender(), input.toString())
     }
 }

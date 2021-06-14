@@ -6,7 +6,7 @@ import org.bukkit.command.CommandSender
 /**
  * Returns an adapter object with this [CommandSender] as a [GimmeCommandSender].
  */
-internal fun CommandSender.asBotCommandSender(): GimmeCommandSender {
+internal fun CommandSender.asGimmeCommandSender(): GimmeCommandSender {
 
     val spigotCommandSender = this
 
