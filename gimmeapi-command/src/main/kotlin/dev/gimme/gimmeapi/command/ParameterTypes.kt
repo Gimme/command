@@ -64,23 +64,34 @@ object ParameterTypes {
      * The basic types are registered by default, others need to be registered manually with this method.
      *
      * @param T             the type to be registered
+     * @param klass         the class of the type to be registered
      * @param name          the display-name of the parameter type
      * @param values        returns all possible values the parameter type can have, or null if undefined
      * @param convertOrNull converts string to the parameter type, or returns null if unable to convert
      */
-    inline fun <reified T : Any> register(
-        name: String = T::class.simpleName ?: "?",
-        noinline values: (() -> Set<String>)? = null,
-        crossinline convertOrNull: (String) -> T?,
+    fun <T : Any> register(
+        klass: Class<T>,
+        name: String = klass.simpleName ?: "?",
+        values: (() -> Set<String>)? = null,
+        convertOrNull: (String) -> T?,
     ): ParameterType<T> {
         val parameterType = ParameterType(
             name = name,
             values = values,
         ) { convertOrNull(it) ?: throw ErrorCode.INVALID_ARGUMENT.createException("\"$it\" (Not a valid $name)") }
 
-        put(T::class, parameterType)
+        put(klass.kotlin, parameterType)
         return parameterType
     }
+
+    /**
+     * @see register
+     */
+    inline fun <reified T : Any> register(
+        name: String = T::class.simpleName ?: "?",
+        noinline values: (() -> Set<String>)? = null,
+        noinline convertOrNull: (String) -> T?,
+    ): ParameterType<T> = register(T::class.java, name, values, convertOrNull)
 
     /**
      * Returns a parameter type for the [klass] if it is an enum, else null.
