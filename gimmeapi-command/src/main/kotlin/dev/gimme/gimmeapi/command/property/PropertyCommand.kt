@@ -56,9 +56,9 @@ abstract class PropertyCommand<out R>(
     abstract fun call(): R
 
     @JvmSynthetic
-    fun <T : CommandSender> sender(): SenderProperty<T> = SenderProperty(null)
+    fun <T : CommandSender> sender(): SenderProperty<T> = SenderProperty()
     @JvmSynthetic
-    fun <T : CommandSender> sender(klass: KClass<T>, required: Boolean = true): Sender<T> = SenderProperty(klass, required).provideDelegate()
+    fun <T : CommandSender> sender(klass: KClass<T>, required: Boolean = true): Sender<T> = createSenderDelegate(klass, required)
     @JvmOverloads
     fun <T : CommandSender> sender(klass: Class<T>, required: Boolean = true): Sender<T> = sender(klass.kotlin, required)
 
@@ -175,34 +175,28 @@ abstract class PropertyCommand<out R>(
         fun getArg() = _args[this] as T
     }
 
-    inner class SenderProperty<out T : CommandSender> internal constructor(
-        private var klass: KClass<T>?,
-        private var required: Boolean? = null
-    ) : CommandProperty<T> {
+    private fun <T : CommandSender> createSenderDelegate(klass: KClass<T>, required: Boolean): Sender<T> {
+        if (required) {
+            if (requiredSender != null) throw IllegalStateException("Only one sender type can be required (non-null)") // TODO: exception type
+            requiredSender = klass
+        } else {
+            optionalSenders?.add(klass) ?: run {
+                optionalSenders = mutableSetOf(klass)
+            }
+        }
+
+        return Sender(klass)
+    }
+
+    inner class SenderProperty<out T : CommandSender> internal constructor() : CommandProperty<T> {
 
         @JvmSynthetic
         override operator fun provideDelegate(thisRef: PropertyCommand<*>, property: KProperty<*>): CommandDelegate<T> {
             @Suppress("UNCHECKED_CAST")
-            klass = property.returnType.jvmErasure as KClass<T>
-            required = !property.returnType.isMarkedNullable
+            val klass = property.returnType.jvmErasure as KClass<T>
+            val required = !property.returnType.isMarkedNullable
 
-            return provideDelegate()
-        }
-
-        fun provideDelegate(): Sender<T> {
-            val klass = klass!!
-            val required = required ?: true
-
-            if (required) {
-                if (requiredSender != null) throw IllegalStateException("Only one sender type can be required (non-null)") // TODO: exception type
-                requiredSender = klass
-            } else {
-                optionalSenders?.add(klass) ?: run {
-                    optionalSenders = mutableSetOf(klass)
-                }
-            }
-
-            return Sender(klass)
+            return sender(klass, required)
         }
     }
 
