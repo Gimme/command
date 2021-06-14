@@ -1,14 +1,12 @@
 package dev.gimme.gimmeapi.command.channel
 
 import dev.gimme.gimmeapi.command.Command
-import dev.gimme.gimmeapi.command.ParameterTypes
 import dev.gimme.gimmeapi.command.exception.CommandException
 import dev.gimme.gimmeapi.command.exception.ErrorCode
 import dev.gimme.gimmeapi.command.exception.IncompleteCommandException
 import dev.gimme.gimmeapi.command.manager.CommandManager
 import dev.gimme.gimmeapi.command.manager.TextCommandManager
 import dev.gimme.gimmeapi.command.parameter.CommandParameter
-import dev.gimme.gimmeapi.command.parameter.ParameterType
 import dev.gimme.gimmeapi.command.sender.CommandSender
 
 /**
@@ -99,7 +97,7 @@ abstract class TextCommandChannel(
             .mapIndexed { index, commandParameter ->
                 val token = tokens[index]
                 val type = commandParameter.type
-                val value = type.parser(token)
+                val value = type.parse(token)
                 val arg = when(commandParameter.form) {
                     CommandParameter.Form.LIST -> listOf(value)
                     CommandParameter.Form.SET -> setOf(value)

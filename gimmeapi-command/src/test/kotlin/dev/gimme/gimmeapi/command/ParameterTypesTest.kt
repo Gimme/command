@@ -70,7 +70,7 @@ internal class ParameterTypesTest {
         input: String,
         expected: T,
     ) {
-        val actual = parameterTypes.get(T::class).parser(input)
+        val actual = parameterTypes.get(T::class).parse(input)
 
         assertEquals(expected, actual)
     }

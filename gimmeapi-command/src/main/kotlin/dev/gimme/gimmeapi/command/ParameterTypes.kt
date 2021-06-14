@@ -93,7 +93,7 @@ object ParameterTypes {
             val values = enumValues.map { it.name }.toSet().let { { it } }
 
             @Suppress("UNCHECKED_CAST")
-            val parser: (String) -> T = { string: String ->
+            val parse: (String) -> T = { string: String ->
                 val value = enumValues.find { it.name.equals(string, ignoreCase = true) }
                     ?: throw ErrorCode.INVALID_ARGUMENT.createException("\"$string\" (Not a valid $name)")
                 value as T
@@ -102,7 +102,7 @@ object ParameterTypes {
             val parameterType = ParameterType(
                 name = name,
                 values = values,
-                parser = parser
+                parse = parse
             )
 
             put(klass, parameterType)
