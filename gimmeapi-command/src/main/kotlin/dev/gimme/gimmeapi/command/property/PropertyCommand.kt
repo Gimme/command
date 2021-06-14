@@ -58,9 +58,9 @@ abstract class PropertyCommand<out R>(
     @JvmSynthetic
     fun <T : CommandSender> sender(): SenderProperty<T> = SenderProperty(null)
     @JvmSynthetic
-    fun <T : CommandSender> sender(klass: KClass<T>, optional: Boolean = false): Sender<T> = SenderProperty(klass, optional).provideDelegate()
+    fun <T : CommandSender> sender(klass: KClass<T>, required: Boolean = true): Sender<T> = SenderProperty(klass, required).provideDelegate()
     @JvmOverloads
-    fun <T : CommandSender> sender(klass: Class<T>, optional: Boolean = false): Sender<T> = sender(klass.kotlin, optional)
+    fun <T : CommandSender> sender(klass: Class<T>, required: Boolean = true): Sender<T> = sender(klass.kotlin, required)
 
     @JvmSynthetic
     fun <T> param(): ParamBuilder<T> = ParamBuilder(null)
@@ -177,23 +177,23 @@ abstract class PropertyCommand<out R>(
 
     inner class SenderProperty<out T : CommandSender> internal constructor(
         private var klass: KClass<T>?,
-        private var optional: Boolean? = null
+        private var required: Boolean? = null
     ) : CommandProperty<T> {
 
         @JvmSynthetic
         override operator fun provideDelegate(thisRef: PropertyCommand<*>, property: KProperty<*>): CommandDelegate<T> {
             @Suppress("UNCHECKED_CAST")
             klass = property.returnType.jvmErasure as KClass<T>
-            optional = property.returnType.isMarkedNullable
+            required = !property.returnType.isMarkedNullable
 
             return provideDelegate()
         }
 
         fun provideDelegate(): Sender<T> {
             val klass = klass!!
-            val optional = optional ?: false
+            val required = required ?: true
 
-            if (!optional) {
+            if (required) {
                 if (requiredSender != null) throw IllegalStateException("Only one sender type can be required (non-null)") // TODO: exception type
                 requiredSender = klass
             } else {

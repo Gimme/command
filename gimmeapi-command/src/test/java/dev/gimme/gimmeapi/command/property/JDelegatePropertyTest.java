@@ -54,8 +54,8 @@ class JDelegatePropertyTest {
         var command = new PropertyCommand<Void>("test-command") {
 
             private final Sender<CommandSender> senderSuper = sender(CommandSender.class);
-            private final Sender<Sender1> senderSub1 = sender(Sender1.class, true);
-            private final Sender<Sender2> senderSub2 = sender(Sender2.class, true);
+            private final Sender<Sender1> senderSub1 = sender(Sender1.class, false);
+            private final Sender<Sender2> senderSub2 = sender(Sender2.class, false);
 
             private final Param<String> string = param(String.class)
                     .name("string")
