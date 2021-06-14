@@ -56,19 +56,19 @@ abstract class PropertyCommand<out R>(
     abstract fun call(): R
 
     @JvmSynthetic
-    fun <T : CommandSender> sender(): SenderProperty<T> = SenderProperty()
+    protected fun <T : CommandSender> sender(): SenderProperty<T> = SenderProperty()
     @JvmSynthetic
-    fun <T : CommandSender> sender(klass: KClass<T>, required: Boolean = true): Sender<T> = createSenderDelegate(klass, required)
+    protected fun <T : CommandSender> sender(klass: KClass<T>, required: Boolean = true): Sender<T> = createSenderDelegate(klass, required)
     @JvmOverloads
-    fun <T : CommandSender> sender(klass: Class<T>, required: Boolean = true): Sender<T> = sender(klass.kotlin, required)
+    protected fun <T : CommandSender> sender(klass: Class<T>, required: Boolean = true): Sender<T> = sender(klass.kotlin, required)
 
     @JvmSynthetic
-    fun <T> param(): ParamBuilder<T> = ParamBuilder(null)
+    protected fun <T> param(): ParamBuilder<T> = ParamBuilder(null)
     @JvmSynthetic
-    fun <T : Any> param(klass: KClass<T>): ParamBuilder<T> = ParamBuilder(klass)
-    fun <T : Any> param(klass: Class<T>): ParamBuilder<T> = ParamBuilder(klass.kotlin)
+    protected fun <T : Any> param(klass: KClass<T>): ParamBuilder<T> = ParamBuilder(klass)
+    protected fun <T : Any> param(klass: Class<T>): ParamBuilder<T> = ParamBuilder(klass.kotlin)
 
-    inner class ParamBuilder<out T> internal constructor(
+    protected inner class ParamBuilder<out T> internal constructor(
         private var klass: KClass<*>?
     ) : CommandProperty<T> {
 
@@ -153,7 +153,7 @@ abstract class PropertyCommand<out R>(
         }
     }
 
-    inner class Param<out T>(
+    protected inner class Param<out T>(
         id: String,
         displayName: String,
         type: ParameterType<*>,
@@ -192,7 +192,7 @@ abstract class PropertyCommand<out R>(
         return Sender(klass)
     }
 
-    inner class SenderProperty<out T : CommandSender> internal constructor() : CommandProperty<T> {
+    protected inner class SenderProperty<out T : CommandSender> internal constructor() : CommandProperty<T> {
 
         @JvmSynthetic
         override operator fun provideDelegate(thisRef: PropertyCommand<*>, property: KProperty<*>): CommandDelegate<T> {
@@ -204,7 +204,7 @@ abstract class PropertyCommand<out R>(
         }
     }
 
-    inner class Sender<out T : CommandSender?>(private val klass: KClass<*>) : CommandDelegate<T> {
+    protected inner class Sender<out T : CommandSender?>(private val klass: KClass<*>) : CommandDelegate<T> {
 
         @JvmSynthetic
         override operator fun getValue(thisRef: PropertyCommand<*>, property: KProperty<*>): T = getValue()
