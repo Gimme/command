@@ -75,6 +75,7 @@ abstract class PropertyCommand<out R>(
         private var name: String? = null
         private var defaultValue: DefaultValue? = null
         private var form: CommandParameter.Form? = null
+        private var suggestions: (() -> Set<String>)? = null
 
         fun name(name: String) = apply { this.name = name }
 
@@ -87,6 +88,8 @@ abstract class PropertyCommand<out R>(
         fun defaultValue(value: String?, representation: String? = value) = default(value, representation)
 
         private fun form(form: CommandParameter.Form) = apply { this.form = form }
+
+        private fun suggestions(suggestions: () -> Set<String>) = apply { this.suggestions = suggestions }
 
         @JvmSynthetic
         override operator fun provideDelegate(thisRef: PropertyCommand<*>, property: KProperty<*>): Param<T> {
@@ -128,18 +131,19 @@ abstract class PropertyCommand<out R>(
             val klass = klass!! // TODO: Error message on null
             val form = form ?: CommandParameter.Form.VALUE
 
+            val type = ParameterTypes.get(klass)
+            val suggestions = suggestions ?: type.values ?: { setOf() }
+
             val id = name.splitCamelCase("-")
             val displayName = name.splitCamelCase(" ")
             val flags = setOf<Char>() // TODO
-
-            val type = ParameterTypes.get(klass)
 
             val param = Param<S>(
                 id = id,
                 displayName = displayName,
                 type = type,
                 form = form,
-                suggestions = type.values ?: { setOf() },
+                suggestions = suggestions,
                 description = null, // TODO
                 flags = flags,
                 defaultValue = defaultValue
