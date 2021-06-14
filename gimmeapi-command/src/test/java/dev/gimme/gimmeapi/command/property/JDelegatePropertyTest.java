@@ -39,7 +39,7 @@ class JDelegatePropertyTest {
         );
 
         assertFalse(command.called[0]);
-        command.execute(UtilsKt.getDUMMY_COMMAND_SENDER(), input);
+        command.executeBy(UtilsKt.getDUMMY_COMMAND_SENDER(), input);
         assertTrue(command.called[0]);
     }
 
@@ -80,7 +80,7 @@ class JDelegatePropertyTest {
         };
 
         assertFalse(called[0]);
-        command.execute(commandSender, Map.of());
+        command.executeBy(commandSender, Map.of());
         assertTrue(called[0]);
     }
 }

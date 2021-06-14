@@ -29,15 +29,15 @@ abstract class BaseCommand<out T>(
     @JvmOverloads
     constructor(name: String, parent: CommandNode? = null) : this(name, parent, setOf())
 
-    final override fun execute(commandSender: CommandSender, args: Map<CommandParameter, Any?>): T {
+    final override fun executeBy(commandSender: CommandSender, args: Map<CommandParameter, Any?>): T {
         if (senderTypes?.any { commandSender::class.isSubclassOf(it) } == false) throw ErrorCode.INCOMPATIBLE_SENDER.createException()
 
-        return executeCommand(commandSender, args)
+        return execute(commandSender, args)
     }
 
     /**
-     * @see execute
+     * @see executeBy
      */
     @Throws(CommandException::class)
-    protected abstract fun executeCommand(commandSender: CommandSender, args: Map<CommandParameter, Any?>): T
+    protected abstract fun execute(commandSender: CommandSender, args: Map<CommandParameter, Any?>): T
 }

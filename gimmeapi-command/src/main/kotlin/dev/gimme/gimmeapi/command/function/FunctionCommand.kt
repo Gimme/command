@@ -29,7 +29,7 @@ import kotlin.reflect.jvm.jvmErasure
  * marked with @[CommandExecutor].
  *
  * If a method in this is marked with @[CommandExecutor], the command's [parameters] and [usage] are automatically
- * derived from it, and it gets called called when the command is [execute]d.
+ * derived from it, and it gets called called when the command is executed.
  *
  * @param T the response type
  */
@@ -66,7 +66,7 @@ abstract class FunctionCommand<out T>(
      * @throws CommandException if the command execution was unsuccessful
      */
     @Throws(CommandException::class)
-    override fun executeCommand(commandSender: CommandSender, args: Map<CommandParameter, Any?>): T {
+    override fun execute(commandSender: CommandSender, args: Map<CommandParameter, Any?>): T {
         val function = commandExecutorFunction
 
         val params: List<KParameter> = function.parameters

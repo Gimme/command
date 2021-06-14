@@ -34,7 +34,7 @@ interface Command<out T> : CommandNode {
      * @throws CommandException if the command execution was unsuccessful
      */
     @Throws(CommandException::class)
-    fun execute(commandSender: CommandSender, args: Map<CommandParameter, Any?>): T
+    fun executeBy(commandSender: CommandSender, args: Map<CommandParameter, Any?>): T
 
     // TODO: handle vararg parameter types
     /**

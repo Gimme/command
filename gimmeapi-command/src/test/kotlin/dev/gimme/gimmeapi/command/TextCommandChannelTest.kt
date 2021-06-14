@@ -25,7 +25,7 @@ class TextCommandChannelTest {
                 })
             }
 
-            override fun execute(commandSender: CommandSender, args: Map<CommandParameter, Any?>) {
+            override fun executeBy(commandSender: CommandSender, args: Map<CommandParameter, Any?>) {
                 actualArgs = args.values
             }
         }

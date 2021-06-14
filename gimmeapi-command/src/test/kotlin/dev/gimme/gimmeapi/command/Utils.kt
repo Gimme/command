@@ -15,7 +15,7 @@ val DUMMY_COMMAND = object : DefaultBaseCommand("test") {
     override var usage = ""
     override var parameters = CommandParameterSet(listOf())
 
-    override fun execute(commandSender: CommandSender, args: Map<CommandParameter, Any?>) {}
+    override fun executeBy(commandSender: CommandSender, args: Map<CommandParameter, Any?>) {}
 }
 
 open class DefaultBaseCommand(
@@ -29,5 +29,5 @@ open class DefaultBaseCommand(
     override var parameters = CommandParameterSet()
     override var senderTypes: Set<KClass<out CommandSender>>? = null
 
-    override fun execute(commandSender: CommandSender, args: Map<CommandParameter, Any?>) {}
+    override fun executeBy(commandSender: CommandSender, args: Map<CommandParameter, Any?>) {}
 }
