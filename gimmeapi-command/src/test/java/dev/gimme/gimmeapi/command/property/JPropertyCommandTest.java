@@ -31,7 +31,8 @@ class JPropertyCommandTest {
     static List<Object> args = List.of(
             "abc",
             123,
-            "a",
+            0.0,
+            0.5,
             "x"
     );
 
@@ -71,7 +72,7 @@ class PCmd extends PropertyCommand<Void> {
             .name("bb")
             .build();
 
-    private final Param<List<String>> list = param(String.class)
+    private final Param<List<Double>> list = param(Double.class)
             .name("list")
             .buildList();
 
@@ -91,8 +92,8 @@ class PCmd extends PropertyCommand<Void> {
 
         assertEquals(args.get(0), a.get());
         assertEquals(args.get(1), b.get());
-        assertIterableEquals(List.of(args.get(2)), list.get());
-        assertIterableEquals(Set.of(args.get(3)), set.get());
+        assertIterableEquals(List.of(args.get(2), args.get(3)), list.get());
+        assertIterableEquals(Set.of(args.get(4)), set.get());
 
         return null;
     }

@@ -8,6 +8,7 @@ import dev.gimme.gimmeapi.command.manager.CommandManager
 import dev.gimme.gimmeapi.command.manager.TextCommandManager
 import dev.gimme.gimmeapi.command.parameter.CommandParameter
 import dev.gimme.gimmeapi.command.sender.CommandSender
+import java.util.*
 
 /**
  * Represents a text-based command channel with, for example, a chat box or a command line.
@@ -72,7 +73,7 @@ abstract class TextCommandChannel(
         val commandLabel = commandPath.joinToString(" ")
 
         // Remove command name, leaving only the arguments
-        val argsInput = commandInput.removePrefix(commandLabel).removePrefix(" ")
+        val argsInput = commandInput.removePrefix(commandLabel)
 
         val args = parseArgsInput(argsInput, commandSearchResult.command)
 
@@ -83,29 +84,66 @@ abstract class TextCommandChannel(
 
     @Throws(CommandException::class)
     private fun parseArgsInput(argsInput: String, command: Command<*>): Map<CommandParameter, Any?> {
-        // Split into words on spaces, ignoring spaces between two quotation marks
-        val tokens = argsInput.split("\\s(?=(?:[^\"]*\"[^\"]*\")*[^\"]*\$)".toRegex())
-            .map { s -> s.replace("\"", "") }
+        val tokens = if (argsInput.isEmpty()) {
+            emptyList()
+        } else {
+            // Split into words on spaces, ignoring spaces between two quotation marks
+            argsInput
+                .removePrefix(" ")
+                .split("\\s(?=(?:[^\"]*\"[^\"]*\")*[^\"]*\$)".toRegex())
+                .map { s -> s.replace("\"", "") }
+        }
 
+        return parseArgsInput(tokens, command)
+    }
+
+    @Throws(CommandException::class)
+    private fun parseArgsInput(argsInput: List<String>, command: Command<*>): Map<CommandParameter, Any?> {
         // TODO: get named args
-        // TODO: throw CommandException if invalid args (e.g., too few, too many, wrong type)
-        // TODO: if arg is missing: if optional, supply default value, else throw CommandException: missing required
-        // TODO: default values in case of collections should accept empty "" or null for 0 and spaced "a b" for multiple values
-        // TODO: handle vararg
 
-        return command.parameters
-            .mapIndexed { index, commandParameter ->
-                val token = tokens[index]
-                val type = commandParameter.type
-                val value = type.parse(token)
-                val arg = when(commandParameter.form) {
-                    CommandParameter.Form.LIST -> listOf(value)
-                    CommandParameter.Form.SET -> setOf(value)
-                    else -> value
-                }
-                Pair(commandParameter, arg)
+        val parameterStack: Queue<CommandParameter> = ArrayDeque(command.parameters)
+        val tokenStack: Queue<String> = ArrayDeque(argsInput)
+
+        // TODO: default values in case of collections should accept empty "" or null for 0 and spaced "a b" for multiple values
+        // TODO: handle multiple vararg parameters?
+
+        val args = mutableMapOf<CommandParameter, MutableList<Any?>>()
+
+        while (parameterStack.isNotEmpty()) {
+            val parameter = parameterStack.peek()
+
+            val stringArg: String? = tokenStack.peek() ?: run {
+                if (parameter.defaultValue == null) throw ErrorCode.REQUIRED_PARAMETER.createException(parameter.id)
+                parameter.defaultValue.value
             }
-            .toMap()
+
+            val typedArg = try {
+                stringArg?.let { parameter.type.parse(it) }
+            } catch (e: CommandException) {
+                parameterStack.remove()
+                if (args[parameter] == null || parameterStack.isEmpty()) throw e
+                continue
+            }
+            tokenStack.poll()
+
+            args[parameter] = (args[parameter] ?: mutableListOf()).apply { add(typedArg) }
+
+            if (parameter.form.isCollection && tokenStack.isNotEmpty()) continue
+            parameterStack.remove()
+        }
+
+        if (tokenStack.isNotEmpty()) throw ErrorCode.TOO_MANY_ARGUMENTS.createException(tokenStack.toList())
+
+        assert(parameterStack.isEmpty())
+        assert(tokenStack.isEmpty())
+
+        return args.entries.associate {
+            it.key to if (it.value.contains(null)) null else when(it.key.form) {
+                CommandParameter.Form.LIST -> it.value
+                CommandParameter.Form.SET -> it.value.toSet()
+                else -> it.value.first()
+            }
+        }
     }
 
     /**

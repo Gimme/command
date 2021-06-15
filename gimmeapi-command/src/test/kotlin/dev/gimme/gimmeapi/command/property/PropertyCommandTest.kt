@@ -30,6 +30,7 @@ internal class PropertyCommandTest {
             "abc",
             123,
             1.3,
+            0.0,
             "x",
         )
 
@@ -52,8 +53,8 @@ internal class PropertyCommandTest {
                     { assertEquals(sender, sender) },
                     { assertEquals(args[0], a) },
                     { assertEquals(args[1], b.get()) },
-                    { assertEquals(listOf(args[2]), list) },
-                    { assertEquals(setOf(args[3]), set) },
+                    { assertEquals(listOf(args[2], args[3]), list) },
+                    { assertEquals(setOf(args[4]), set) },
                 )
             }
         }
