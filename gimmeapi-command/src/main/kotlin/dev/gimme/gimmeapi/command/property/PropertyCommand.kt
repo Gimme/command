@@ -85,16 +85,14 @@ abstract class PropertyCommand<out R>(
         fun name(name: String) = apply { this.name = name }
 
         /** @see DefaultValue */
+        @JvmOverloads
+        @JvmName("defaultValue")
         fun default(value: String?, representation: String? = value) =
             apply { this.defaultValue = DefaultValue(value, representation) }
 
-        /** @see DefaultValue */
-        @JvmOverloads
-        fun defaultValue(value: String?, representation: String? = value) = default(value, representation)
-
         private fun form(form: CommandParameter.Form) = apply { this.form = form }
 
-        private fun suggestions(suggestions: () -> Set<String>) = apply { this.suggestions = suggestions }
+        fun suggestions(suggestions: () -> Set<String>) = apply { this.suggestions = suggestions }
 
         @JvmSynthetic
         override operator fun provideDelegate(thisRef: PropertyCommand<*>, property: KProperty<*>): Param<T> {
@@ -178,6 +176,7 @@ abstract class PropertyCommand<out R>(
         defaultValue = defaultValue
     ), CommandDelegate<T> {
 
+        @JvmSynthetic
         override operator fun getValue(thisRef: PropertyCommand<*>, property: KProperty<*>): T = get()
 
         @Suppress("UNCHECKED_CAST")
