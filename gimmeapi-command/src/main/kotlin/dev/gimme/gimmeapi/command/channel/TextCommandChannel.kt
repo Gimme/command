@@ -175,7 +175,7 @@ abstract class TextCommandChannel(
             }
         }
 
-        return this.getCompletionSuggestions(namedArgs, flags, orderedArgs)
+        return this.getCompletionSuggestions(namedArgs, flags, orderedArgs, includeFlags = currentWord.startsWith("-"))
             .filter { it.startsWith(currentWord) }
             .toSet()
     }
