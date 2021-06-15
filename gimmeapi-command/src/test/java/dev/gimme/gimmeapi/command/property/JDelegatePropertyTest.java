@@ -1,5 +1,6 @@
 package dev.gimme.gimmeapi.command.property;
 
+import dev.gimme.gimmeapi.command.SenderTypes;
 import dev.gimme.gimmeapi.command.UtilsKt;
 import dev.gimme.gimmeapi.command.parameter.CommandParameter;
 import dev.gimme.gimmeapi.command.sender.CommandSender;
@@ -45,8 +46,6 @@ class JDelegatePropertyTest {
 
     @Test
     void converts_delegate_properties_to_command_senders() {
-
-
         var commandSender = new Sender1();
 
         final boolean[] called = {false};
@@ -74,6 +73,33 @@ class JDelegatePropertyTest {
                 assertEquals("sender1", senderSub1.getValue().getName());
                 assertEquals(senderSub1.getValue().getName(), senderSuper.getValue().getName());
                 assertNull(senderSub2.getValue());
+
+                return null;
+            }
+        };
+
+        assertFalse(called[0]);
+        command.executeBy(commandSender, Map.of());
+        assertTrue(called[0]);
+    }
+
+    @Test
+    void handles_custom_adapted_senders() {
+        SenderTypes.INSTANCE.registerAdapter(Player.class, PlayerSender.class, (PlayerSender sender) -> sender.player);
+
+        var commandSender = new PlayerSender();
+
+        final boolean[] called = {false};
+
+        var command = new PropertyCommand<Void>("test-command") {
+
+            private final Sender<Player> sender = sender(Player.class);
+
+            @Override
+            public Void call() {
+                called[0] = true;
+
+                assertEquals(commandSender.player, sender.getValue());
 
                 return null;
             }
@@ -168,3 +194,20 @@ class Sender2 implements CommandSender {
     public void sendMessage(@NotNull String message) {
     }
 }
+
+class PlayerSender implements CommandSender {
+
+    Player player = new Player();
+
+    @NotNull
+    @Override
+    public String getName() {
+        return "sender2";
+    }
+
+    @Override
+    public void sendMessage(@NotNull String message) {
+    }
+}
+
+class Player {}

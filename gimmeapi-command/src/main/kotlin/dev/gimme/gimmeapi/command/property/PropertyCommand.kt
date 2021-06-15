@@ -2,6 +2,7 @@ package dev.gimme.gimmeapi.command.property
 
 import dev.gimme.gimmeapi.command.BaseCommand
 import dev.gimme.gimmeapi.command.ParameterTypes
+import dev.gimme.gimmeapi.command.SenderTypes
 import dev.gimme.gimmeapi.command.node.CommandNode
 import dev.gimme.gimmeapi.command.parameter.CommandParameter
 import dev.gimme.gimmeapi.command.parameter.DefaultValue
@@ -38,10 +39,9 @@ abstract class PropertyCommand<out R>(
 
     final override var usage: String = "" // TODO
 
-    private var requiredSender: KClass<out CommandSender>? = null
-    private var optionalSenders: MutableSet<KClass<out CommandSender>>? = null
-    final override val senderTypes: Set<KClass<out CommandSender>>?
-        get() = requiredSender?.let { setOf(it) } ?: optionalSenders
+    private var requiredSender: KClass<*>? = null
+    private var optionalSenders: MutableSet<KClass<*>>? = null
+    override val senderTypes: Set<KClass<*>>? get() = requiredSender?.let { setOf(it) } ?: optionalSenders
 
     private lateinit var _commandSender: CommandSender
     private lateinit var _args: Map<CommandParameter, Any?>
@@ -56,14 +56,19 @@ abstract class PropertyCommand<out R>(
     abstract fun call(): R
 
     @JvmSynthetic
-    protected fun <T : CommandSender> sender(): SenderProperty<T> = SenderProperty()
+    protected fun <T> sender(): SenderProperty<T> = SenderProperty()
+
     @JvmSynthetic
-    protected fun <T : CommandSender> sender(klass: KClass<T>, required: Boolean = true): Sender<T> = createSenderDelegate(klass, required)
+    protected fun <T : Any> sender(klass: KClass<T>, required: Boolean = true): Sender<T> =
+        createSenderDelegate(klass, required)
+
     @JvmOverloads
-    protected fun <T : CommandSender> sender(klass: Class<T>, required: Boolean = true): Sender<T> = sender(klass.kotlin, required)
+    protected fun <T : Any> sender(klass: Class<T>, required: Boolean = true): Sender<T> =
+        sender(klass.kotlin, required)
 
     @JvmSynthetic
     protected fun <T> param(): ParamBuilder<T> = ParamBuilder(null)
+
     @JvmSynthetic
     protected fun <T : Any> param(klass: KClass<T>): ParamBuilder<T> = ParamBuilder(klass)
     protected fun <T : Any> param(klass: Class<T>): ParamBuilder<T> = ParamBuilder(klass.kotlin)
@@ -179,7 +184,7 @@ abstract class PropertyCommand<out R>(
         fun getArg() = _args[this] as T
     }
 
-    private fun <T : CommandSender> createSenderDelegate(klass: KClass<T>, required: Boolean): Sender<T> {
+    private fun <T> createSenderDelegate(klass: KClass<*>, required: Boolean): Sender<T> {
         if (required) {
             if (requiredSender != null) throw IllegalStateException("Only one sender type can be required (non-null)") // TODO: exception type
             requiredSender = klass
@@ -192,30 +197,34 @@ abstract class PropertyCommand<out R>(
         return Sender(klass)
     }
 
-    protected inner class SenderProperty<out T : CommandSender> internal constructor() : CommandProperty<T> {
+    protected inner class SenderProperty<out T> internal constructor() : CommandProperty<T> {
 
         @JvmSynthetic
         override operator fun provideDelegate(thisRef: PropertyCommand<*>, property: KProperty<*>): CommandDelegate<T> {
             @Suppress("UNCHECKED_CAST")
-            val klass = property.returnType.jvmErasure as KClass<T>
+            val klass = property.returnType.jvmErasure
             val required = !property.returnType.isMarkedNullable
 
-            return sender(klass, required)
+            return createSenderDelegate(klass, required)
         }
     }
 
-    protected inner class Sender<out T : CommandSender?>(private val klass: KClass<*>) : CommandDelegate<T> {
+    protected inner class Sender<out T>(private val klass: KClass<*>) : CommandDelegate<T> {
 
         @JvmSynthetic
         override operator fun getValue(thisRef: PropertyCommand<*>, property: KProperty<*>): T = getValue()
 
+        @Suppress("UNCHECKED_CAST")
         fun getValue(): T {
-            @Suppress("UNCHECKED_CAST")
-            return if (_commandSender::class.isSubclassOf(klass)) {
-                _commandSender as T
-            } else {
-                null as T
+            if (_commandSender::class.isSubclassOf(klass)) {
+                return _commandSender as T
             }
+
+            SenderTypes.adapt(_commandSender, klass)?.let {
+                return it as T
+            }
+
+            return null as T
         }
     }
 }

@@ -23,14 +23,16 @@ abstract class BaseCommand<out T>(
     override var description: String = "",
     override var usage: String = "",
     override var parameters: CommandParameterSet = CommandParameterSet(),
-    override val senderTypes: Set<KClass<out CommandSender>>? = null,
+    override val senderTypes: Set<KClass<*>>? = null,
 ) : BaseCommandNode(name, parent, aliases), Command<T> {
 
     @JvmOverloads
     constructor(name: String, parent: CommandNode? = null) : this(name, parent, setOf())
 
     final override fun executeBy(commandSender: CommandSender, args: Map<CommandParameter, Any?>): T {
-        if (senderTypes?.any { commandSender::class.isSubclassOf(it) } == false) throw ErrorCode.INCOMPATIBLE_SENDER.createException()
+        if (senderTypes?.any {
+                commandSender::class.isSubclassOf(it) || SenderTypes.adapt(commandSender, it) != null
+            } == false) throw ErrorCode.INCOMPATIBLE_SENDER.createException()
 
         return execute(commandSender, args)
     }

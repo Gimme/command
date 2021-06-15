@@ -23,7 +23,7 @@ interface Command<out T> : CommandNode {
     var description: String
     var usage: String
     var parameters: CommandParameterSet
-    val senderTypes: Set<KClass<out CommandSender>>?
+    val senderTypes: Set<KClass<*>>?
 
     /**
      * Executes this command as the [commandSender] with the [args] mapping of parameters to arguments and returns the

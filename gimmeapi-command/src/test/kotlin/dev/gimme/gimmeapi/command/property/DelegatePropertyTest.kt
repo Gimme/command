@@ -1,6 +1,7 @@
 package dev.gimme.gimmeapi.command.property
 
 import dev.gimme.gimmeapi.command.DUMMY_COMMAND_SENDER
+import dev.gimme.gimmeapi.command.SenderTypes
 import dev.gimme.gimmeapi.command.sender.CommandSender
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
@@ -92,6 +93,40 @@ internal class DelegatePropertyTest {
                 assertEquals("sender1", senderSub1!!.name)
                 assertEquals(senderSub1!!.name, senderSuper.name)
                 assertNull(senderSub2)
+            }
+        }
+
+        assertFalse(called)
+        command.executeBy(commandSender, mapOf())
+        assertTrue(called)
+    }
+
+    @Test
+    fun `Handles custom adapted senders`() {
+        open class Player {
+            val name = "player"
+        }
+        open class PlayerSender(val player: Player) : CommandSender {
+            override val name = "sender"
+
+            override fun sendMessage(message: String) {}
+        }
+
+        SenderTypes.registerAdapter { sender: PlayerSender -> sender.player }
+
+        val commandSender = PlayerSender(Player())
+
+        var called = false
+
+        val command = object : PropertyCommand<Unit>("test-command") {
+
+            val player: Player by sender()
+
+            override fun call() {
+                called = true
+
+                assertEquals(commandSender.player, player)
+                assertEquals("player", player.name)
             }
         }
 
