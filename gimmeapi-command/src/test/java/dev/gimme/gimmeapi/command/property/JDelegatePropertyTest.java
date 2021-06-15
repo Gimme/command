@@ -68,11 +68,11 @@ class JDelegatePropertyTest {
             public Void call() {
                 called[0] = true;
 
-                assertEquals(commandSender, senderSuper.getValue());
-                assertEquals(commandSender, senderSub1.getValue());
-                assertEquals("sender1", senderSub1.getValue().getName());
-                assertEquals(senderSub1.getValue().getName(), senderSuper.getValue().getName());
-                assertNull(senderSub2.getValue());
+                assertEquals(commandSender, senderSuper.get());
+                assertEquals(commandSender, senderSub1.get());
+                assertEquals("sender1", senderSub1.get().getName());
+                assertEquals(senderSub1.get().getName(), senderSuper.get().getName());
+                assertNull(senderSub2.get());
 
                 return null;
             }
@@ -99,7 +99,7 @@ class JDelegatePropertyTest {
             public Void call() {
                 called[0] = true;
 
-                assertEquals(commandSender.player, sender.getValue());
+                assertEquals(commandSender.player, sender.get());
 
                 return null;
             }
@@ -158,14 +158,14 @@ class DelegateTestCommand extends PropertyCommand<Void> {
         var listInput = JDelegatePropertyTest.listInput;
         var setInput = JDelegatePropertyTest.setInput;
 
-        assertEquals("a", string.getArg());
-        assertEquals(1, i.getArg());
-        assertEquals(0.5, d.getArg());
-        assertEquals(true, b.getArg());
-        assertIterableEquals(listInput, list.getArg());
-        assertIterableEquals(setInput, set.getArg());
-        assertIterableEquals(listInput, collection.getArg());
-        assertIterableEquals(listInput, iterable.getArg());
+        assertEquals("a", string.get());
+        assertEquals(1, i.get());
+        assertEquals(0.5, d.get());
+        assertEquals(true, b.get());
+        assertIterableEquals(listInput, list.get());
+        assertIterableEquals(setInput, set.get());
+        assertIterableEquals(listInput, collection.get());
+        assertIterableEquals(listInput, iterable.get());
 
         return null;
     }

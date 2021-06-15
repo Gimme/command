@@ -178,10 +178,10 @@ abstract class PropertyCommand<out R>(
         defaultValue = defaultValue
     ), CommandDelegate<T> {
 
-        override operator fun getValue(thisRef: PropertyCommand<*>, property: KProperty<*>): T = getArg()
+        override operator fun getValue(thisRef: PropertyCommand<*>, property: KProperty<*>): T = get()
 
         @Suppress("UNCHECKED_CAST")
-        fun getArg() = _args[this] as T
+        fun get() = _args[this] as T
     }
 
     private fun <T> createSenderDelegate(klass: KClass<*>, required: Boolean): Sender<T> {
@@ -212,10 +212,10 @@ abstract class PropertyCommand<out R>(
     protected inner class Sender<out T>(private val klass: KClass<*>) : CommandDelegate<T> {
 
         @JvmSynthetic
-        override operator fun getValue(thisRef: PropertyCommand<*>, property: KProperty<*>): T = getValue()
+        override operator fun getValue(thisRef: PropertyCommand<*>, property: KProperty<*>): T = get()
 
         @Suppress("UNCHECKED_CAST")
-        fun getValue(): T {
+        fun get(): T {
             if (_commandSender::class.isSubclassOf(klass)) {
                 return _commandSender as T
             }

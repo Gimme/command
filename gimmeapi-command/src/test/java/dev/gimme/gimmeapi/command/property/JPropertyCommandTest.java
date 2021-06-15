@@ -89,10 +89,10 @@ class PCmd extends PropertyCommand<Void> {
 
         var args = JPropertyCommandTest.args;
 
-        assertEquals(args.get(0), a.getArg());
-        assertEquals(args.get(1), b.getArg());
-        assertIterableEquals(List.of(args.get(2)), list.getArg());
-        assertIterableEquals(Set.of(args.get(3)), set.getArg());
+        assertEquals(args.get(0), a.get());
+        assertEquals(args.get(1), b.get());
+        assertIterableEquals(List.of(args.get(2)), list.get());
+        assertIterableEquals(Set.of(args.get(3)), set.get());
 
         return null;
     }

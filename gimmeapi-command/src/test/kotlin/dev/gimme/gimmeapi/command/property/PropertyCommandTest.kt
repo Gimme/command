@@ -51,7 +51,7 @@ internal class PropertyCommandTest {
                 assertAll(
                     { assertEquals(sender, sender) },
                     { assertEquals(args[0], a) },
-                    { assertEquals(args[1], b.getArg()) },
+                    { assertEquals(args[1], b.get()) },
                     { assertEquals(listOf(args[2]), list) },
                     { assertEquals(setOf(args[3]), set) },
                 )
