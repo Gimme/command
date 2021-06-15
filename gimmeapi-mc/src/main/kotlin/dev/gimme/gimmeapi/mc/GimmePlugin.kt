@@ -1,10 +1,14 @@
 package dev.gimme.gimmeapi.mc
 
 import dev.gimme.gimmeapi.command.ParameterTypes
+import dev.gimme.gimmeapi.command.SenderTypes
 import dev.gimme.gimmeapi.command.channel.TextCommandChannel
 import dev.gimme.gimmeapi.command.manager.CommandManager
 import dev.gimme.gimmeapi.mc.command.ChatCommandChannel
+import dev.gimme.gimmeapi.mc.command.McCommandSender
 import org.bukkit.NamespacedKey
+import org.bukkit.command.ConsoleCommandSender
+import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
 
 /**
@@ -25,7 +29,7 @@ abstract class GimmePlugin : JavaPlugin() {
         private set
 
     init {
-        registerSpigotParameterTypes()
+        registerBaseSpigotTypes()
     }
 
     final override fun onEnable() {
@@ -52,7 +56,7 @@ abstract class GimmePlugin : JavaPlugin() {
      */
     protected abstract fun onStop()
 
-    private fun registerSpigotParameterTypes() {
+    private fun registerBaseSpigotTypes() {
         ParameterTypes.register(values = { server.onlinePlayers.map { it.name }.toSet() }) { server.getPlayerExact(it) }
         ParameterTypes.register(values = { server.worlds.map { it.name }.toSet() }) { server.getWorld(it) }
         ParameterTypes.register(values = {
@@ -62,5 +66,9 @@ abstract class GimmePlugin : JavaPlugin() {
             @Suppress("DEPRECATION")
             if (pair.size != 2) null else server.getAdvancement(NamespacedKey(pair[0], pair[1]))
         }
+
+        SenderTypes.registerAdapter { s: McCommandSender -> s.spigotCommandSender }
+        SenderTypes.registerAdapter { s: McCommandSender -> s.spigotCommandSender as? Player }
+        SenderTypes.registerAdapter { s: McCommandSender -> s.spigotCommandSender as? ConsoleCommandSender }
     }
 }

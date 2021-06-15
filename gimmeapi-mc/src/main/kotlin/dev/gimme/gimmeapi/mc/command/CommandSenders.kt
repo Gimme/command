@@ -1,18 +1,19 @@
 package dev.gimme.gimmeapi.mc.command
 
-import dev.gimme.gimmeapi.command.sender.CommandSender as GimmeCommandSender
-import org.bukkit.command.CommandSender
+import dev.gimme.gimmeapi.command.sender.CommandSender
+import org.bukkit.command.CommandSender as SpigotCommandSender
 
 /**
- * Returns an adapter object with this [CommandSender] as a [GimmeCommandSender].
+ * Returns an adapter object with this [SpigotCommandSender] as a [CommandSender].
  */
-internal fun CommandSender.asGimmeCommandSender(): GimmeCommandSender {
+internal fun SpigotCommandSender.asGimmeCommandSender(): CommandSender = McCommandSender(this)
 
-    val spigotCommandSender = this
+/**
+ * TODO
+ */
+class McCommandSender(val spigotCommandSender: SpigotCommandSender) : CommandSender {
 
-    return object : GimmeCommandSender {
-        override val name = spigotCommandSender.name
+    override val name = spigotCommandSender.name
 
-        override fun sendMessage(message: String) = spigotCommandSender.sendMessage(message)
-    }
+    override fun sendMessage(message: String) = spigotCommandSender.sendMessage(message)
 }
