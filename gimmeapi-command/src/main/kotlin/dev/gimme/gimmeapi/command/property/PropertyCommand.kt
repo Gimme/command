@@ -130,7 +130,7 @@ abstract class PropertyCommand<out R>(
         fun buildSet(): Param<Set<T>> = form(CommandParameter.Form.SET).buildOfType()
 
         private fun <S> buildOfType(): Param<S> {
-            val name = name!! // TODO: Error message on null
+            val name = name ?: "param${parameters.size + 1}"
             val klass = klass!! // TODO: Error message on null
             val form = form ?: CommandParameter.Form.VALUE
 
