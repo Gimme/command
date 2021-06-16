@@ -58,19 +58,13 @@ abstract class PropertyCommand<out R>(
     @JvmSynthetic
     protected fun <T> sender(): SenderProperty<T> = SenderProperty()
 
-    @JvmSynthetic
-    protected fun <T : Any> sender(klass: KClass<T>, required: Boolean = true): Sender<T> =
-        createSenderDelegate(klass, required)
-
     @JvmOverloads
-    protected fun <T : Any> sender(klass: Class<T>, required: Boolean = true): Sender<T> =
-        sender(klass.kotlin, required)
+    protected fun <T : Any> sender(klass: Class<T>, optional: Boolean = false): Sender<T> =
+        createSenderDelegate(klass.kotlin, optional)
 
     @JvmSynthetic
     protected fun <T> param(): ParamBuilder<T> = ParamBuilder(null)
 
-    @JvmSynthetic
-    protected fun <T : Any> param(klass: KClass<T>): ParamBuilder<T> = ParamBuilder(klass)
     protected fun <T : Any> param(klass: Class<T>): ParamBuilder<T> = ParamBuilder(klass.kotlin)
 
     protected inner class ParamBuilder<out T> internal constructor(
@@ -183,14 +177,12 @@ abstract class PropertyCommand<out R>(
         fun get() = _args[this] as T
     }
 
-    private fun <T> createSenderDelegate(klass: KClass<*>, required: Boolean): Sender<T> {
-        if (required) {
-            if (requiredSender != null) throw IllegalStateException("Only one sender type can be required (non-null)") // TODO: exception type
+    private fun <T> createSenderDelegate(klass: KClass<*>, optional: Boolean): Sender<T> {
+        if (!optional) {
+            if (requiredSender != null) throw IllegalStateException("Only one sender type can be required (i.e., non-null)") // TODO: exception type
             requiredSender = klass
         } else {
-            optionalSenders?.add(klass) ?: run {
-                optionalSenders = mutableSetOf(klass)
-            }
+            optionalSenders = (optionalSenders ?: mutableSetOf()).apply { add(klass) }
         }
 
         return Sender(klass)
@@ -202,9 +194,9 @@ abstract class PropertyCommand<out R>(
         override operator fun provideDelegate(thisRef: PropertyCommand<*>, property: KProperty<*>): CommandDelegate<T> {
             @Suppress("UNCHECKED_CAST")
             val klass = property.returnType.jvmErasure
-            val required = !property.returnType.isMarkedNullable
+            val optional = property.returnType.isMarkedNullable
 
-            return createSenderDelegate(klass, required)
+            return createSenderDelegate(klass, optional)
         }
     }
 
