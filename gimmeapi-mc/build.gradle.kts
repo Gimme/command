@@ -36,7 +36,7 @@ tasks.withType<KotlinCompile>() {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_13
+    sourceCompatibility = JavaVersion.VERSION_11
     withSourcesJar()
 }
 
