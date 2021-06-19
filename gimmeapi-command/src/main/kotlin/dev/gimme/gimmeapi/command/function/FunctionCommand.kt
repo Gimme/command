@@ -26,9 +26,9 @@ import kotlin.reflect.jvm.jvmErasure
 
 /**
  * Represents an easy-to-set-up command with automatic generation of some properties derived from a member function
- * marked with @[CommandExecutor].
+ * marked with @[CommandFunction].
  *
- * If a method in this is marked with @[CommandExecutor], the command's [parameters] and [usage] are automatically
+ * If a method in this is marked with @[CommandFunction], the command's [parameters] and [usage] are automatically
  * derived from it, and it gets called called when the command is executed.
  *
  * @param T the response type
@@ -50,8 +50,8 @@ abstract class FunctionCommand<out T>(
     @JvmOverloads
     constructor(name: String, parent: CommandNode? = null) : this(name, parent, setOf())
 
-    private val commandExecutorFunction: KFunction<T> = getFirstCommandExecutorFunction()
-    private val commandExecutorAnnotation: CommandExecutor = commandExecutorFunction.findAnnotation()!!
+    private val commandFunction: KFunction<T> = getFirstCommandFunction()
+    private val commandFunctionAnnotation: CommandFunction = commandFunction.findAnnotation()!!
     private val baseCommandSenderType: KType = CommandSender::class.createType()
 
     final override var parameters: CommandParameterSet = generateParameters()
@@ -61,13 +61,13 @@ abstract class FunctionCommand<out T>(
      * Attempts to execute this command as the [commandSender] with the args mapping of parameters to arguments and
      * returns the result.
      *
-     * The [args] have to fit the parameters of the function annotated with @[CommandExecutor].
+     * The [args] have to fit the parameters of the function annotated with @[CommandFunction].
      *
      * @throws CommandException if the command execution was unsuccessful
      */
     @Throws(CommandException::class)
     override fun execute(commandSender: CommandSender, args: Map<CommandParameter, Any?>): T {
-        val function = commandExecutorFunction
+        val function = commandFunction
 
         val params: List<KParameter> = function.parameters
 
@@ -92,13 +92,13 @@ abstract class FunctionCommand<out T>(
     }
 
     /**
-     * Generates a set of [CommandParameter]s that matches the parameters of the [FunctionCommand.commandExecutorFunction] with default values from
-     * [FunctionCommand.commandExecutorAnnotation].
+     * Generates a set of [CommandParameter]s that matches the parameters of the [FunctionCommand.commandFunction] with default values from
+     * [FunctionCommand.commandFunctionAnnotation].
      */
     private fun generateParameters(): CommandParameterSet {
         val usedFlags = mutableSetOf<Char>()
 
-        val valueParameters = commandExecutorFunction.parameters
+        val valueParameters = commandFunction.parameters
             .filter { it.kind == KParameter.Kind.VALUE && !it.type.isSubtypeOf(baseCommandSenderType) }
 
         return CommandParameterSet(
@@ -107,7 +107,7 @@ abstract class FunctionCommand<out T>(
                 val id = name.splitCamelCase("-")
                 val displayName = name.splitCamelCase(" ")
                 val flags = generateFlags(id, usedFlags)
-                val defaultValue = commandExecutorAnnotation.getDefaultValue(valueParameters.indexOf(param))
+                val defaultValue = commandFunctionAnnotation.getDefaultValue(valueParameters.indexOf(param))
                 usedFlags.addAll(flags)
 
                 val jvmErasure = param.type.jvmErasure
@@ -176,31 +176,32 @@ abstract class FunctionCommand<out T>(
     }
 
     /**
-     * Returns the first found method that is annotated with @[CommandExecutor].
+     * Returns the first found method that is annotated with @[CommandFunction].
      *
      * @param T the command response type
-     * @throws IllegalStateException if there is no method annotated with @[CommandExecutor] or if it has the wrong return
+     * @throws IllegalStateException if there is no method annotated with @[CommandFunction] or if it has the wrong return
      * type
      */
     @Throws(CommandException::class)
-    internal fun <T> Command<T>.getFirstCommandExecutorFunction(): KFunction<T> {
+    internal fun <T> Command<T>.getFirstCommandFunction(): KFunction<T> {
         // Look through the public methods in the command class
         for (function in this::class.memberFunctions) {
             // Make sure it has the right annotation
-            if (!function.hasAnnotation<CommandExecutor>()) continue
+            if (!function.hasAnnotation<CommandFunction>()) continue
 
             return try {
                 @Suppress("UNCHECKED_CAST")
                 function as KFunction<T>
             } catch (e: ClassCastException) {
                 throw ClassCastException(
-                    "The return type: \"${function.returnType.jvmErasure.qualifiedName}\" of the" +
-                            " command executor function: \"${function.name}\" in the command: \"$id\" does not match the" +
-                            " command's return type."
+                    "The return type: \"${function.returnType.jvmErasure.qualifiedName}\"" +
+                            " of the command function: \"${function.name}\"" +
+                            " in ${this::class.qualifiedName}" +
+                            " does not match the command's return type."
                 )
             }
         }
 
-        throw IllegalStateException("No function marked with @${CommandExecutor::class.simpleName} in the command: \"${this.id}\"")
+        throw IllegalStateException("No function marked with @${CommandFunction::class.simpleName} in ${this::class.qualifiedName}")
     }
 }

@@ -47,7 +47,7 @@ class FCmd extends FunctionCommand<Void> {
         super(name);
     }
 
-    @CommandExecutor
+    @CommandFunction
     private void call(CommandSender sender, String a, int b) {
         called[0] = true;
         assertEquals(sender, sender);

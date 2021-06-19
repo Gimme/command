@@ -19,6 +19,6 @@ class LambdaCommand<T>(
     aliases = aliases,
 ) {
 
-    @CommandExecutor
+    @CommandFunction
     private fun foo(sender: CommandSender): T = execute(sender)
 }

@@ -1,7 +1,7 @@
 package dev.gimme.gimmeapi.command
 
 import dev.gimme.gimmeapi.command.commands.HelpCommand
-import dev.gimme.gimmeapi.command.function.CommandExecutor
+import dev.gimme.gimmeapi.command.function.CommandFunction
 import dev.gimme.gimmeapi.command.channel.TextCommandChannel
 import dev.gimme.gimmeapi.command.function.FunctionCommand
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -29,7 +29,7 @@ class HelpCommandTest {
     }
 
     private class DummyCommand(name: String) : FunctionCommand<Any>(name) {
-        @CommandExecutor
+        @CommandFunction
         fun execute() {
         }
     }

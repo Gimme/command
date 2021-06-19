@@ -1,7 +1,7 @@
 package dev.gimme.gimmeapi.command.commands
 
 import dev.gimme.gimmeapi.command.function.FunctionCommand
-import dev.gimme.gimmeapi.command.function.CommandExecutor
+import dev.gimme.gimmeapi.command.function.CommandFunction
 import dev.gimme.gimmeapi.command.channel.CommandChannel
 
 /**
@@ -10,7 +10,7 @@ import dev.gimme.gimmeapi.command.channel.CommandChannel
 class HelpCommand(private val commandChannel: CommandChannel<*>) : FunctionCommand<List<HelpCommand.CommandHelp>>("help") {
 
     /** Prints available commands. */
-    @CommandExecutor
+    @CommandFunction
     fun printCommands(): List<CommandHelp> {
 
         val list: MutableList<CommandHelp> = mutableListOf()

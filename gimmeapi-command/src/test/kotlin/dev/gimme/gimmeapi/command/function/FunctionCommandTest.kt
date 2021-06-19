@@ -32,7 +32,7 @@ internal class FunctionCommandTest {
 
         val command = object : FunctionCommand<Any?>(commandName) {
 
-            @CommandExecutor
+            @CommandFunction
             private fun call(sender: CommandSender, a: String, b: Int) {
                 called = true
 

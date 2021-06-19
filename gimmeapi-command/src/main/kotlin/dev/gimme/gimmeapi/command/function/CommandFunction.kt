@@ -1,11 +1,10 @@
 package dev.gimme.gimmeapi.command.function
 
-import dev.gimme.gimmeapi.command.Command
 import dev.gimme.gimmeapi.command.sender.CommandSender
 
 /**
- * Marks a function in a [Command] class as a command executor meaning it gets called when that command gets executed
- * with arguments that conform to the function's parameters.
+ * Marks a function in a [FunctionCommand] class as a command executor, meaning it gets called when that command gets
+ * executed with arguments that conform to the function's parameters.
  *
  * Supported parameter types:
  * - String
@@ -22,7 +21,7 @@ import dev.gimme.gimmeapi.command.sender.CommandSender
  */
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FUNCTION)
-annotation class CommandExecutor(
+annotation class CommandFunction(
     /**
      * A list of default values to be used for optional parameters when omitted, where each value corresponds to the
      * command parameter with the same index.
