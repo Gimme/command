@@ -8,6 +8,7 @@ import dev.gimme.gimmeapi.command.exception.ErrorCode
 import dev.gimme.gimmeapi.command.node.CommandNode
 import dev.gimme.gimmeapi.command.parameter.CommandParameter
 import dev.gimme.gimmeapi.command.parameter.CommandParameterSet
+import dev.gimme.gimmeapi.command.parameter.DefaultValue
 import dev.gimme.gimmeapi.command.sender.CommandSender
 import dev.gimme.gimmeapi.core.common.splitCamelCase
 import kotlin.reflect.KClass
@@ -107,7 +108,7 @@ abstract class FunctionCommand<out T>(
                 val id = name.splitCamelCase("-")
                 val displayName = name.splitCamelCase(" ")
                 val flags = generateFlags(id, usedFlags)
-                val defaultValue = commandFunctionAnnotation.getDefaultValue(valueParameters.indexOf(param))
+                val defaultValue: DefaultValue? = null
                 usedFlags.addAll(flags)
 
                 val jvmErasure = param.type.jvmErasure
