@@ -32,28 +32,32 @@ internal class FunctionCommandTest {
         val commandName = "k"
         val arg1 = "abc"
         val arg2 = 123
+        val arg3 = "three"
+        val arg4 = "four"
 
         val command = object : FunctionCommand<Any?>(commandName) {
 
             @CommandFunction
-            private fun call(s: CommandSender, a: String, b: Int) {
+            private fun call(s: CommandSender, a: String, b: Int, c: List<String>) {
                 called = true
 
                 assertEquals(s, sender)
                 assertEquals(arg1, a)
                 assertEquals(arg2, b)
+                assertEquals(listOf(arg3, arg4), c)
             }
         }
 
         assertFalse(called)
 
         channel.commandManager.registerCommand(command)
-        channel.parseInput(sender, "$commandName $arg1 $arg2")
+        channel.parseInput(sender, "$commandName $arg1 $arg2 $arg3 $arg4")
 
         assertTrue(called)
 
         assertNotNull(command.parameters["a"])
         assertNotNull(command.parameters["b"])
+        assertNotNull(command.parameters["c"])
     }
 
     @Test
