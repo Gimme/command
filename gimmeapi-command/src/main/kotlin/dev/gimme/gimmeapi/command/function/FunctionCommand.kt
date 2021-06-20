@@ -147,11 +147,11 @@ abstract class FunctionCommand<out T>(
 
                 val jvmErasure = param.type.jvmErasure
                 val form = when {
-                    jvmErasure.isSuperclassOf(List::class) -> CommandParameter.Form.LIST
-                    jvmErasure.isSuperclassOf(Set::class) -> CommandParameter.Form.SET
+                    jvmErasure.isSuperclassOf(MutableList::class) -> CommandParameter.Form.LIST
+                    jvmErasure.isSuperclassOf(MutableSet::class) -> CommandParameter.Form.SET
                     else -> CommandParameter.Form.VALUE
                 }
-                val klass: KClass<*> = if (form != CommandParameter.Form.VALUE) {
+                val klass: KClass<*> = if (form.isCollection) {
                     param.type.arguments.firstOrNull()?.type?.jvmErasure
                         ?: throw RuntimeException("Unsupported parameter type: ${param.type}") // TODO: exception type
                 } else {

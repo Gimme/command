@@ -94,8 +94,8 @@ abstract class PropertyCommand<out R>(
 
             val jvmErasure = property.returnType.jvmErasure
             val form = when {
-                jvmErasure.isSuperclassOf(List::class) -> CommandParameter.Form.LIST
-                jvmErasure.isSuperclassOf(Set::class) -> CommandParameter.Form.SET
+                jvmErasure.isSuperclassOf(MutableList::class) -> CommandParameter.Form.LIST
+                jvmErasure.isSuperclassOf(MutableSet::class) -> CommandParameter.Form.SET
                 else -> CommandParameter.Form.VALUE
             }
             form(form)
