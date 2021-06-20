@@ -41,7 +41,9 @@ abstract class PropertyCommand<out R>(
 
     private var requiredSender: KClass<*>? = null
     private var optionalSenders: MutableSet<KClass<*>>? = null
-    override val senderTypes: Set<KClass<*>>? get() = requiredSender?.let { setOf(it) } ?: optionalSenders
+    @Suppress("UNUSED_PARAMETER")
+    override var senderTypes: Set<KClass<*>>? get() = requiredSender?.let { setOf(it) } ?: optionalSenders
+        set(value) {}
 
     private lateinit var _commandSender: CommandSender
     private lateinit var _args: Map<CommandParameter, Any?>

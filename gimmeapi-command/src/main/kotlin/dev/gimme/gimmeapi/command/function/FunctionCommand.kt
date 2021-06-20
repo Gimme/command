@@ -2,20 +2,13 @@ package dev.gimme.gimmeapi.command.function
 
 import dev.gimme.gimmeapi.command.BaseCommand
 import dev.gimme.gimmeapi.command.Command
-import dev.gimme.gimmeapi.command.ParameterTypes
 import dev.gimme.gimmeapi.command.SenderTypes
-import dev.gimme.gimmeapi.command.annotations.Parameter
 import dev.gimme.gimmeapi.command.annotations.Sender
-import dev.gimme.gimmeapi.command.annotations.getDefaultValue
 import dev.gimme.gimmeapi.command.exception.CommandException
 import dev.gimme.gimmeapi.command.exception.ErrorCode
 import dev.gimme.gimmeapi.command.node.CommandNode
 import dev.gimme.gimmeapi.command.parameter.CommandParameter
-import dev.gimme.gimmeapi.command.parameter.CommandParameterSet
-import dev.gimme.gimmeapi.command.parameter.DefaultValue
 import dev.gimme.gimmeapi.command.sender.CommandSender
-import dev.gimme.gimmeapi.core.common.splitCamelCase
-import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.KParameter
 import kotlin.reflect.full.createType
@@ -23,7 +16,6 @@ import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.hasAnnotation
 import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.full.isSubtypeOf
-import kotlin.reflect.full.isSuperclassOf
 import kotlin.reflect.full.memberFunctions
 import kotlin.reflect.full.safeCast
 import kotlin.reflect.jvm.isAccessible
@@ -58,12 +50,27 @@ abstract class FunctionCommand<out T>(
     private val commandFunction: KFunction<T> = getFirstCommandFunction()
     private val commandFunctionAnnotation: CommandFunction = commandFunction.findAnnotation()!!
 
-    final override var parameters: CommandParameterSet = generateParameters()
     final override var usage: String = generateUsage()
 
-    private var requiredSender: KClass<*>? = null
-    private var optionalSenders: MutableSet<KClass<*>>? = null
-    final override val senderTypes: Set<KClass<*>>? get() = requiredSender?.let { setOf(it) } ?: optionalSenders
+    init {
+        val senderParameters: List<KParameter> = commandFunction.parameters
+            .filter {
+                it.kind == KParameter.Kind.VALUE &&
+                        (it.type.isSubtypeOf(CommandSender::class.createType(nullable = true)) || it.hasAnnotation<Sender>())
+            }
+        val valueParameters: List<KParameter> = commandFunction.parameters
+            .minus(senderParameters)
+            .filter { it.kind == KParameter.Kind.VALUE }
+
+        generateSenders(senderParameters.map { SenderSettings(type = it.type) })
+        generateParameters(valueParameters.map { param ->
+            ParameterSettings(
+                name = param.name ?: throw UnsupportedParameterException(param),
+                annotation = param.findAnnotation(),
+                type = param.type,
+            )
+        })
+    }
 
     /**
      * Attempts to execute this command as the [commandSender] with the args mapping of parameters to arguments and
@@ -110,79 +117,6 @@ abstract class FunctionCommand<out T>(
     }
 
     /**
-     * Generates a set of [CommandParameter]s that matches the parameters of the [FunctionCommand.commandFunction] with default values from
-     * [FunctionCommand.commandFunctionAnnotation].
-     */
-    private fun generateParameters(): CommandParameterSet {
-        val usedFlags = mutableSetOf<Char>()
-
-        val senderParameters: List<KParameter> = commandFunction.parameters
-            .filter {
-                it.kind == KParameter.Kind.VALUE &&
-                        (it.type.isSubtypeOf(CommandSender::class.createType(nullable = true)) || it.hasAnnotation<Sender>())
-            }
-        val valueParameters: List<KParameter> = commandFunction.parameters
-            .minus(senderParameters)
-            .filter { it.kind == KParameter.Kind.VALUE }
-
-
-        senderParameters.forEach {
-            val klass = it.type.jvmErasure
-            val optional = it.type.isMarkedNullable
-
-            if (!optional) {
-                if (requiredSender != null) throw IllegalStateException("Only one sender type can be required (i.e., non-null)") // TODO: exception type
-                requiredSender = klass
-            } else {
-                optionalSenders = (optionalSenders ?: mutableSetOf()).apply { add(klass) }
-            }
-        }
-
-        return CommandParameterSet(
-            valueParameters.map { param ->
-                val parameterAnnotation: Parameter? = param.findAnnotation()
-
-                val name = param.name ?: throw UnsupportedParameterException(param)
-                val id = name.splitCamelCase("-")
-                val displayName = name.splitCamelCase(" ")
-                val flags = generateFlags(id, usedFlags)
-                val defaultValue: DefaultValue? = parameterAnnotation?.getDefaultValue()
-                usedFlags.addAll(flags)
-
-                val jvmErasure = param.type.jvmErasure
-                val form = when {
-                    jvmErasure.isSuperclassOf(MutableList::class) -> CommandParameter.Form.LIST
-                    jvmErasure.isSuperclassOf(MutableSet::class) -> CommandParameter.Form.SET
-                    else -> CommandParameter.Form.VALUE
-                }
-                val klass: KClass<*> = if (form.isCollection) {
-                    param.type.arguments.firstOrNull()?.type?.jvmErasure
-                        ?: throw RuntimeException("Unsupported parameter type: ${param.type}") // TODO: exception type
-                } else {
-                    jvmErasure
-                }
-
-                val type = ParameterTypes.get(klass)
-
-                if (!param.type.isMarkedNullable && defaultValue != null && defaultValue.value == null) {
-                    throw IllegalStateException("Parameter \"$id\" has a null default value for a type marked as non-nullable") // TODO: exception type
-                }
-
-                CommandParameter(
-                    id = id,
-                    displayName = displayName,
-                    type = type,
-                    form = form,
-                    suggestions = type.values ?: { setOf() },
-                    flags = flags,
-                    defaultValue = defaultValue,
-                    description = parameterAnnotation?.description?.ifEmpty { null }
-                )
-            }.toList()
-        )
-    }
-
-    /**
      * Generates a "usage string" that matches the [Command.parameters].
      */
     private fun Command<*>.generateUsage(): String {
@@ -196,23 +130,6 @@ abstract class FunctionCommand<out T>(
         }
 
         return sb.toString()
-    }
-
-    /**
-     * Generates a set of flags from the [string] without clashing with any of the [unavailableFlags].
-     */
-    private fun generateFlags(string: String, unavailableFlags: Set<Char> = setOf()): Set<Char> {
-        require(string.isNotEmpty())
-
-        val flags = mutableSetOf<Char>()
-
-        val firstLetterLower = string.first().let { if (it.isUpperCase()) it.lowercaseChar() else it }
-        val firstLetterUpper = firstLetterLower.uppercaseChar()
-
-        if (!unavailableFlags.contains(firstLetterLower)) flags.add(firstLetterLower)
-        else if (!unavailableFlags.contains(firstLetterUpper)) flags.add(firstLetterUpper)
-
-        return flags
     }
 
     /**
