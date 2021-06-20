@@ -3,6 +3,10 @@ package dev.gimme.gimmeapi.command.function
 import dev.gimme.gimmeapi.command.BaseCommand
 import dev.gimme.gimmeapi.command.Command
 import dev.gimme.gimmeapi.command.ParameterTypes
+import dev.gimme.gimmeapi.command.SenderTypes
+import dev.gimme.gimmeapi.command.annotations.Parameter
+import dev.gimme.gimmeapi.command.annotations.Sender
+import dev.gimme.gimmeapi.command.annotations.defaultValue
 import dev.gimme.gimmeapi.command.exception.CommandException
 import dev.gimme.gimmeapi.command.exception.ErrorCode
 import dev.gimme.gimmeapi.command.node.CommandNode
@@ -14,10 +18,10 @@ import dev.gimme.gimmeapi.core.common.splitCamelCase
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.KParameter
-import kotlin.reflect.KType
 import kotlin.reflect.full.createType
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.hasAnnotation
+import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.full.isSubtypeOf
 import kotlin.reflect.full.isSuperclassOf
 import kotlin.reflect.full.memberFunctions
@@ -53,10 +57,13 @@ abstract class FunctionCommand<out T>(
 
     private val commandFunction: KFunction<T> = getFirstCommandFunction()
     private val commandFunctionAnnotation: CommandFunction = commandFunction.findAnnotation()!!
-    private val baseCommandSenderType: KType = CommandSender::class.createType()
 
     final override var parameters: CommandParameterSet = generateParameters()
     final override var usage: String = generateUsage()
+
+    private var requiredSender: KClass<*>? = null
+    private var optionalSenders: MutableSet<KClass<*>>? = null
+    final override val senderTypes: Set<KClass<*>>? get() = requiredSender?.let { setOf(it) } ?: optionalSenders
 
     /**
      * Attempts to execute this command as the [commandSender] with the args mapping of parameters to arguments and
@@ -75,13 +82,22 @@ abstract class FunctionCommand<out T>(
         // First argument has to be the instance (command)
         val typedArgsMap: MutableMap<KParameter, Any?> = mutableMapOf(params[0] to this)
 
-        // Inject command sender
-        params
-            .filter { it.type.isSubtypeOf(baseCommandSenderType) }
-            .forEach { senderParam ->
-                typedArgsMap[senderParam] = senderParam.type.jvmErasure.safeCast(commandSender)
-                    ?: throw ErrorCode.INCOMPATIBLE_SENDER.createException()
+        // Inject command senders
+        params.forEach { param ->
+            val sender: Any? = when {
+                commandSender::class.isSubclassOf(param.type.jvmErasure) -> {
+                    param.type.jvmErasure.safeCast(commandSender)
+                }
+                param.hasAnnotation<Sender>() -> {
+                    SenderTypes.adapt(commandSender, param.type.jvmErasure)
+                }
+                else -> return@forEach
             }
+
+            if (sender == null && !param.isOptional) throw ErrorCode.INCOMPATIBLE_SENDER.createException()
+
+            typedArgsMap[param] = sender
+        }
 
         args.forEach { (key, value) ->
             val p = params.find { it.name == key.id } ?: throw ErrorCode.INVALID_PARAMETER.createException(key.id)
@@ -99,16 +115,34 @@ abstract class FunctionCommand<out T>(
     private fun generateParameters(): CommandParameterSet {
         val usedFlags = mutableSetOf<Char>()
 
-        val valueParameters = commandFunction.parameters
-            .filter { it.kind == KParameter.Kind.VALUE && !it.type.isSubtypeOf(baseCommandSenderType) }
+        val senderParameters: List<KParameter> = commandFunction.parameters
+            .filter { it.kind == KParameter.Kind.VALUE && (it.type.isSubtypeOf(CommandSender::class.createType()) || it.hasAnnotation<Sender>()) }
+        val valueParameters: List<KParameter> = commandFunction.parameters
+            .minus(senderParameters)
+            .filter { it.kind == KParameter.Kind.VALUE }
+
+
+        senderParameters.forEach {
+            val optional = it.isOptional
+            val klass = it.type.jvmErasure
+
+            if (!optional) {
+                if (requiredSender != null) throw IllegalStateException("Only one sender type can be required (i.e., non-null)") // TODO: exception type
+                requiredSender = klass
+            } else {
+                optionalSenders = (optionalSenders ?: mutableSetOf()).apply { add(klass) }
+            }
+        }
 
         return CommandParameterSet(
             valueParameters.map { param ->
+                val parameterAnnotation: Parameter? = param.findAnnotation()
+
                 val name = param.name ?: throw UnsupportedParameterException(param)
                 val id = name.splitCamelCase("-")
                 val displayName = name.splitCamelCase(" ")
                 val flags = generateFlags(id, usedFlags)
-                val defaultValue: DefaultValue? = null
+                val defaultValue: DefaultValue? = parameterAnnotation?.defaultValue()
                 usedFlags.addAll(flags)
 
                 val jvmErasure = param.type.jvmErasure
@@ -137,7 +171,8 @@ abstract class FunctionCommand<out T>(
                     form = form,
                     suggestions = type.values ?: { setOf() },
                     flags = flags,
-                    defaultValue = defaultValue
+                    defaultValue = defaultValue,
+                    description = parameterAnnotation?.description?.ifEmpty { null }
                 )
             }.toList()
         )

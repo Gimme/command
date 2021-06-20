@@ -1,6 +1,9 @@
 package dev.gimme.gimmeapi.command.function
 
 import dev.gimme.gimmeapi.command.DUMMY_COMMAND_SENDER
+import dev.gimme.gimmeapi.command.SenderTypes
+import dev.gimme.gimmeapi.command.annotations.Parameter
+import dev.gimme.gimmeapi.command.annotations.Sender
 import dev.gimme.gimmeapi.command.channel.TextCommandChannel
 import dev.gimme.gimmeapi.command.sender.CommandSender
 import org.junit.jupiter.api.Assertions
@@ -23,7 +26,7 @@ internal class FunctionCommandTest {
     }
 
     @Test
-    fun test() {
+    fun `Calls function command with parameters`() {
         var called = false
 
         val commandName = "k"
@@ -33,14 +36,12 @@ internal class FunctionCommandTest {
         val command = object : FunctionCommand<Any?>(commandName) {
 
             @CommandFunction
-            private fun call(sender: CommandSender, a: String, b: Int) {
+            private fun call(s: CommandSender, a: String, b: Int) {
                 called = true
 
-                Assertions.assertAll(
-                    { assertEquals(sender, sender) },
-                    { assertEquals(arg1, a) },
-                    { assertEquals(arg2, b) },
-                )
+                assertEquals(s, sender)
+                assertEquals(arg1, a)
+                assertEquals(arg2, b)
             }
         }
 
@@ -53,6 +54,107 @@ internal class FunctionCommandTest {
 
         assertNotNull(command.parameters["a"])
         assertNotNull(command.parameters["b"])
+    }
+
+    @Test
+    fun `Uses default values`() {
+        var called = false
+
+        val commandName = "k"
+        val arg1 = "abc"
+
+        val command = object : FunctionCommand<Any?>(commandName) {
+
+            @CommandFunction
+            private fun call(
+                @Parameter(default = "xyz")
+                a: String,
+                @Parameter(default = "xyz")
+                b: String,
+                @Parameter(default = "5")
+                c: Int,
+            ) {
+                called = true
+
+                assertEquals(arg1, a)
+                assertEquals("xyz", b)
+                assertEquals(5, c)
+            }
+        }
+
+        assertFalse(called)
+
+        channel.commandManager.registerCommand(command)
+        channel.parseInput(sender, "$commandName $arg1")
+
+        assertTrue(called)
+    }
+
+    @Test
+    fun `Parses sender subtype`() {
+        class PlayerSender : CommandSender {
+            override val name = "player"
+            override fun sendMessage(message: String) {
+            }
+        }
+
+        val sender = PlayerSender()
+
+        var called = false
+
+        val commandName = "k"
+
+        val command = object : FunctionCommand<Any?>(commandName) {
+
+            @CommandFunction
+            private fun call(playerSender: PlayerSender) {
+                called = true
+
+                assertEquals(playerSender, sender)
+            }
+        }
+
+        assertFalse(called)
+
+        channel.commandManager.registerCommand(command)
+        channel.parseInput(sender, commandName)
+
+        assertTrue(called)
+    }
+
+    @Test
+    fun `Parses custom sender type`() {
+        class PlayerSender : CommandSender {
+            override val name = "player"
+            override fun sendMessage(message: String) {
+            }
+        }
+
+        class Player(val name: String)
+        SenderTypes.registerAdapter { s: PlayerSender -> Player(s.name) }
+
+        val sender = PlayerSender()
+
+        var called = false
+
+        val commandName = "k"
+
+        val command = object : FunctionCommand<Any?>(commandName) {
+
+            @CommandFunction
+            private fun call(@Sender player: Player) {
+                called = true
+
+                assertEquals(player.name, sender.name)
+            }
+        }
+
+        assertFalse(called)
+
+        channel.commandManager.registerCommand(command)
+        channel.parseInput(sender, commandName)
+
+        assertTrue(called)
     }
 }
 
