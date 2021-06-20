@@ -110,10 +110,11 @@ internal class FunctionCommandTest {
         val command = object : FunctionCommand<Any?>(commandName) {
 
             @CommandFunction
-            private fun call(playerSender: PlayerSender) {
+            private fun call(playerSender: PlayerSender, playerSender2: PlayerSender?) {
                 called = true
 
                 assertEquals(playerSender, sender)
+                assertEquals(playerSender2, sender)
             }
         }
 

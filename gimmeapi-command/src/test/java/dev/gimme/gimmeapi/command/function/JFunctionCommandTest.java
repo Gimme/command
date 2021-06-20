@@ -23,10 +23,11 @@ class JFunctionCommandTest {
         }
     };
 
+    static final CommandSender SENDER = UtilsKt.getDUMMY_COMMAND_SENDER();
+
     @Test
     void test() {
         String commandName = "k";
-        CommandSender sender = UtilsKt.getDUMMY_COMMAND_SENDER();
         String arg1 = "abc";
         int arg2 = 123;
         FCmd c = new FCmd(commandName);
@@ -34,7 +35,7 @@ class JFunctionCommandTest {
         assertFalse(c.called[0]);
 
         channel.getCommandManager().registerCommand(c);
-        channel.parseInput(sender, commandName
+        channel.parseInput(SENDER, commandName
                 + " " + arg1
                 + " " + arg2
         );
@@ -52,9 +53,10 @@ class FCmd extends FunctionCommand<Void> {
     }
 
     @CommandFunction
-    private void call(CommandSender sender, String a, int b, @Parameter(defaultValue = "3") int c) {
+    private void call(CommandSender s, String a, int b, @Parameter(defaultValue = "3") int c) {
         called[0] = true;
-        assertEquals(sender, sender);
+
+        assertEquals(JFunctionCommandTest.SENDER, s);
         assertEquals("abc", a);
         assertEquals(123, b);
         assertEquals(3, c);

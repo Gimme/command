@@ -94,7 +94,8 @@ abstract class FunctionCommand<out T>(
                 else -> return@forEach
             }
 
-            if (sender == null && !param.isOptional) throw ErrorCode.INCOMPATIBLE_SENDER.createException()
+            val optional = param.type.isMarkedNullable
+            if (sender == null && !optional) throw ErrorCode.INCOMPATIBLE_SENDER.createException()
 
             typedArgsMap[param] = sender
         }
@@ -116,15 +117,18 @@ abstract class FunctionCommand<out T>(
         val usedFlags = mutableSetOf<Char>()
 
         val senderParameters: List<KParameter> = commandFunction.parameters
-            .filter { it.kind == KParameter.Kind.VALUE && (it.type.isSubtypeOf(CommandSender::class.createType()) || it.hasAnnotation<Sender>()) }
+            .filter {
+                it.kind == KParameter.Kind.VALUE &&
+                        (it.type.isSubtypeOf(CommandSender::class.createType(nullable = true)) || it.hasAnnotation<Sender>())
+            }
         val valueParameters: List<KParameter> = commandFunction.parameters
             .minus(senderParameters)
             .filter { it.kind == KParameter.Kind.VALUE }
 
 
         senderParameters.forEach {
-            val optional = it.isOptional
             val klass = it.type.jvmErasure
+            val optional = it.type.isMarkedNullable
 
             if (!optional) {
                 if (requiredSender != null) throw IllegalStateException("Only one sender type can be required (i.e., non-null)") // TODO: exception type
