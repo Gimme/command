@@ -67,7 +67,7 @@ class SimpleCommandManagerTest {
         var executed = false
 
         val command = object : DefaultBaseCommand(commandName, DefaultBaseCommand(commandParent)) {
-            override fun executeBy(commandSender: CommandSender, args: Map<CommandParameter, Any?>) {
+            override fun execute(commandSender: CommandSender, args: Map<CommandParameter, Any?>) {
                 executed = true
             }
         }
@@ -84,13 +84,13 @@ class SimpleCommandManagerTest {
         var childExecuted = false
 
         val parentCommand = object : DefaultBaseCommand("parent") {
-            override fun executeBy(commandSender: CommandSender, args: Map<CommandParameter, Any?>) {
+            override fun execute(commandSender: CommandSender, args: Map<CommandParameter, Any?>) {
                 assertIterableEquals(listOf("a", "b"), args.values)
                 parentExecuted = true
             }
         }
         val childCommand = object : DefaultBaseCommand("child", DefaultBaseCommand("parent")) {
-            override fun executeBy(commandSender: CommandSender, args: Map<CommandParameter, Any?>) {
+            override fun execute(commandSender: CommandSender, args: Map<CommandParameter, Any?>) {
                 assertIterableEquals(listOf("x", "y"), args.values)
                 childExecuted = true
             }
