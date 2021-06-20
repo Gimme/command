@@ -6,7 +6,7 @@ import dev.gimme.gimmeapi.command.ParameterTypes
 import dev.gimme.gimmeapi.command.SenderTypes
 import dev.gimme.gimmeapi.command.annotations.Parameter
 import dev.gimme.gimmeapi.command.annotations.Sender
-import dev.gimme.gimmeapi.command.annotations.defaultValue
+import dev.gimme.gimmeapi.command.annotations.getDefaultValue
 import dev.gimme.gimmeapi.command.exception.CommandException
 import dev.gimme.gimmeapi.command.exception.ErrorCode
 import dev.gimme.gimmeapi.command.node.CommandNode
@@ -142,7 +142,7 @@ abstract class FunctionCommand<out T>(
                 val id = name.splitCamelCase("-")
                 val displayName = name.splitCamelCase(" ")
                 val flags = generateFlags(id, usedFlags)
-                val defaultValue: DefaultValue? = parameterAnnotation?.defaultValue()
+                val defaultValue: DefaultValue? = parameterAnnotation?.getDefaultValue()
                 usedFlags.addAll(flags)
 
                 val jvmErasure = param.type.jvmErasure

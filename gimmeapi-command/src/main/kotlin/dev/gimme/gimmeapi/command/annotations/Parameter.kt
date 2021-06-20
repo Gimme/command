@@ -4,12 +4,13 @@ import dev.gimme.gimmeapi.command.parameter.DefaultValue
 
 @Target(AnnotationTarget.VALUE_PARAMETER)
 annotation class Parameter(
+    @get:JvmName("defaultValue")
     val default: String = "",
     val defaultRepresentation: String = "",
     val description: String = "",
 )
 
-fun Parameter.defaultValue(): DefaultValue? {
+fun Parameter.getDefaultValue(): DefaultValue? {
     return if (default.isEmpty() && defaultRepresentation.isEmpty()) {
         null
     } else {
