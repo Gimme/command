@@ -1,6 +1,7 @@
 package dev.gimme.gimmeapi.command.function;
 
 import dev.gimme.gimmeapi.command.UtilsKt;
+import dev.gimme.gimmeapi.command.annotations.Parameter;
 import dev.gimme.gimmeapi.command.channel.TextCommandChannel;
 import dev.gimme.gimmeapi.command.sender.CommandSender;
 import org.jetbrains.annotations.NotNull;
@@ -33,7 +34,10 @@ class JFunctionCommandTest {
         assertFalse(c.called[0]);
 
         channel.getCommandManager().registerCommand(c);
-        channel.parseInput(sender, commandName + " " + arg1 + " " + arg2);
+        channel.parseInput(sender, commandName
+                + " " + arg1
+                + " " + arg2
+        );
 
         assertTrue(c.called[0]);
     }
@@ -48,10 +52,11 @@ class FCmd extends FunctionCommand<Void> {
     }
 
     @CommandFunction
-    private void call(CommandSender sender, String a, int b) {
+    private void call(CommandSender sender, String a, int b, @Parameter(defaultValue = "3") int c) {
         called[0] = true;
         assertEquals(sender, sender);
         assertEquals("abc", a);
         assertEquals(123, b);
+        assertEquals(3, c);
     }
 }

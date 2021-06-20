@@ -6,7 +6,6 @@ import dev.gimme.gimmeapi.command.annotations.Parameter
 import dev.gimme.gimmeapi.command.annotations.Sender
 import dev.gimme.gimmeapi.command.channel.TextCommandChannel
 import dev.gimme.gimmeapi.command.sender.CommandSender
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotNull
