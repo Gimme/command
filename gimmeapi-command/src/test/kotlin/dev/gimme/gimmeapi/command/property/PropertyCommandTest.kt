@@ -39,10 +39,9 @@ internal class PropertyCommandTest {
             val a: String? by param()
 
             val b: Param<Int?> = param(Int::class.java)
-                .name("bb")
                 .build()
 
-            val list: List<Double> by param<List<Double>>().name("c")
+            val list: List<Double> by param()
 
             val set: Set<String> by param()
 
@@ -67,8 +66,8 @@ internal class PropertyCommandTest {
         assertTrue(called)
 
         assertNotNull(command.parameters["a"])
-        assertNotNull(command.parameters["bb"])
-        assertNotNull(command.parameters["c"])
+        assertNotNull(command.parameters["b"])
+        assertNotNull(command.parameters["list"])
         assertNotNull(command.parameters["set"])
     }
 }

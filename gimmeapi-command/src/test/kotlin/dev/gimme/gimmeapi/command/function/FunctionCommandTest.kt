@@ -3,7 +3,6 @@ package dev.gimme.gimmeapi.command.function
 import dev.gimme.gimmeapi.command.DUMMY_COMMAND_SENDER
 import dev.gimme.gimmeapi.command.SenderTypes
 import dev.gimme.gimmeapi.command.annotations.Parameter
-import dev.gimme.gimmeapi.command.annotations.Sender
 import dev.gimme.gimmeapi.command.channel.TextCommandChannel
 import dev.gimme.gimmeapi.command.sender.CommandSender
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -146,7 +145,7 @@ internal class FunctionCommandTest {
         val command = object : FunctionCommand<Any?>(commandName) {
 
             @CommandFunction
-            private fun call(@Sender player: Player) {
+            private fun call(@dev.gimme.gimmeapi.command.annotations.Sender player: Player) {
                 called = true
 
                 assertEquals(player.name, sender.name)

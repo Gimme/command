@@ -54,7 +54,7 @@ class JPropertyCommandTest {
         assertTrue(command.called[0]);
 
         assertNotNull(command.getParameters().get("a"));
-        assertNotNull(command.getParameters().get("bb"));
+        assertNotNull(command.getParameters().get("b"));
         assertNotNull(command.getParameters().get("list"));
         assertNotNull(command.getParameters().get("set"));
     }
@@ -65,19 +65,15 @@ class PCmd extends PropertyCommand<Void> {
     final boolean[] called = {false};
 
     private final Param<String> a = param(String.class)
-            .name("a")
             .build();
 
     private final Param<Integer> b = param(Integer.class)
-            .name("bb")
             .build();
 
     private final Param<List<Double>> list = param(Double.class)
-            .name("list")
             .buildList();
 
     private final Param<Set<String>> set = param(String.class)
-            .name("set")
             .buildSet();
 
     PCmd(@NotNull String name) {

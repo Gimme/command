@@ -4,7 +4,7 @@ package dev.gimme.gimmeapi.command.parameter
  * Represents a command parameter, which helps define how arguments can be passed to the command execution function.
  *
  * @property id           the unique identifier of this parameter
- * @property displayName  the display name of this parameter
+ * @property name         the name of this parameter
  * @property type         the type of this parameter
  * @property suggestions  gets all suggested argument values
  * @property description  the description of this parameter
@@ -12,9 +12,9 @@ package dev.gimme.gimmeapi.command.parameter
  * @property flags        available shorthand flags representing this parameter
  * @property defaultValue the default value used if this parameter is optional
  */
-open class CommandParameter(
+data class CommandParameter(
     val id: String,
-    val displayName: String,
+    val name: String,
     val type: ParameterType<*>,
     val suggestions: () -> Set<String> = type.values ?: { setOf() },
     val description: String? = null,

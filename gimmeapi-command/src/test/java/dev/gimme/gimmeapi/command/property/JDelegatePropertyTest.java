@@ -30,9 +30,9 @@ class JDelegatePropertyTest {
         var command = new DelegateTestCommand();
         Map<CommandParameter, Object> input = Map.of(
                 requireNonNull(command.getParameters().get("string")), "a",
-                requireNonNull(command.getParameters().get("int")), 1,
-                requireNonNull(command.getParameters().get("double")), 0.5,
-                requireNonNull(command.getParameters().get("boolean")), true,
+                requireNonNull(command.getParameters().get("i")), 1,
+                requireNonNull(command.getParameters().get("d")), 0.5,
+                requireNonNull(command.getParameters().get("b")), true,
                 requireNonNull(command.getParameters().get("list")), listInput,
                 requireNonNull(command.getParameters().get("set")), setInput,
                 requireNonNull(command.getParameters().get("collection")), listInput,
@@ -40,7 +40,7 @@ class JDelegatePropertyTest {
         );
 
         assertFalse(command.called[0]);
-        command.executeBy(UtilsKt.getDUMMY_COMMAND_SENDER(), input);
+        command.execute(UtilsKt.getDUMMY_COMMAND_SENDER(), input);
         assertTrue(command.called[0]);
     }
 
@@ -48,39 +48,11 @@ class JDelegatePropertyTest {
     void converts_delegate_properties_to_command_senders() {
         var commandSender = new Sender1();
 
-        final boolean[] called = {false};
+        var command = new MultipleSenderTestCommand(commandSender);
 
-        var command = new PropertyCommand<Void>("test-command") {
-
-            private final Sender<CommandSender> senderSuper = sender(CommandSender.class);
-            private final Sender<Sender1> senderSub1 = sender(Sender1.class, true);
-            private final Sender<Sender2> senderSub2 = sender(Sender2.class, true);
-
-            private final Param<String> string = param(String.class)
-                    .name("string")
-                    .build();
-
-            private final Param<Integer> i = param(Integer.class)
-                    .name("int")
-                    .build();
-
-            @Override
-            public Void call() {
-                called[0] = true;
-
-                assertEquals(commandSender, senderSuper.get());
-                assertEquals(commandSender, senderSub1.get());
-                assertEquals("sender1", senderSub1.get().getName());
-                assertEquals(senderSub1.get().getName(), senderSuper.get().getName());
-                assertNull(senderSub2.get());
-
-                return null;
-            }
-        };
-
-        assertFalse(called[0]);
-        command.executeBy(commandSender, Map.of());
-        assertTrue(called[0]);
+        assertFalse(command.called[0]);
+        command.execute(commandSender, Map.of());
+        assertTrue(command.called[0]);
     }
 
     @Test
@@ -89,25 +61,69 @@ class JDelegatePropertyTest {
 
         var commandSender = new PlayerSender();
 
-        final boolean[] called = {false};
+        var command = new CustomSenderTestCommand(commandSender.player);
 
-        var command = new PropertyCommand<Void>("test-command") {
+        assertFalse(command.called[0]);
+        command.execute(commandSender, Map.of());
+        assertTrue(command.called[0]);
+    }
+}
 
-            private final Sender<Player> sender = sender(Player.class);
+class MultipleSenderTestCommand extends PropertyCommand<Void> {
 
-            @Override
-            public Void call() {
-                called[0] = true;
+    final boolean[] called = {false};
+    private final CommandSender expectedSender;
 
-                assertEquals(commandSender.player, sender.get());
+    private final Sender<CommandSender> senderSuper = sender(CommandSender.class);
+    private final Sender<Sender1> senderSub1 = sender(Sender1.class, true);
+    private final Sender<Sender2> senderSub2 = sender(Sender2.class, true);
 
-                return null;
-            }
-        };
+    private final Param<String> string = param(String.class)
+            .build();
 
-        assertFalse(called[0]);
-        command.executeBy(commandSender, Map.of());
-        assertTrue(called[0]);
+    private final Param<Integer> i = param(Integer.class)
+            .build();
+
+    MultipleSenderTestCommand(CommandSender expectedSender) {
+        super("test-command");
+
+        this.expectedSender = expectedSender;
+    }
+
+    @Override
+    public Void call() {
+        called[0] = true;
+
+        assertEquals(expectedSender, senderSuper.get());
+        assertEquals(expectedSender, senderSub1.get());
+        assertEquals("sender1", senderSub1.get().getName());
+        assertEquals(senderSub1.get().getName(), senderSuper.get().getName());
+        assertNull(senderSub2.get());
+
+        return null;
+    }
+}
+
+class CustomSenderTestCommand extends PropertyCommand<Void> {
+
+    final boolean[] called = {false};
+    private final Player expectedPlayer;
+
+    private final Sender<Player> sender = sender(Player.class);
+
+    CustomSenderTestCommand(Player expectedPlayer) {
+        super("test-command");
+
+        this.expectedPlayer = expectedPlayer;
+    }
+
+    @Override
+    public Void call() {
+        called[0] = true;
+
+        assertEquals(expectedPlayer, sender.get());
+
+        return null;
     }
 }
 
@@ -116,35 +132,27 @@ class DelegateTestCommand extends PropertyCommand<Void> {
     final boolean[] called = {false};
 
     private final Param<String> string = param(String.class)
-            .name("string")
             .build();
 
     private final Param<Integer> i = param(Integer.class)
-            .name("int")
             .build();
 
     private final Param<Double> d = param(Double.class)
-            .name("double")
             .build();
 
     private final Param<Boolean> b = param(Boolean.class)
-            .name("boolean")
             .build();
 
     private final Param<List<String>> list = param(String.class)
-            .name("list")
             .buildList();
 
     private final Param<Set<String>> set = param(String.class)
-            .name("set")
             .buildSet();
 
     private final Param<? extends Collection<String>> collection = param(String.class)
-            .name("collection")
             .buildList();
 
     private final Param<? extends Iterable<String>> iterable = param(String.class)
-            .name("iterable")
             .buildList();
 
     DelegateTestCommand() {

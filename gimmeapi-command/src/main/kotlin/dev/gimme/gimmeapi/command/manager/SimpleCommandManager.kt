@@ -49,7 +49,7 @@ open class SimpleCommandManager<R>(private val defaultResponseParser: (Any?) -> 
     ): R {
         val commandNode = executorByCommand[command]
 
-        return commandNode?.execute(commandSender, args) ?: defaultResponseParser(command.executeBy(commandSender, args))
+        return commandNode?.execute(commandSender, args) ?: defaultResponseParser(command.execute(commandSender, args))
     }
 
     override fun addRegisterCommandListener(registerCommandListener: CommandManager.RegisterCommandListener) {
@@ -77,7 +77,7 @@ open class SimpleCommandManager<R>(private val defaultResponseParser: (Any?) -> 
          */
         @Throws(CommandException::class)
         fun execute(commandSender: CommandSender, args: Map<CommandParameter, Any?>): R {
-            val response = command.executeBy(commandSender, args)
+            val response = command.execute(commandSender, args)
             return responseParser(response)
         }
     }

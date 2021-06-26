@@ -15,26 +15,22 @@ import kotlin.reflect.KClass
  * @property description a detailed description of this command
  * @property usage       information of how to use the command
  * @property parameters  this command's parameters
- * @property senderTypes the only types of senders allowed to execute this command, or null if no limitation
  */
 interface Command<out T> : CommandNode {
 
     var summary: String
     var description: String
-    var usage: String
-    var parameters: CommandParameterSet
-    var senderTypes: Set<KClass<*>>?
+    val usage: String
+    val parameters: CommandParameterSet
 
     /**
      * Executes this command as the [commandSender] with the [args] mapping of parameters to arguments and returns the
      * result.
      *
-     * The [commandSender] has to be a valid subtype of any of the [senderTypes].
-     *
      * @throws CommandException if the command execution was unsuccessful
      */
     @Throws(CommandException::class)
-    fun executeBy(commandSender: CommandSender, args: Map<CommandParameter, Any?>): T
+    fun execute(commandSender: CommandSender, args: Map<CommandParameter, Any?>): T
 
     // TODO: handle vararg parameter types
     /**

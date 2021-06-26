@@ -55,7 +55,7 @@ class SimpleCommandManagerTest {
         commandManager.registerCommand(command)
         commandManager.executeCommand(DUMMY_COMMAND_SENDER, command, args)
 
-        verify(exactly = 1) { command.executeBy(DUMMY_COMMAND_SENDER, args) }
+        verify(exactly = 1) { command.execute(DUMMY_COMMAND_SENDER, args) }
     }
 
     @ParameterizedTest

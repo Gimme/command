@@ -57,7 +57,7 @@ internal class DelegatePropertyTest {
             .toMap()
 
         assertFalse(called)
-        command.executeBy(DUMMY_COMMAND_SENDER, input)
+        command.execute(DUMMY_COMMAND_SENDER, input)
         assertTrue(called)
     }
 
@@ -97,7 +97,7 @@ internal class DelegatePropertyTest {
         }
 
         assertFalse(called)
-        command.executeBy(commandSender, mapOf())
+        command.execute(commandSender, mapOf())
         assertTrue(called)
     }
 
@@ -131,7 +131,7 @@ internal class DelegatePropertyTest {
         }
 
         assertFalse(called)
-        command.executeBy(commandSender, mapOf())
+        command.execute(commandSender, mapOf())
         assertTrue(called)
     }
 }
