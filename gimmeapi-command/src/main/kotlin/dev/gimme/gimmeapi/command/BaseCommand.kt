@@ -213,7 +213,7 @@ abstract class BaseCommand<out R>(
         println(declaredFields)
 
         this.javaClass.declaredFields.forEach { field ->
-            val paramAnnotation = field.getAnnotation(Parameter::class.java)
+            val paramAnnotation: Parameter? = field.kotlinProperty?.findAnnotation()
 
             val settings = when {
                 paramAnnotation != null -> {

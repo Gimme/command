@@ -1,5 +1,6 @@
 package dev.gimme.gimmeapi.command
 
+import dev.gimme.gimmeapi.command.annotations.Parameter
 import dev.gimme.gimmeapi.command.annotations.Sender
 import dev.gimme.gimmeapi.command.parameter.CommandParameter
 import dev.gimme.gimmeapi.command.sender.CommandSender
@@ -40,10 +41,49 @@ class BaseCommandTest {
         })
     }
 
+    @Test
+    fun parameterAnnotation() {
+        val arg1 = "arg1"
+        val command = object : BaseCommand<Any>("test-command") {
+            @Parameter
+            private lateinit var param1: String
+
+            override fun call() {
+                assertEquals(arg1, param1)
+
+                called = true
+            }
+        }
+
+        testCommand(
+            command,
+            mapOf(command.parameters.first() to arg1),
+        )
+    }
+
+    @Test
+    fun parameterDelegate() {
+        val arg1 = "arg1"
+        val command = object : BaseCommand<Any>("test-command") {
+            private val param1: String by param()
+
+            override fun call() {
+                assertEquals(arg1, param1)
+
+                called = true
+            }
+        }
+
+        testCommand(
+            command,
+            mapOf(command.parameters.first() to arg1),
+        )
+    }
+
     private fun testCommand(
         command: BaseCommand<*>,
+        args: Map<CommandParameter, Any?> = mapOf(),
         sender: CommandSender = dummySender,
-        args: Map<CommandParameter, Any?> = mapOf()
     ) {
         assertFalse(called)
         command.execute(sender, args)
