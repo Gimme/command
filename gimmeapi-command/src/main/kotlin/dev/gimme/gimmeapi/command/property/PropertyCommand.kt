@@ -24,7 +24,5 @@ abstract class PropertyCommand<out R>(
 
     @JvmOverloads
     constructor(name: String, parent: CommandNode? = null) : this(name, parent, setOf())
-
-    final override var usage: String = "" // TODO
 }
 

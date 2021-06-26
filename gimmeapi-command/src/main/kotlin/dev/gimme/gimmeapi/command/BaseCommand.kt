@@ -1,6 +1,7 @@
 package dev.gimme.gimmeapi.command
 
 import dev.gimme.gimmeapi.command.annotations.Parameter
+import dev.gimme.gimmeapi.command.annotations.Sender
 import dev.gimme.gimmeapi.command.annotations.getDefaultValue
 import dev.gimme.gimmeapi.command.exception.CommandException
 import dev.gimme.gimmeapi.command.exception.ErrorCode
@@ -13,7 +14,6 @@ import dev.gimme.gimmeapi.command.parameter.CommandParameterSet
 import dev.gimme.gimmeapi.command.parameter.DefaultValue
 import dev.gimme.gimmeapi.command.property.CommandDelegate
 import dev.gimme.gimmeapi.command.property.CommandProperty
-import dev.gimme.gimmeapi.command.property.PropertyCommand
 import dev.gimme.gimmeapi.command.sender.CommandSender
 import dev.gimme.gimmeapi.core.common.splitCamelCase
 import java.lang.reflect.Field
@@ -61,6 +61,7 @@ abstract class BaseCommand<out R>(
     private var paramFieldById: MutableMap<String, Field> = mutableMapOf()
     private var paramBuilderFieldById: MutableMap<String, Param<*>> = mutableMapOf()
     // TODO: same for senders as above
+    private var senderFields: MutableSet<Field> = mutableSetOf()
 
     @JvmOverloads
     constructor(name: String, parent: CommandNode? = null) : this(name, parent, setOf())
@@ -74,11 +75,28 @@ abstract class BaseCommand<out R>(
         _args = args
 
         paramFieldById.forEach { (id, field) ->
-            field.set(this, args.entries.first { it.key.id == id }.value)
+            field.isAccessible = true
+            field.set(this, args.entries.firstOrNull { it.key.id == id }?.value)
         }
 
         paramBuilderFieldById.forEach { (id, param) ->
-            param.set(args.entries.first { it.key.id == id }.value)
+            param.set(args.entries.firstOrNull { it.key.id == id }?.value)
+        }
+
+        senderFields.forEach { field ->
+            val klass = field.type.kotlin
+            var value: Any? = null
+
+            if (commandSender::class.isSubclassOf(klass)) {
+                value = commandSender
+            } else {
+                SenderTypes.adapt(_commandSender, klass)?.also {
+                    value = it
+                }
+            }
+
+            field.isAccessible = true
+            field.set(this, value)
         }
 
         return if (commandFunction != null) {
@@ -262,14 +280,16 @@ abstract class BaseCommand<out R>(
         val senderSettings = mutableListOf<SenderSettings>()
 
         this.javaClass.declaredFields.forEach { field ->
-            val senderAnnotation = field.getAnnotation(dev.gimme.gimmeapi.command.annotations.Sender::class.java)
+            val senderAnnotation: Sender? = field.kotlinProperty?.findAnnotation()
 
             if (senderAnnotation != null) {
+                senderFields.add(field)
+
                 senderSettings.add(SenderSettings.fromType(type = field.kotlinProperty!!.returnType))
-            } else if (Sender::class.java.isAssignableFrom(field.type)) {
+            } else if (S::class.java.isAssignableFrom(field.type)) {
                 field.isAccessible = true
                 @Suppress("UNCHECKED_CAST")
-                val value = field.get(this) as Sender<*>
+                val value = field.get(this) as S<*>
 
                 senderSettings.add(
                     SenderSettings(
@@ -419,10 +439,10 @@ abstract class BaseCommand<out R>(
         return sb.toString()
     }
 
-    protected inner class Sender<out T>(val klass: KClass<*>, val optional: Boolean) : CommandDelegate<T> {
+    protected inner class S<out T>(val klass: KClass<*>, val optional: Boolean) : CommandDelegate<T> {
 
         @JvmSynthetic
-        override operator fun getValue(thisRef: PropertyCommand<*>, property: KProperty<*>): T = get()
+        override operator fun getValue(thisRef: BaseCommand<*>, property: KProperty<*>): T = get()
 
         @Suppress("UNCHECKED_CAST")
         fun get(): T {
@@ -453,7 +473,7 @@ abstract class BaseCommand<out R>(
     ) : CommandProperty<T>, CommandDelegate<T>, Param<T> {
 
         @JvmSynthetic
-        override operator fun getValue(thisRef: PropertyCommand<*>, property: KProperty<*>): T = get()
+        override operator fun getValue(thisRef: BaseCommand<*>, property: KProperty<*>): T = get()
 
         private var value: Any? = null
         @Suppress("UNCHECKED_CAST")
@@ -477,7 +497,7 @@ abstract class BaseCommand<out R>(
         fun suggestions(suggestions: () -> Set<String>) = apply { this._suggestions = suggestions }
 
         @JvmSynthetic
-        override operator fun provideDelegate(thisRef: PropertyCommand<*>, property: KProperty<*>): ParamBuilder<T> {
+        override operator fun provideDelegate(thisRef: BaseCommand<*>, property: KProperty<*>): ParamBuilder<T> {
             val jvmErasure = property.returnType.jvmErasure
             val form = when {
                 jvmErasure.isSuperclassOf(MutableList::class) -> CommandParameter.Form.LIST
@@ -528,7 +548,7 @@ abstract class BaseCommand<out R>(
     protected fun <T> sender(): SenderProperty<T> = SenderProperty()
 
     @JvmOverloads
-    protected fun <T : Any> sender(klass: Class<T>, optional: Boolean = false): Sender<T> =
+    protected fun <T : Any> sender(klass: Class<T>, optional: Boolean = false): S<T> =
         createSenderDelegate(klass.kotlin, optional)
 
     @JvmSynthetic
@@ -536,14 +556,14 @@ abstract class BaseCommand<out R>(
 
     protected fun <T : Any> param(klass: Class<T>): ParamBuilder<T> = ParamBuilder(klass.kotlin)
 
-    private fun <T> createSenderDelegate(klass: KClass<*>, optional: Boolean): Sender<T> {
-        return Sender(klass, optional)
+    private fun <T> createSenderDelegate(klass: KClass<*>, optional: Boolean): S<T> {
+        return S(klass, optional)
     }
 
     protected inner class SenderProperty<out T> internal constructor() : CommandProperty<T> {
 
         @JvmSynthetic
-        override operator fun provideDelegate(thisRef: PropertyCommand<*>, property: KProperty<*>): CommandDelegate<T> {
+        override operator fun provideDelegate(thisRef: BaseCommand<*>, property: KProperty<*>): CommandDelegate<T> {
             @Suppress("UNCHECKED_CAST")
             val klass = property.returnType.jvmErasure
             val optional = property.returnType.isMarkedNullable

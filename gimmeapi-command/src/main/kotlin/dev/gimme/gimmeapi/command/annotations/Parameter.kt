@@ -10,7 +10,7 @@ import dev.gimme.gimmeapi.command.parameter.DefaultValue
  * displayed.
  * @property description           the description of this parameter
  */
-@Target(AnnotationTarget.VALUE_PARAMETER)
+@Target(AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.PROPERTY)
 annotation class Parameter(
     @get:JvmName("defaultValue")
     val default: String = "",

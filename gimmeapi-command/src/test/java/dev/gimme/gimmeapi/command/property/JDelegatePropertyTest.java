@@ -74,9 +74,9 @@ class MultipleSenderTestCommand extends PropertyCommand<Void> {
     final boolean[] called = {false};
     private final CommandSender expectedSender;
 
-    private final Sender<CommandSender> senderSuper = sender(CommandSender.class);
-    private final Sender<Sender1> senderSub1 = sender(Sender1.class, true);
-    private final Sender<Sender2> senderSub2 = sender(Sender2.class, true);
+    private final S<CommandSender> senderSuper = sender(CommandSender.class);
+    private final S<Sender1> senderSub1 = sender(Sender1.class, true);
+    private final S<Sender2> senderSub2 = sender(Sender2.class, true);
 
     private final Param<String> string = param(String.class)
             .build();
@@ -109,7 +109,7 @@ class CustomSenderTestCommand extends PropertyCommand<Void> {
     final boolean[] called = {false};
     private final Player expectedPlayer;
 
-    private final Sender<Player> sender = sender(Player.class);
+    private final S<Player> sender = sender(Player.class);
 
     CustomSenderTestCommand(Player expectedPlayer) {
         super("test-command");
