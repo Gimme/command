@@ -58,10 +58,7 @@ abstract class BaseCommand<out R>(
     private lateinit var _commandSender: CommandSender
     private lateinit var _args: Map<CommandParameter, Any?>
 
-    private var paramFieldById: MutableMap<String, Field> = mutableMapOf()
-    private var paramBuilderFieldById: MutableMap<String, Param<*>> = mutableMapOf()
-
-    // TODO: same for senders as above
+    private val argumentPropertySetters: MutableMap<CommandParameter, (Any?) -> Unit> = mutableMapOf()
     private var senderFields: MutableSet<Field> = mutableSetOf()
 
     @JvmOverloads
@@ -75,13 +72,8 @@ abstract class BaseCommand<out R>(
         _commandSender = commandSender
         _args = args
 
-        paramFieldById.forEach { (id, field) ->
-            field.isAccessible = true
-            field.set(this, args.entries.firstOrNull { it.key.id == id }?.value)
-        }
-
-        paramBuilderFieldById.forEach { (id, param) ->
-            param.set(args.entries.firstOrNull { it.key.id == id }?.value)
+        args.forEach { (parameter, arg) ->
+            argumentPropertySetters[parameter]?.invoke(arg)
         }
 
         senderFields.forEach { field ->
@@ -165,14 +157,69 @@ abstract class BaseCommand<out R>(
         val suggestions: (() -> Set<String>)?,
         val defaultValue: DefaultValue?,
         val description: String?,
+        val setValue: ((value: Any?) -> Unit)? = null,
     ) {
         companion object {
+            fun fromField(field: Field, obj: Any): ParameterSettings? {
+                val paramAnnotation: Parameter? = field.kotlinProperty?.findAnnotation()
+
+                return when {
+                    paramAnnotation != null -> {
+                        val name = field.name
+
+                        fromType(
+                            name = name,
+                            annotation = paramAnnotation,
+                            type = field.kotlinProperty!!.returnType,
+                            setValue = {
+                                field.isAccessible = true
+                                field.set(obj, it)
+                            },
+                        )
+                    }
+                    Param::class.java.isAssignableFrom(field.type) -> {
+                        val name = field.name.removeSuffix("\$delegate")
+
+                        field.isAccessible = true
+                        @Suppress("UNCHECKED_CAST")
+                        val value = field.get(obj) as Param<*>
+
+                        val type: KType = field.kotlinProperty!!.returnType.let {
+                            if (it.jvmErasure.isSubclassOf(Param::class)) {
+                                it.arguments.first().type!!
+                            } else {
+                                it
+                            }
+                        }
+
+                        fromType(
+                            name = name,
+                            annotation = null,
+                            type = type,
+                            suggestions = value.suggestions,
+                            defaultValue = value.defaultValue,
+                            setValue = { value.set(it) },
+                        )
+                    }
+                    else -> null
+                }
+            }
+
+            fun fromFunctionParameter(functionParameter: KParameter): ParameterSettings {
+                return fromType(
+                    name = functionParameter.name ?: throw UnsupportedParameterException(functionParameter),
+                    annotation = functionParameter.findAnnotation(),
+                    type = functionParameter.type,
+                )
+            }
+
             fun fromType(
                 name: String,
                 annotation: Parameter?,
                 type: KType,
                 suggestions: (() -> Set<String>)? = null,
                 defaultValue: DefaultValue? = null,
+                setValue: ((value: Any?) -> Unit)? = null,
             ): ParameterSettings {
                 annotation?.getDefaultValue()?.also {
                     if (!type.isMarkedNullable && it.value == null) {
@@ -214,6 +261,7 @@ abstract class BaseCommand<out R>(
                     suggestions = suggestions,
                     defaultValue = _defaultValue,
                     description = description,
+                    setValue = setValue,
                 )
             }
         }
@@ -234,75 +282,20 @@ abstract class BaseCommand<out R>(
     private fun generateParameters(): CommandParameterSet {
         val paramSettings = mutableListOf<ParameterSettings>()
 
-        val declaredFields = this.javaClass.declaredFields
-        println(declaredFields)
-
         this.javaClass.declaredFields.forEach { field ->
-            val paramAnnotation: Parameter? = field.kotlinProperty?.findAnnotation()
-
-            val settings = when {
-                paramAnnotation != null -> {
-                    val name = field.name
-
-                    paramFieldById[name] = field
-
-                    ParameterSettings.fromType(
-                        name = name,
-                        annotation = paramAnnotation,
-                        type = field.kotlinProperty!!.returnType
-                    )
-                }
-                Param::class.java.isAssignableFrom(field.type) -> {
-                    val name = field.name.removeSuffix("\$delegate")
-
-                    field.isAccessible = true
-                    @Suppress("UNCHECKED_CAST")
-                    val value = field.get(this) as Param<*>
-
-                    paramBuilderFieldById[name] = value
-
-                    val type: KType = field.kotlinProperty!!.returnType.let {
-                        if (it.jvmErasure.isSubclassOf(Param::class)) {
-                            it.arguments.first().type!!
-                        } else {
-                            it
-                        }
-                    }
-
-                    ParameterSettings.fromType(
-                        name = name,
-                        annotation = null,
-                        type = type,
-                        suggestions = value.suggestions,
-                        defaultValue = value.defaultValue,
-                    )
-                }
-                else -> null
-            }
-
-            if (settings != null) {
-                paramSettings.add(settings)
+            ParameterSettings.fromField(field, this)?.let {
+                paramSettings.add(it)
             }
         }
 
         commandFunction?.also { commandFunction ->
-            val senderParameters: List<KParameter> = commandFunction.parameters
-                .filter {
-                    it.kind == KParameter.Kind.VALUE &&
-                            (it.type.isSubtypeOf(CommandSender::class.createType(nullable = true)) || it.hasAnnotation<dev.gimme.gimmeapi.command.annotations.Sender>())
-                }
-
-            val valueParameters: List<KParameter> = commandFunction.parameters
-                .minus(senderParameters)
-                .filter { it.kind == KParameter.Kind.VALUE }
-
-            paramSettings.addAll(valueParameters.map { param ->
-                ParameterSettings.fromType(
-                    name = param.name ?: throw UnsupportedParameterException(param),
-                    annotation = param.findAnnotation(),
-                    type = param.type,
-                )
-            })
+            paramSettings.addAll(
+                commandFunction.parameters
+                    .filter { it.isCommandParameter() }
+                    .map { param ->
+                        ParameterSettings.fromFunctionParameter(param)
+                    }
+            )
         }
 
         return generateParameters(paramSettings)
@@ -312,9 +305,7 @@ abstract class BaseCommand<out R>(
         val senderSettings = mutableListOf<SenderSettings>()
 
         this.javaClass.declaredFields.forEach { field ->
-            val senderAnnotation: Sender? = field.kotlinProperty?.findAnnotation()
-
-            if (senderAnnotation != null) {
+            if (field.kotlinProperty?.hasAnnotation<Sender>() == true) {
                 senderFields.add(field)
 
                 senderSettings.add(SenderSettings.fromType(type = field.kotlinProperty!!.returnType))
@@ -322,17 +313,20 @@ abstract class BaseCommand<out R>(
         }
 
         commandFunction?.also { commandFunction ->
-            val senderParameters: List<KParameter> = commandFunction.parameters
-                .filter {
-                    it.kind == KParameter.Kind.VALUE &&
-                            (it.type.isSubtypeOf(CommandSender::class.createType(nullable = true)) || it.hasAnnotation<dev.gimme.gimmeapi.command.annotations.Sender>())
-                }
-
-            senderSettings.addAll(senderParameters.map { SenderSettings.fromType(type = it.type) })
+            senderSettings.addAll(
+                commandFunction.parameters
+                    .filter { it.isSenderParameter() }
+                    .map { SenderSettings.fromType(type = it.type) }
+            )
         }
 
         return generateSenders(senderSettings)
     }
+
+    private fun KParameter.isSenderParameter() = this.kind == KParameter.Kind.VALUE &&
+            (this.type.isSubtypeOf(CommandSender::class.createType(nullable = true)) || this.hasAnnotation<Sender>())
+
+    private fun KParameter.isCommandParameter() = !this.isSenderParameter() && this.kind == KParameter.Kind.VALUE
 
     /**
      * Generates a set of [CommandParameter]s based on the supplied [parameterSettings].
@@ -365,7 +359,9 @@ abstract class BaseCommand<out R>(
                 flags = flags,
                 defaultValue = defaultValue,
                 description = description
-            )
+            ).also { parameter ->
+                settings.setValue?.let { argumentPropertySetters[parameter] = it }
+            }
         }.also { parameterList ->
             val groupedParameters: Map<String, Int> =
                 parameterList.groupingBy { it.id }.eachCount().filter { it.value > 1 }

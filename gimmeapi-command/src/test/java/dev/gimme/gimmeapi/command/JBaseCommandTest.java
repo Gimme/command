@@ -4,8 +4,8 @@ import dev.gimme.gimmeapi.command.annotations.Parameter;
 import dev.gimme.gimmeapi.command.annotations.Sender;
 import dev.gimme.gimmeapi.command.parameter.CommandParameter;
 import dev.gimme.gimmeapi.command.sender.CommandSender;
-import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
@@ -113,7 +113,9 @@ class JTestCommand1 extends BaseCommand<Void> {
     }
 }
 
-class JPlayer {}
+class JPlayer {
+}
+
 class JPlayerSender implements CommandSender {
     final JPlayer player;
 
@@ -123,10 +125,13 @@ class JPlayerSender implements CommandSender {
 
     @NotNull
     @Override
-    public String getName() { return "player"; }
+    public String getName() {
+        return "player";
+    }
 
     @Override
-    public void sendMessage(@NotNull String message) { }
+    public void sendMessage(@NotNull String message) {
+    }
 }
 
 class JTestCommand2 extends BaseCommand<Void> {
