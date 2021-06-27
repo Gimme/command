@@ -150,7 +150,7 @@ abstract class BaseCommand<out R>(
         return function.callBy(typedArgsMap)
     }
 
-    protected class ParameterSettings private constructor(
+    private class ParameterSettings(
         val name: String,
         val form: CommandParameter.Form,
         val klass: KClass<*>,
@@ -164,19 +164,6 @@ abstract class BaseCommand<out R>(
                 val paramAnnotation: Parameter? = field.kotlinProperty?.findAnnotation()
 
                 return when {
-                    paramAnnotation != null -> {
-                        val name = field.name
-
-                        fromType(
-                            name = name,
-                            annotation = paramAnnotation,
-                            type = field.kotlinProperty!!.returnType,
-                            setValue = {
-                                field.isAccessible = true
-                                field.set(obj, it)
-                            },
-                        )
-                    }
                     Param::class.java.isAssignableFrom(field.type) -> {
                         val name = field.name.removeSuffix("\$delegate")
 
@@ -199,6 +186,19 @@ abstract class BaseCommand<out R>(
                             suggestions = value.suggestions,
                             defaultValue = value.defaultValue,
                             setValue = { value.set(it) },
+                        )
+                    }
+                    paramAnnotation != null -> {
+                        val name = field.name
+
+                        fromType(
+                            name = name,
+                            annotation = paramAnnotation,
+                            type = field.kotlinProperty!!.returnType,
+                            setValue = {
+                                field.isAccessible = true
+                                field.set(obj, it)
+                            },
                         )
                     }
                     else -> null
