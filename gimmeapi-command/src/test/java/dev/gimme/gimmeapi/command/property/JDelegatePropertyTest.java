@@ -78,11 +78,9 @@ class MultipleSenderTestCommand extends PropertyCommand<Void> {
     private final S<Sender1> senderSub1 = sender(Sender1.class, true);
     private final S<Sender2> senderSub2 = sender(Sender2.class, true);
 
-    private final Param<String> string = param(String.class)
-            .build();
+    private final Param<String> string = param();
 
-    private final Param<Integer> i = param(Integer.class)
-            .build();
+    private final Param<Integer> i = param();
 
     MultipleSenderTestCommand(CommandSender expectedSender) {
         super("test-command");
@@ -131,29 +129,21 @@ class DelegateTestCommand extends PropertyCommand<Void> {
 
     final boolean[] called = {false};
 
-    private final Param<String> string = param(String.class)
-            .build();
+    private final Param<String> string = param();
 
-    private final Param<Integer> i = param(Integer.class)
-            .build();
+    private final Param<Integer> i = param();
 
-    private final Param<Double> d = param(Double.class)
-            .build();
+    private final Param<Double> d = param();
 
-    private final Param<Boolean> b = param(Boolean.class)
-            .build();
+    private final Param<Boolean> b = param();
 
-    private final Param<List<String>> list = param(String.class)
-            .list();
+    private final Param<List<String>> list = param();
 
-    private final Param<Set<String>> set = param(String.class)
-            .set();
+    private final Param<Set<String>> set = param();
 
-    private final Param<? extends Collection<String>> collection = param(String.class)
-            .list();
+    private final Param<? extends Collection<String>> collection = param();
 
-    private final Param<? extends Iterable<String>> iterable = param(String.class)
-            .list();
+    private final Param<? extends Iterable<String>> iterable = param();
 
     DelegateTestCommand() {
         super("test-command");

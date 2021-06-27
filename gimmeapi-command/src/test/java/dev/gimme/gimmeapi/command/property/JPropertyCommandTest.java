@@ -64,17 +64,13 @@ class PCmd extends PropertyCommand<Void> {
 
     final boolean[] called = {false};
 
-    private final Param<String> a = param(String.class)
-            .build();
+    private final Param<String> a = param();
 
-    private final Param<Integer> b = param(Integer.class)
-            .build();
+    private final Param<Integer> b = param();
 
-    private final Param<List<Double>> list = param(Double.class)
-            .list();
+    private final Param<List<Double>> list = param();
 
-    private final Param<Set<String>> set = param(String.class)
-            .set();
+    private final Param<Set<String>> set = param();
 
     PCmd(@NotNull String name) {
         super(name);

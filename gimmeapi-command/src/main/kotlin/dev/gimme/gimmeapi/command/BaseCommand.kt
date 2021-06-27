@@ -153,16 +153,22 @@ abstract class BaseCommand<out R>(
         return function.callBy(typedArgsMap)
     }
 
-    protected class ParameterSettings(
+    protected class ParameterSettings private constructor(
         val name: String,
-        val annotation: Parameter?,
         val form: CommandParameter.Form,
         val klass: KClass<*>,
-        val suggestions: (() -> Set<String>)? = null,
-        val defaultValue: DefaultValue? = null,
+        val suggestions: (() -> Set<String>)?,
+        val defaultValue: DefaultValue?,
+        val description: String?,
     ) {
         companion object {
-            fun fromType(name: String, annotation: Parameter?, type: KType): ParameterSettings {
+            fun fromType(
+                name: String,
+                annotation: Parameter?,
+                type: KType,
+                suggestions: (() -> Set<String>)? = null,
+                defaultValue: DefaultValue? = null,
+            ): ParameterSettings {
                 annotation?.getDefaultValue()?.also {
                     if (!type.isMarkedNullable && it.value == null) {
                         throw IllegalStateException("Parameter \"$name\" has a null default value for a type marked as non-nullable") // TODO: exception type
@@ -184,11 +190,25 @@ abstract class BaseCommand<out R>(
                     jvmErasure
                 }
 
+                var _defaultValue = defaultValue ?: annotation?.getDefaultValue()
+
+                if (_defaultValue == null && type.isMarkedNullable) _defaultValue = DefaultValue(null, null)
+
+                _defaultValue?.let {
+                    if (!type.isMarkedNullable && it.value == null) {
+                        throw IllegalStateException("Parameter \"${name}\" has to be marked nullable when having a null default value") // TODO: exception type
+                    }
+                }
+
+                val description = annotation?.description?.ifEmpty { null }
+
                 return ParameterSettings(
                     name = name,
-                    annotation = annotation,
                     form = form,
                     klass = klass,
+                    suggestions = suggestions,
+                    defaultValue = _defaultValue,
+                    description = description,
                 )
             }
         }
@@ -236,11 +256,18 @@ abstract class BaseCommand<out R>(
 
                     paramBuilderFieldById[name] = value
 
-                    ParameterSettings(
+                    val type: KType = field.kotlinProperty!!.returnType.let {
+                        if (it.jvmErasure.isSubclassOf(Param::class)) {
+                            it.arguments.first().type!!
+                        } else {
+                            it
+                        }
+                    }
+
+                    ParameterSettings.fromType(
                         name = name,
                         annotation = null,
-                        form = value.form,
-                        klass = value.klass,
+                        type = type,
                         suggestions = value.suggestions,
                         defaultValue = value.defaultValue,
                     )
@@ -324,7 +351,7 @@ abstract class BaseCommand<out R>(
 
             val id = name.splitCamelCase("-")
             val flags = generateFlags(id, usedFlags)
-            val defaultValue: DefaultValue? = settings.defaultValue ?: settings.annotation?.getDefaultValue()
+            val defaultValue: DefaultValue? = settings.defaultValue
             usedFlags.addAll(flags)
 
             val form = settings.form
@@ -333,10 +360,7 @@ abstract class BaseCommand<out R>(
             val type = ParameterTypes.get(klass)
             val suggestions: () -> Set<String> = settings.suggestions ?: type.values ?: { setOf() }
 
-            /* TODO
-            if (!settings.type.isMarkedNullable && defaultValue != null && defaultValue.value == null) {
-                throw IllegalStateException("Parameter \"$id\" has a null default value for a type marked as non-nullable") // TODO: exception type
-            }*/
+            val description = settings.description
 
             CommandParameter(
                 id = id,
@@ -346,7 +370,7 @@ abstract class BaseCommand<out R>(
                 suggestions = suggestions,
                 flags = flags,
                 defaultValue = defaultValue,
-                description = settings.annotation?.description?.ifEmpty { null }
+                description = description
             )
         }.also { parameterList ->
             val groupedParameters: Map<String, Int> =
@@ -460,7 +484,6 @@ abstract class BaseCommand<out R>(
 
     protected interface Param<out T> {
         val form: CommandParameter.Form
-        val klass: KClass<*>
         val suggestions: (() -> Set<String>)?
         val defaultValue: DefaultValue?
 
@@ -468,9 +491,7 @@ abstract class BaseCommand<out R>(
         fun set(value: Any?)
     }
 
-    protected inner class ParamBuilder<out T> internal constructor(
-        private var _klass: KClass<*>?
-    ) : CommandProperty<T>, CommandDelegate<T>, Param<T> {
+    protected inner class ParamBuilder<out T> internal constructor() : CommandProperty<T>, CommandDelegate<T>, Param<T> {
 
         @JvmSynthetic
         override operator fun getValue(thisRef: BaseCommand<*>, property: KProperty<*>): T = get()
@@ -498,47 +519,11 @@ abstract class BaseCommand<out R>(
 
         @JvmSynthetic
         override operator fun provideDelegate(thisRef: BaseCommand<*>, property: KProperty<*>): ParamBuilder<T> {
-            val jvmErasure = property.returnType.jvmErasure
-            val form = when {
-                jvmErasure.isSuperclassOf(MutableList::class) -> CommandParameter.Form.LIST
-                jvmErasure.isSuperclassOf(MutableSet::class) -> CommandParameter.Form.SET
-                else -> CommandParameter.Form.VALUE
-            }
-            form(form)
-
-            if (_klass == null) {
-                _klass = if (form.isCollection) {
-                    property.returnType.arguments.firstOrNull()?.type?.jvmErasure
-                        ?: throw RuntimeException("Unsupported parameter type: ${property.returnType}") // TODO: exception type
-                } else {
-                    jvmErasure
-                }
-            }
-            if (_defaultValue == null && property.returnType.isMarkedNullable) default(null)
-
-            _defaultValue?.let { defaultValue ->
-                if (!property.returnType.isMarkedNullable && defaultValue.value == null) {
-                    throw IllegalStateException("Parameter \"${property.name}\" has a null default value for a type marked as non-nullable") // TODO: exception type
-                }
-            }
-
             return this
-        }
-
-        @Deprecated("No need to explicitly build anymore")
-        fun build() = castToTypeUnchecked<T>()
-        fun list(): ParamBuilder<List<T>> = form(CommandParameter.Form.LIST).castToTypeUnchecked()
-        fun set(): ParamBuilder<Set<T>> = form(CommandParameter.Form.SET).castToTypeUnchecked()
-
-        private fun <S> castToTypeUnchecked(): ParamBuilder<S> {
-            @Suppress("UNCHECKED_CAST")
-            return this as ParamBuilder<S>
         }
 
         override val form: CommandParameter.Form
             get() = _form ?: CommandParameter.Form.VALUE
-        override val klass: KClass<*>
-            get() = _klass!!
         override val suggestions: (() -> Set<String>)?
             get() = _suggestions
         override val defaultValue: DefaultValue?
@@ -552,10 +537,7 @@ abstract class BaseCommand<out R>(
     protected fun <T : Any> sender(klass: Class<T>, optional: Boolean = false): S<T> =
         createSenderDelegate(klass.kotlin, optional)
 
-    @JvmSynthetic
-    protected fun <T> param(): ParamBuilder<T> = ParamBuilder(null)
-
-    protected fun <T : Any> param(klass: Class<T>): ParamBuilder<T> = ParamBuilder(klass.kotlin)
+    protected fun <T> param(): ParamBuilder<T> = ParamBuilder()
 
     private fun <T> createSenderDelegate(klass: KClass<*>, optional: Boolean): S<T> {
         return S(klass, optional)

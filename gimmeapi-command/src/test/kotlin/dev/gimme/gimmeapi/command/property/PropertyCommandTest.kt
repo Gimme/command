@@ -38,7 +38,7 @@ internal class PropertyCommandTest {
 
             val a: String? by param()
 
-            val b: Param<Int?> = param(Int::class.java)
+            val b: Param<Int?> = param()
 
             val list: List<Double> by param()
 
