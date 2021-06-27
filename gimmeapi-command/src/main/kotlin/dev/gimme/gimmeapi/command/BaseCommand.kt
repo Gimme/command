@@ -60,6 +60,7 @@ abstract class BaseCommand<out R>(
 
     private var paramFieldById: MutableMap<String, Field> = mutableMapOf()
     private var paramBuilderFieldById: MutableMap<String, Param<*>> = mutableMapOf()
+
     // TODO: same for senders as above
     private var senderFields: MutableSet<Field> = mutableSetOf()
 
@@ -120,7 +121,11 @@ abstract class BaseCommand<out R>(
      * @throws CommandException if the command execution was unsuccessful
      */
     @Throws(CommandException::class)
-    private fun executeByFunction(function: KFunction<R>, commandSender: CommandSender, args: Map<CommandParameter, Any?>): R {
+    private fun executeByFunction(
+        function: KFunction<R>,
+        commandSender: CommandSender,
+        args: Map<CommandParameter, Any?>
+    ): R {
         val params: List<KParameter> = function.parameters
 
         // First argument has to be the instance (command)
@@ -313,17 +318,6 @@ abstract class BaseCommand<out R>(
                 senderFields.add(field)
 
                 senderSettings.add(SenderSettings.fromType(type = field.kotlinProperty!!.returnType))
-            } else if (S::class.java.isAssignableFrom(field.type)) {
-                field.isAccessible = true
-                @Suppress("UNCHECKED_CAST")
-                val value = field.get(this) as S<*>
-
-                senderSettings.add(
-                    SenderSettings(
-                        klass = value.klass,
-                        optional = value.optional,
-                    )
-                )
             }
         }
 
@@ -463,27 +457,7 @@ abstract class BaseCommand<out R>(
         return sb.toString()
     }
 
-    protected inner class S<out T>(val klass: KClass<*>, val optional: Boolean) : CommandDelegate<T> {
-
-        @JvmSynthetic
-        override operator fun getValue(thisRef: BaseCommand<*>, property: KProperty<*>): T = get()
-
-        @Suppress("UNCHECKED_CAST")
-        fun get(): T {
-            if (_commandSender::class.isSubclassOf(klass)) {
-                return _commandSender as T
-            }
-
-            SenderTypes.adapt(_commandSender, klass)?.let {
-                return it as T
-            }
-
-            return null as T
-        }
-    }
-
     protected interface Param<out T> {
-        val form: CommandParameter.Form
         val suggestions: (() -> Set<String>)?
         val defaultValue: DefaultValue?
 
@@ -491,67 +465,36 @@ abstract class BaseCommand<out R>(
         fun set(value: Any?)
     }
 
-    protected inner class ParamBuilder<out T> internal constructor() : CommandProperty<T>, CommandDelegate<T>, Param<T> {
+    protected inner class ParamBuilder<out T> internal constructor() : CommandProperty<T>, CommandDelegate<T>,
+        Param<T> {
 
-        @JvmSynthetic
-        override operator fun getValue(thisRef: BaseCommand<*>, property: KProperty<*>): T = get()
+        override var suggestions: (() -> Set<String>)? = null
+        override var defaultValue: DefaultValue? = null
 
         private var value: Any? = null
+
         @Suppress("UNCHECKED_CAST")
         override fun get() = value as T
         override fun set(value: Any?) {
             this.value = value
         }
 
-        private var _defaultValue: DefaultValue? = null
-        private var _form: CommandParameter.Form? = null
-        private var _suggestions: (() -> Set<String>)? = null
-
         /** @see DefaultValue */
         @JvmOverloads
         @JvmName("defaultValue")
         fun default(value: String?, representation: String? = value) =
-            apply { this._defaultValue = DefaultValue(value, representation) }
+            apply { this.defaultValue = DefaultValue(value, representation) }
 
-        private fun form(form: CommandParameter.Form) = apply { this._form = form }
-
-        fun suggestions(suggestions: () -> Set<String>) = apply { this._suggestions = suggestions }
+        fun suggestions(suggestions: () -> Set<String>) = apply { this.suggestions = suggestions }
 
         @JvmSynthetic
         override operator fun provideDelegate(thisRef: BaseCommand<*>, property: KProperty<*>): ParamBuilder<T> {
             return this
         }
 
-        override val form: CommandParameter.Form
-            get() = _form ?: CommandParameter.Form.VALUE
-        override val suggestions: (() -> Set<String>)?
-            get() = _suggestions
-        override val defaultValue: DefaultValue?
-            get() = _defaultValue
+        @JvmSynthetic
+        override operator fun getValue(thisRef: BaseCommand<*>, property: KProperty<*>): T = get()
     }
-
-    @JvmSynthetic
-    protected fun <T> sender(): SenderProperty<T> = SenderProperty()
-
-    @JvmOverloads
-    protected fun <T : Any> sender(klass: Class<T>, optional: Boolean = false): S<T> =
-        createSenderDelegate(klass.kotlin, optional)
 
     protected fun <T> param(): ParamBuilder<T> = ParamBuilder()
-
-    private fun <T> createSenderDelegate(klass: KClass<*>, optional: Boolean): S<T> {
-        return S(klass, optional)
-    }
-
-    protected inner class SenderProperty<out T> internal constructor() : CommandProperty<T> {
-
-        @JvmSynthetic
-        override operator fun provideDelegate(thisRef: BaseCommand<*>, property: KProperty<*>): CommandDelegate<T> {
-            @Suppress("UNCHECKED_CAST")
-            val klass = property.returnType.jvmErasure
-            val optional = property.returnType.isMarkedNullable
-
-            return createSenderDelegate(klass, optional)
-        }
-    }
 }

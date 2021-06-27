@@ -66,19 +66,6 @@ class BaseCommandTest {
     }
 
     @Test
-    fun senderDelegate() {
-        testCommand(object : BaseCommand<Any>("test-command") {
-            private val sender: CommandSender by sender()
-
-            override fun call() {
-                assertEquals(dummySender, sender)
-
-                called = true
-            }
-        })
-    }
-
-    @Test
     fun parameterAnnotation() {
         val arg1 = "arg1"
         val command = object : BaseCommand<Any>("test-command") {
