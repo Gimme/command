@@ -522,14 +522,15 @@ abstract class BaseCommand<out R>(
                 }
             }
 
-            return build()
+            return this
         }
 
-        fun build() = buildOfType<T>()
-        fun buildList(): ParamBuilder<List<T>> = form(CommandParameter.Form.LIST).buildOfType()
-        fun buildSet(): ParamBuilder<Set<T>> = form(CommandParameter.Form.SET).buildOfType()
+        @Deprecated("No need to explicitly build anymore")
+        fun build() = castToTypeUnchecked<T>()
+        fun list(): ParamBuilder<List<T>> = form(CommandParameter.Form.LIST).castToTypeUnchecked()
+        fun set(): ParamBuilder<Set<T>> = form(CommandParameter.Form.SET).castToTypeUnchecked()
 
-        private fun <S> buildOfType(): ParamBuilder<S> {
+        private fun <S> castToTypeUnchecked(): ParamBuilder<S> {
             @Suppress("UNCHECKED_CAST")
             return this as ParamBuilder<S>
         }

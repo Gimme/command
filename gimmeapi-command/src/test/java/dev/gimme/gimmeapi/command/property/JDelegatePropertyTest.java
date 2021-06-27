@@ -144,16 +144,16 @@ class DelegateTestCommand extends PropertyCommand<Void> {
             .build();
 
     private final Param<List<String>> list = param(String.class)
-            .buildList();
+            .list();
 
     private final Param<Set<String>> set = param(String.class)
-            .buildSet();
+            .set();
 
     private final Param<? extends Collection<String>> collection = param(String.class)
-            .buildList();
+            .list();
 
     private final Param<? extends Iterable<String>> iterable = param(String.class)
-            .buildList();
+            .list();
 
     DelegateTestCommand() {
         super("test-command");

@@ -71,10 +71,10 @@ class PCmd extends PropertyCommand<Void> {
             .build();
 
     private final Param<List<Double>> list = param(Double.class)
-            .buildList();
+            .list();
 
     private final Param<Set<String>> set = param(String.class)
-            .buildSet();
+            .set();
 
     PCmd(@NotNull String name) {
         super(name);
