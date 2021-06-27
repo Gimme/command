@@ -57,7 +57,7 @@ class BaseCommandTest {
 
         testCommand(
             command,
-            mapOf(command.parameters.first() to arg1),
+            listOf(arg1),
         )
     }
 
@@ -76,7 +76,88 @@ class BaseCommandTest {
 
         testCommand(
             command,
-            mapOf(command.parameters.first() to arg1),
+            listOf(arg1),
+        )
+    }
+
+    @Test
+    fun `Handles various parameter types`() {
+        val listArg = listOf("a", "b", "a")
+        val halfArgs = listOf(
+            "a",
+            1,
+            0.5,
+            true,
+            listArg.toList(),
+            listArg.toSet(),
+            listArg.toList(),
+            listArg.toList(),
+        )
+        val args = halfArgs.plus(halfArgs)
+
+        val command = object : BaseCommand<Any>("test-command") {
+
+            val string1: String by param()
+            val int1: Int by param()
+            val double1: Double by param()
+            val boolean1: Boolean by param()
+            val list1: List<String> by param()
+            val set1: Set<String> by param()
+            val collection1: Collection<String> by param()
+            val iterable1: Iterable<String> by param()
+
+            @Parameter
+            lateinit var string2: String
+
+            @Parameter
+            var int2: Int = 0
+
+            @Parameter
+            var double2: Double = 0.0
+
+            @Parameter
+            var boolean2: Boolean = false
+
+            @Parameter
+            lateinit var list2: List<String>
+
+            @Parameter
+            lateinit var set2: Set<String>
+
+            @Parameter
+            lateinit var collection2: Collection<String>
+
+            @Parameter
+            lateinit var iterable2: Iterable<String>
+
+            override fun call() {
+                val iter = args.iterator()
+
+                assertEquals(iter.next(), string1)
+                assertEquals(iter.next(), int1)
+                assertEquals(iter.next(), double1)
+                assertEquals(iter.next(), boolean1)
+                assertEquals(iter.next(), list1)
+                assertEquals(iter.next(), set1)
+                assertEquals(iter.next(), collection1)
+                assertEquals(iter.next(), iterable1)
+
+                assertEquals(iter.next(), string2)
+                assertEquals(iter.next(), int2)
+                assertEquals(iter.next(), double2)
+                assertEquals(iter.next(), boolean2)
+                assertEquals(iter.next(), list2)
+                assertEquals(iter.next(), set2)
+                assertEquals(iter.next(), collection2)
+                assertEquals(iter.next(), iterable2)
+
+                called = true
+            }
+        }
+
+        testCommand(
+            command,
+            args,
         )
     }
 
@@ -89,4 +170,16 @@ class BaseCommandTest {
         command.execute(sender, args)
         assertTrue(called)
     }
+
+    private fun testCommand(
+        command: BaseCommand<*>,
+        args: List<Any?>,
+        sender: CommandSender = dummySender,
+    ) = testCommand(
+        command,
+        command.parameters.mapIndexed { index, commandParameter ->
+            commandParameter to args[index]
+        }.toMap(),
+        sender,
+    )
 }
