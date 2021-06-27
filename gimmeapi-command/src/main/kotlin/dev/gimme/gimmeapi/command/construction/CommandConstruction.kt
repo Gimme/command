@@ -2,7 +2,7 @@ package dev.gimme.gimmeapi.command.construction
 
 import dev.gimme.gimmeapi.command.BaseCommand
 import dev.gimme.gimmeapi.command.Command
-import dev.gimme.gimmeapi.command.ParameterTypes
+import dev.gimme.gimmeapi.command.parameter.ParameterTypes
 import dev.gimme.gimmeapi.command.annotations.Sender
 import dev.gimme.gimmeapi.command.exception.CommandException
 import dev.gimme.gimmeapi.command.function.CommandFunction

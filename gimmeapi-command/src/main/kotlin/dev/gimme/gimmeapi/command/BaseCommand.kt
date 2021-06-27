@@ -16,6 +16,7 @@ import dev.gimme.gimmeapi.command.parameter.DefaultValue
 import dev.gimme.gimmeapi.command.property.CommandDelegate
 import dev.gimme.gimmeapi.command.property.CommandProperty
 import dev.gimme.gimmeapi.command.sender.CommandSender
+import dev.gimme.gimmeapi.command.sender.SenderTypes
 import java.lang.reflect.Field
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction

@@ -1,7 +1,7 @@
 package dev.gimme.gimmeapi.mc
 
-import dev.gimme.gimmeapi.command.ParameterTypes
-import dev.gimme.gimmeapi.command.SenderTypes
+import dev.gimme.gimmeapi.command.parameter.ParameterTypes
+import dev.gimme.gimmeapi.command.sender.SenderTypes
 import dev.gimme.gimmeapi.command.channel.TextCommandChannel
 import dev.gimme.gimmeapi.command.manager.CommandManager
 import dev.gimme.gimmeapi.mc.command.ChatCommandChannel

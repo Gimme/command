@@ -3,6 +3,7 @@ package dev.gimme.gimmeapi.command
 import dev.gimme.gimmeapi.command.channel.TextCommandChannel
 import dev.gimme.gimmeapi.command.manager.TextCommandManager
 import dev.gimme.gimmeapi.command.parameter.CommandParameter
+import dev.gimme.gimmeapi.command.parameter.ParameterTypes
 import dev.gimme.gimmeapi.command.sender.CommandSender
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.params.ParameterizedTest

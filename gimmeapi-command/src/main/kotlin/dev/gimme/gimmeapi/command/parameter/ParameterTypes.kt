@@ -1,8 +1,7 @@
-package dev.gimme.gimmeapi.command
+package dev.gimme.gimmeapi.command.parameter
 
 import dev.gimme.gimmeapi.command.exception.ErrorCode
 import dev.gimme.gimmeapi.command.exception.UnsupportedParameterTypeException
-import dev.gimme.gimmeapi.command.parameter.ParameterType
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
 

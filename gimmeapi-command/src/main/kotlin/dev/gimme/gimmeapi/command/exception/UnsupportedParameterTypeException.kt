@@ -1,6 +1,6 @@
 package dev.gimme.gimmeapi.command.exception
 
-import dev.gimme.gimmeapi.command.ParameterTypes
+import dev.gimme.gimmeapi.command.parameter.ParameterTypes
 import dev.gimme.gimmeapi.command.parameter.ParameterType
 import kotlin.reflect.KClass
 

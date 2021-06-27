@@ -1,5 +1,6 @@
 package dev.gimme.gimmeapi.command
 
+import dev.gimme.gimmeapi.command.parameter.ParameterTypes
 import org.junit.jupiter.api.Assertions.assertAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test

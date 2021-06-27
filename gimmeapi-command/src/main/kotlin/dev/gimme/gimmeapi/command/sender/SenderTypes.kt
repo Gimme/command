@@ -1,6 +1,5 @@
-package dev.gimme.gimmeapi.command
+package dev.gimme.gimmeapi.command.sender
 
-import dev.gimme.gimmeapi.command.sender.CommandSender
 import kotlin.reflect.KClass
 
 // TODO: document

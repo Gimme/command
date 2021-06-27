@@ -5,6 +5,8 @@ import dev.gimme.gimmeapi.command.annotations.Sender;
 import dev.gimme.gimmeapi.command.parameter.CommandParameter;
 import dev.gimme.gimmeapi.command.sender.CommandSender;
 import javax.annotation.Nullable;
+
+import dev.gimme.gimmeapi.command.sender.SenderTypes;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 

@@ -1,6 +1,5 @@
 package dev.gimme.gimmeapi.command.property;
 
-import dev.gimme.gimmeapi.command.SenderTypes;
 import dev.gimme.gimmeapi.command.UtilsKt;
 import dev.gimme.gimmeapi.command.parameter.CommandParameter;
 import dev.gimme.gimmeapi.command.sender.CommandSender;

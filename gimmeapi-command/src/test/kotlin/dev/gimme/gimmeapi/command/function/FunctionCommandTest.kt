@@ -1,7 +1,7 @@
 package dev.gimme.gimmeapi.command.function
 
 import dev.gimme.gimmeapi.command.DUMMY_COMMAND_SENDER
-import dev.gimme.gimmeapi.command.SenderTypes
+import dev.gimme.gimmeapi.command.sender.SenderTypes
 import dev.gimme.gimmeapi.command.annotations.Parameter
 import dev.gimme.gimmeapi.command.channel.TextCommandChannel
 import dev.gimme.gimmeapi.command.sender.CommandSender
