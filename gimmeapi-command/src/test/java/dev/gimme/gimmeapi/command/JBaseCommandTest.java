@@ -4,6 +4,8 @@ import dev.gimme.gimmeapi.command.annotations.Parameter;
 import dev.gimme.gimmeapi.command.annotations.Sender;
 import dev.gimme.gimmeapi.command.parameter.CommandParameter;
 import dev.gimme.gimmeapi.command.sender.CommandSender;
+import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nullable;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
@@ -31,6 +33,16 @@ class JBaseCommandTest {
     }
 
     @Test
+    void multipleSenders() {
+        SenderTypes.INSTANCE.registerAdapter(JPlayer.class, JPlayerSender.class, (s) -> s.player);
+
+        JPlayer player = new JPlayer();
+        JPlayerSender playerSender = new JPlayerSender(player);
+        testCommand(new JTestCommand2(dummySender, null, null), List.of(), dummySender);
+        testCommand(new JTestCommand2(playerSender, playerSender, player), List.of(), playerSender);
+    }
+
+    @Test
     void handles_various_parameter_types() {
         List<String> listArg = List.of("a", "b", "a");
         List<Object> halfArgs = List.of(
@@ -45,7 +57,7 @@ class JBaseCommandTest {
         );
         List<Object> args = Stream.concat(halfArgs.stream(), halfArgs.stream()).collect(Collectors.toList());
 
-        BaseCommand<Void> command = new JTestCommand2(args);
+        BaseCommand<Void> command = new JTestCommand3(args);
 
         testCommand(
                 command,
@@ -101,7 +113,57 @@ class JTestCommand1 extends BaseCommand<Void> {
     }
 }
 
+class JPlayer {}
+class JPlayerSender implements CommandSender {
+    final JPlayer player;
+
+    JPlayerSender(JPlayer player) {
+        this.player = player;
+    }
+
+    @NotNull
+    @Override
+    public String getName() { return "player"; }
+
+    @Override
+    public void sendMessage(@NotNull String message) { }
+}
+
 class JTestCommand2 extends BaseCommand<Void> {
+
+    @Sender
+    private CommandSender sender;
+    @Sender
+    @Nullable
+    private JPlayerSender playerSender;
+    @Sender
+    @Nullable
+    private JPlayer player;
+
+    @Override
+    protected Void call() {
+        assertEquals(expectedSender1, sender);
+        assertEquals(expectedSender2, playerSender);
+        assertEquals(expectedSender3, player);
+
+        JBaseCommandTest.called = true;
+        return null;
+    }
+
+    private final Object expectedSender1;
+    private final Object expectedSender2;
+    private final Object expectedSender3;
+
+    JTestCommand2(Object expectedSender1, Object expectedSender2, Object expectedSender3) {
+        super("test-command");
+
+        this.expectedSender1 = expectedSender1;
+        this.expectedSender2 = expectedSender2;
+        this.expectedSender3 = expectedSender3;
+    }
+}
+
+class JTestCommand3 extends BaseCommand<Void> {
 
     private final Param<String> string1 = param();
     private final Param<Integer> int1 = param();
@@ -164,7 +226,7 @@ class JTestCommand2 extends BaseCommand<Void> {
 
     private final List<Object> args;
 
-    JTestCommand2(List<Object> args) {
+    JTestCommand3(List<Object> args) {
         super("test-command");
 
         this.args = args;

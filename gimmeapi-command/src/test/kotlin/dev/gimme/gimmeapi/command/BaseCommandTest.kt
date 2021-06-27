@@ -29,6 +29,43 @@ class BaseCommandTest {
     }
 
     @Test
+    fun multipleSenders() {
+        class Player
+        class PlayerSender(val player: Player) : CommandSender {
+            override val name = "player"
+            override fun sendMessage(message: String) {}
+        }
+        SenderTypes.registerAdapter<Player, PlayerSender> { it.player }
+
+        class TestCommand(
+            val expectedSender1: Any?,
+            val expectedSender2: Any?,
+            val expectedSender3: Any?,
+        ) : BaseCommand<Any>("test-command") {
+
+            @Sender
+            private lateinit var sender: CommandSender
+            @Sender
+            private val playerSender: PlayerSender? = null
+            @Sender
+            private val player: Player? = null
+
+            override fun call() {
+                assertEquals(expectedSender1, sender)
+                assertEquals(expectedSender2, playerSender)
+                assertEquals(expectedSender3, player)
+
+                called = true
+            }
+        }
+
+        val player = Player()
+        val playerSender = PlayerSender(player)
+        testCommand(TestCommand(dummySender, null, null), sender = dummySender)
+        testCommand(TestCommand(playerSender, playerSender, player), sender = playerSender)
+    }
+
+    @Test
     fun senderDelegate() {
         testCommand(object : BaseCommand<Any>("test-command") {
             private val sender: CommandSender by sender()
@@ -166,7 +203,7 @@ class BaseCommandTest {
         args: Map<CommandParameter, Any?> = mapOf(),
         sender: CommandSender = dummySender,
     ) {
-        assertFalse(called)
+        called = false
         command.execute(sender, args)
         assertTrue(called)
     }
