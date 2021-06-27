@@ -64,7 +64,7 @@ abstract class BaseCommand<out R>(
     @JvmOverloads
     constructor(name: String, parent: CommandNode? = null) : this(name, parent, setOf())
 
-    override fun execute(commandSender: CommandSender, args: Map<CommandParameter, Any?>): R {
+    final override fun execute(commandSender: CommandSender, args: Map<CommandParameter, Any?>): R {
         if (senderTypes?.any {
                 commandSender::class.isSubclassOf(it) || SenderTypes.adapt(commandSender, it) != null
             } == false) throw ErrorCode.INCOMPATIBLE_SENDER.createException()
@@ -129,7 +129,7 @@ abstract class BaseCommand<out R>(
                 commandSender::class.isSubclassOf(param.type.jvmErasure) -> {
                     param.type.jvmErasure.safeCast(commandSender)
                 }
-                param.hasAnnotation<dev.gimme.gimmeapi.command.annotations.Sender>() -> {
+                param.hasAnnotation<Sender>() -> {
                     SenderTypes.adapt(commandSender, param.type.jvmErasure)
                 }
                 else -> return@forEach
