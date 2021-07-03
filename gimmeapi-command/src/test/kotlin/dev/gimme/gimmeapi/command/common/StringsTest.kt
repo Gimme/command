@@ -1,4 +1,4 @@
-package dev.gimme.gimmeapi.core.common
+package dev.gimme.gimmeapi.command.common
 
 import org.junit.jupiter.api.Assertions.assertAll
 import org.junit.jupiter.api.Assertions.assertEquals

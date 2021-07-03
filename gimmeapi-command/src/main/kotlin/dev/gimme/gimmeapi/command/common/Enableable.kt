@@ -1,4 +1,4 @@
-package dev.gimme.gimmeapi.core.common
+package dev.gimme.gimmeapi.command.common
 
 /**
  * Represents something that can be enabled and disabled.

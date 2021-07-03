@@ -2,7 +2,7 @@ package dev.gimme.gimmeapi.command.channel
 
 import dev.gimme.gimmeapi.command.manager.CommandManager
 import dev.gimme.gimmeapi.command.sender.MessageReceiver
-import dev.gimme.gimmeapi.core.common.Enableable
+import dev.gimme.gimmeapi.command.common.Enableable
 
 /**
  * Represents a channel through which commands can be sent and responses received.

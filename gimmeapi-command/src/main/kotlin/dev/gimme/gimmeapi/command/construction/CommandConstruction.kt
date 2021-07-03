@@ -10,7 +10,7 @@ import dev.gimme.gimmeapi.command.parameter.CommandParameter
 import dev.gimme.gimmeapi.command.parameter.CommandParameterSet
 import dev.gimme.gimmeapi.command.parameter.DefaultValue
 import dev.gimme.gimmeapi.command.sender.CommandSender
-import dev.gimme.gimmeapi.core.common.splitCamelCase
+import dev.gimme.gimmeapi.command.common.splitCamelCase
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.KParameter
