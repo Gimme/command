@@ -62,6 +62,6 @@ class ChatCommandChannel(
         val input = StringBuilder(label)
         args.forEach { input.append(" $it") }
 
-        return parseInput(sender.asGimmeCommandSender(), input.toString())
+        return parseInput(sender.gimme, input.toString())
     }
 }

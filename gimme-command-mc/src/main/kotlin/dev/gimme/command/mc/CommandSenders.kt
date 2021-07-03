@@ -4,16 +4,22 @@ import dev.gimme.command.sender.CommandSender
 import org.bukkit.command.CommandSender as SpigotCommandSender
 
 /**
- * Returns an adapter object with this [SpigotCommandSender] as a [CommandSender].
+ * Returns this [SpigotCommandSender] as a new [CommandSender].
  */
-internal fun SpigotCommandSender.asGimmeCommandSender(): CommandSender = McCommandSender(this)
+internal val SpigotCommandSender.gimme: CommandSender
+    get() = McCommandSender(this)
 
 /**
- * TODO
+ * Represents a Minecraft command sender.
  */
-class McCommandSender(val spigotCommandSender: SpigotCommandSender) : CommandSender {
+class McCommandSender(
+    /**
+     * The source [SpigotCommandSender].
+     */
+    val spigot: SpigotCommandSender
+) : CommandSender {
 
-    override val name = spigotCommandSender.name
+    override val name = this.spigot.name
 
-    override fun sendMessage(message: String) = spigotCommandSender.sendMessage(message)
+    override fun sendMessage(message: String) = this.spigot.sendMessage(message)
 }
