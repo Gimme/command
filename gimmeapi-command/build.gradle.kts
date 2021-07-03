@@ -12,9 +12,6 @@ repositories {
 }
 
 dependencies {
-    // Project
-    api(project(":gimmeapi-core"))
-
     // Kotlin
     implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))

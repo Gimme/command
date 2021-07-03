@@ -17,7 +17,6 @@ repositories {
 
 dependencies {
     // Project
-    api(project(":gimmeapi-core"))
     api(project(":gimmeapi-command"))
 
     // Kotlin
