@@ -12,7 +12,7 @@ repositories {
 
 dependencies {
     // API
-    api(rootProject)
+    api(project(":gimme-command-core"))
     api("net.dv8tion:JDA:4.3.0_277")
 }
 

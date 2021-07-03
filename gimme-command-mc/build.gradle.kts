@@ -13,7 +13,7 @@ repositories {
 
 dependencies {
     // API
-    api(rootProject)
+    api(project(":gimme-command-core"))
 
     // Spigot
     compileOnly("org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT")
