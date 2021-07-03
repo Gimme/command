@@ -1,6 +1,9 @@
 package dev.gimme.command.mc
 
 import dev.gimme.command.sender.CommandSender
+import dev.gimme.command.sender.SenderTypes
+import org.bukkit.command.ConsoleCommandSender
+import org.bukkit.entity.Player
 import org.bukkit.command.CommandSender as SpigotCommandSender
 
 /**
@@ -22,4 +25,12 @@ class McCommandSender(
     override val name = this.spigot.name
 
     override fun sendMessage(message: String) = this.spigot.sendMessage(message)
+
+    companion object {
+        init {
+            SenderTypes.registerAdapter { s: McCommandSender -> s.spigot }
+            SenderTypes.registerAdapter { s: McCommandSender -> s.spigot as? Player }
+            SenderTypes.registerAdapter { s: McCommandSender -> s.spigot as? ConsoleCommandSender }
+        }
+    }
 }
