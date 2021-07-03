@@ -1,7 +1,7 @@
 plugins {
-    kotlin("jvm") version "1.5.20"
+    kotlin("jvm")
     `maven-publish`
-    id("org.jetbrains.dokka") version "1.4.32"
+    id("org.jetbrains.dokka")
 }
 
 group = "dev.gimme.command"
@@ -9,22 +9,17 @@ version = "0.1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots")
+    maven("https://oss.sonatype.org/content/groups/public")
+    mavenLocal()
 }
 
 dependencies {
-    // Kotlin
-    implementation(kotlin("stdlib-jdk8"))
-    implementation(kotlin("reflect"))
-    implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
+    // API
+    api(rootProject)
 
-    // Test
-    testImplementation(platform("org.junit:junit-bom:5.7.0"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
-    testImplementation("io.mockk:mockk:1.10.6")
-    testImplementation("com.github.spotbugs:spotbugs-annotations:4.2.3")
-
-    // Other
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.1")
+    // Spigot
+    compileOnly("org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT")
 }
 
 tasks.test {
