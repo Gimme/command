@@ -188,7 +188,7 @@ internal fun Command<*>.generateUsage(): String {
     val sb = StringBuilder(name)
 
     parameters.forEach { parameter ->
-        val defaultValueRepresentation = parameter.defaultValue?.representation
+        val defaultValueRepresentation = parameter.defaultValue?.getDisplayString()
         val wrap = if (parameter.optional) Pair("[", "]") else Pair("<", ">")
 
         sb.append(" ${wrap.first}${parameter.id}${defaultValueRepresentation?.let { "=$defaultValueRepresentation" } ?: ""}${wrap.second}")

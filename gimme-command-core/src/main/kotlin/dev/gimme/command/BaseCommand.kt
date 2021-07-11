@@ -49,9 +49,6 @@ abstract class BaseCommand<out R>(
 
     private val commandFunction: KFunction<R>? = getFirstCommandFunction()
 
-    private lateinit var _commandSender: CommandSender
-    private lateinit var _args: Map<CommandParameter, Any?>
-
     internal val argumentPropertySetters: MutableMap<CommandParameter, (Any?) -> Unit> = mutableMapOf()
     internal val senderFields: MutableSet<Field> = mutableSetOf()
 
@@ -63,8 +60,11 @@ abstract class BaseCommand<out R>(
                 commandSender::class.isSubclassOf(it) || SenderTypes.adapt(commandSender, it) != null
             } == false) throw ErrorCode.INCOMPATIBLE_SENDER.createException()
 
-        _commandSender = commandSender
-        _args = args
+        @Suppress("NAME_SHADOWING")
+        val args = args.toMutableMap()
+        parameters.filter { it.optional && args[it] == null }.forEach { param ->
+            args[param] = param.defaultValue!!.computeDefaultValue()
+        }
 
         args.forEach { (parameter, arg) ->
             argumentPropertySetters[parameter]?.invoke(arg)
@@ -77,7 +77,7 @@ abstract class BaseCommand<out R>(
             if (commandSender::class.isSubclassOf(klass)) {
                 value = commandSender
             } else {
-                SenderTypes.adapt(_commandSender, klass)?.also {
+                SenderTypes.adapt(commandSender, klass)?.also {
                     value = it
                 }
             }
@@ -163,8 +163,9 @@ abstract class BaseCommand<out R>(
         /** @see DefaultValue */
         @JvmOverloads
         @JvmName("defaultValue")
-        fun default(value: String?, representation: String? = value) =
-            apply { this.defaultValue = DefaultValue(value, representation) }
+        @Suppress("UNCHECKED_CAST")
+        fun <T> default(value: T?, representation: String? = value?.toString()) =
+            apply { this.defaultValue = DefaultValue(value, representation) } as ParamBuilder<T>
 
         fun suggestions(suggestions: () -> Set<String>) = apply { this.suggestions = suggestions }
 

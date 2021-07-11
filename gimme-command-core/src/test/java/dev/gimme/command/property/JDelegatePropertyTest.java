@@ -6,6 +6,7 @@ import dev.gimme.command.sender.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +32,6 @@ class JDelegatePropertyTest {
                 requireNonNull(command.getParameters().get("string")), "a",
                 requireNonNull(command.getParameters().get("i")), 1,
                 requireNonNull(command.getParameters().get("d")), 0.5,
-                requireNonNull(command.getParameters().get("b")), true,
                 requireNonNull(command.getParameters().get("list")), listInput,
                 requireNonNull(command.getParameters().get("set")), setInput,
                 requireNonNull(command.getParameters().get("collection")), listInput,
@@ -48,15 +48,19 @@ class DelegateTestCommand extends PropertyCommand<Void> {
 
     final boolean[] called = {false};
 
-    private final Param<String> string = param();
+    private final Param<String> string = param()
+            .defaultValue("a");
 
     private final Param<Integer> i = param();
 
-    private final Param<Double> d = param();
+    private final Param<Double> d = param()
+            .defaultValue("2");
 
-    private final Param<Boolean> b = param();
+    private final Param<Boolean> b = param()
+            .defaultValue(true);
 
-    private final Param<List<String>> list = param();
+    private final Param<List<String>> list = param()
+            .defaultValue(new ArrayList<>());
 
     private final Param<Set<String>> set = param();
 

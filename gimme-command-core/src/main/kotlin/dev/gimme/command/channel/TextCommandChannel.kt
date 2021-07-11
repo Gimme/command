@@ -113,8 +113,8 @@ abstract class TextCommandChannel(
             val parameter = parameterStack.peek()
 
             val stringArg: String? = tokenStack.peek() ?: run {
-                if (parameter.defaultValue == null) throw ErrorCode.REQUIRED_PARAMETER.createException(parameter.id)
-                parameter.defaultValue.value
+                if (!parameter.optional) throw ErrorCode.REQUIRED_PARAMETER.createException(parameter.id)
+                null
             }
 
             val typedArg = try {

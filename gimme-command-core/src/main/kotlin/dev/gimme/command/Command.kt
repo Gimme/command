@@ -51,7 +51,6 @@ interface Command<out T> : CommandNode {
         val suggestions = mutableSetOf<String>()
 
         nextParameter?.let {
-            it.defaultValue?.value?.let { defaultValue -> suggestions.add(defaultValue) }
             suggestions.addAll(it.suggestions())
         }
 
