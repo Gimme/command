@@ -12,7 +12,6 @@ import dev.gimme.command.node.BaseCommandNode
 import dev.gimme.command.node.CommandNode
 import dev.gimme.command.parameter.CommandParameter
 import dev.gimme.command.parameter.CommandParameterSet
-import dev.gimme.command.parameter.DefaultValue
 import dev.gimme.command.property.CommandDelegate
 import dev.gimme.command.property.CommandProperty
 import dev.gimme.command.sender.CommandSender
@@ -49,8 +48,8 @@ abstract class BaseCommand<out R>(
 
     private val commandFunction: KFunction<R>? = getFirstCommandFunction()
 
-    internal val argumentPropertySetters: MutableMap<CommandParameter, (Any?) -> Unit> = mutableMapOf()
-    internal val senderFields: MutableSet<Field> = mutableSetOf()
+    private val argumentPropertySetters: MutableMap<CommandParameter, (Any?) -> Unit> = mutableMapOf()
+    private val senderFields: MutableSet<Field> = mutableSetOf()
 
     @JvmOverloads
     constructor(name: String, parent: CommandNode? = null) : this(name, parent, setOf())
@@ -62,8 +61,8 @@ abstract class BaseCommand<out R>(
 
         @Suppress("NAME_SHADOWING")
         val args = args.toMutableMap()
-        parameters.filter { it.optional && args[it] == null }.forEach { param ->
-            args[param] = param.defaultValue!!.computeDefaultValue()
+        parameters.filter { it.optional && args[it] == null }.forEach {
+            args[it] = it.defaultValue
         }
 
         args.forEach { (parameter, arg) ->
@@ -144,13 +143,25 @@ abstract class BaseCommand<out R>(
         return function.callBy(typedArgsMap)
     }
 
+    internal fun registerParameter(parameter: CommandParameter, onExecute: ((Any?) -> Unit)): CommandParameter {
+        argumentPropertySetters[parameter] = onExecute
+        return parameter
+    }
+
+    internal fun registerSender(field: Field): Field {
+        senderFields.add(field)
+        return field
+    }
+
     protected fun <T> param(): ParamBuilder<T> = ParamBuilder()
 
     protected inner class ParamBuilder<out T> internal constructor() : CommandProperty<T>, CommandDelegate<T>,
         Param<T> {
 
         override var suggestions: (() -> Set<String>)? = null
-        override var defaultValue: DefaultValue? = null
+        override var optional: Boolean = false
+        override var defaultValue: Any? = null
+        override var defaultValueString: String? = null
 
         private var value: Any? = null
 
@@ -160,12 +171,15 @@ abstract class BaseCommand<out R>(
             this.value = value
         }
 
-        /** @see DefaultValue */
         @JvmOverloads
         @JvmName("defaultValue")
         @Suppress("UNCHECKED_CAST")
         fun <T> default(value: T?, representation: String? = value?.toString()) =
-            apply { this.defaultValue = DefaultValue(value, representation) } as ParamBuilder<T>
+            apply {
+                this.optional = true
+                this.defaultValue = value
+                this.defaultValueString = representation
+            } as ParamBuilder<T>
 
         fun suggestions(suggestions: () -> Set<String>) = apply { this.suggestions = suggestions }
 
@@ -180,7 +194,9 @@ abstract class BaseCommand<out R>(
 
     interface Param<out T> {
         val suggestions: (() -> Set<String>)?
-        val defaultValue: DefaultValue?
+        val optional: Boolean
+        val defaultValue: Any?
+        val defaultValueString: String?
 
         fun get(): T
         fun set(value: Any?)

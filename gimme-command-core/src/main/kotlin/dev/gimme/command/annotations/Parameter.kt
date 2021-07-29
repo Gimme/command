@@ -1,6 +1,7 @@
 package dev.gimme.command.annotations
 
-import dev.gimme.command.parameter.DefaultValue
+import dev.gimme.command.parameter.ParameterTypes
+import kotlin.reflect.KClass
 
 /**
  * Marks a command parameter.
@@ -18,13 +19,5 @@ annotation class Parameter(
     val description: String = "",
 )
 
-fun Parameter.getDefaultValue(): DefaultValue? {
-    return if (default.isEmpty() && defaultRepresentation.isEmpty()) {
-        null
-    } else {
-        DefaultValue(
-            default.ifEmpty { null },
-            defaultRepresentation.ifEmpty { null }
-        )
-    }
-}
+fun Parameter.getDefaultValue(klass: KClass<*>): Any? = default.ifEmpty { null }?.let { ParameterTypes.get(klass).parse(it) }
+fun Parameter.getDefaultValueString(): String? = defaultRepresentation.ifEmpty { default.ifEmpty { null } }

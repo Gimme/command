@@ -54,7 +54,7 @@ class DelegateTestCommand extends PropertyCommand<Void> {
     private final Param<Integer> i = param();
 
     private final Param<Double> d = param()
-            .defaultValue("2");
+            .defaultValue(2d);
 
     private final Param<Boolean> b = param()
             .defaultValue(true);

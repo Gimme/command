@@ -3,11 +3,12 @@ package dev.gimme.command.construction
 import dev.gimme.command.BaseCommand
 import dev.gimme.command.annotations.Parameter
 import dev.gimme.command.annotations.getDefaultValue
+import dev.gimme.command.annotations.getDefaultValueString
+import dev.gimme.command.common.splitCamelCase
 import dev.gimme.command.function.UnsupportedParameterException
 import dev.gimme.command.parameter.CommandParameter
-import dev.gimme.command.parameter.DefaultValue
+import dev.gimme.command.parameter.ParameterTypes
 import java.lang.reflect.Field
-import kotlin.reflect.KClass
 import kotlin.reflect.KParameter
 import kotlin.reflect.KType
 import kotlin.reflect.full.findAnnotation
@@ -16,83 +17,49 @@ import kotlin.reflect.full.isSuperclassOf
 import kotlin.reflect.jvm.jvmErasure
 import kotlin.reflect.jvm.kotlinProperty
 
-internal class ParameterSettings(
-    val name: String,
-    val form: CommandParameter.Form,
-    val klass: KClass<*>,
-    val suggestions: (() -> Set<String>)?,
-    val defaultValue: DefaultValue?,
-    val description: String?,
-    val setValue: ((value: Any?) -> Unit)? = null,
-) {
+internal class ParameterSettings {
     companion object {
-        fun fromField(field: Field, obj: Any): ParameterSettings? {
-            val paramAnnotation: Parameter? = field.kotlinProperty?.findAnnotation()
-
-            return when {
-                BaseCommand.Param::class.java.isAssignableFrom(field.type) -> {
-                    val name = field.name.removeSuffix("\$delegate")
-
-                    field.isAccessible = true
-                    @Suppress("UNCHECKED_CAST")
-                    val value = field.get(obj) as BaseCommand.Param<*>
-
-                    val type: KType = field.kotlinProperty!!.returnType.let {
-                        if (it.jvmErasure.isSubclassOf(BaseCommand.Param::class)) {
-                            it.arguments.first().type!!
-                        } else {
-                            it
-                        }
-                    }
-
-                    fromType(
-                        name = name,
-                        annotation = null,
-                        type = type,
-                        suggestions = value.suggestions,
-                        defaultValue = value.defaultValue,
-                        setValue = { value.set(it) },
-                    )
+        fun fromParamField(field: Field, param: BaseCommand.Param<*>): CommandParameter {
+            val type: KType = field.kotlinProperty!!.returnType.let {
+                if (it.jvmErasure.isSubclassOf(BaseCommand.Param::class)) {
+                    it.arguments.first().type!!
+                } else {
+                    it
                 }
-                paramAnnotation != null -> {
-                    val name = field.name
-
-                    fromType(
-                        name = name,
-                        annotation = paramAnnotation,
-                        type = field.kotlinProperty!!.returnType,
-                        setValue = {
-                            field.isAccessible = true
-                            field.set(obj, it)
-                        },
-                    )
-                }
-                else -> null
             }
-        }
 
-        fun fromFunctionParameter(functionParameter: KParameter): ParameterSettings {
             return fromType(
-                name = functionParameter.name ?: throw UnsupportedParameterException(functionParameter),
-                annotation = functionParameter.findAnnotation(),
-                type = functionParameter.type,
+                name = field.name.removeSuffix("\$delegate"),
+                annotation = null,
+                type = type,
+                suggestions = param.suggestions,
+                defaultValue = param.defaultValue,
+                defaultValueString = param.defaultValueString,
+                optional = param.optional,
             )
         }
 
-        fun fromType(
+        fun fromField(field: Field, annotation: Parameter): CommandParameter = fromType(
+            name = field.name,
+            annotation = annotation,
+            type = field.kotlinProperty!!.returnType,
+        )
+
+        fun fromFunctionParameter(functionParameter: KParameter): CommandParameter = fromType(
+            name = functionParameter.name ?: throw UnsupportedParameterException(functionParameter),
+            annotation = functionParameter.findAnnotation(),
+            type = functionParameter.type,
+        )
+
+        private fun fromType(
             name: String,
             annotation: Parameter?,
             type: KType,
             suggestions: (() -> Set<String>)? = null,
-            defaultValue: DefaultValue? = null,
-            setValue: ((value: Any?) -> Unit)? = null,
-        ): ParameterSettings {
-            annotation?.getDefaultValue()?.also {
-                if (!type.isMarkedNullable && it.value == null) {
-                    throw IllegalStateException("Parameter \"$name\" has a null default value for a type marked as non-nullable") // TODO: exception type
-                }
-            }
-
+            defaultValue: Any? = null,
+            defaultValueString: String? = null,
+            optional: Boolean? = null,
+        ): CommandParameter {
             val jvmErasure = type.jvmErasure
 
             val form = when {
@@ -108,26 +75,34 @@ internal class ParameterSettings(
                 jvmErasure
             }
 
-            var _defaultValue = defaultValue ?: annotation?.getDefaultValue()
+            var _defaultValue = defaultValue ?: annotation?.getDefaultValue(klass)
+            val _defaultValueString = defaultValueString ?: annotation?.getDefaultValueString()
+            var _optional = optional ?: (_defaultValue != null)
 
-            if (_defaultValue == null && type.isMarkedNullable) _defaultValue = DefaultValue(null, null)
+            if (_defaultValue == null && type.isMarkedNullable) {
+                _optional = true
+                _defaultValue = null
+            }
 
-            _defaultValue?.let {
-                if (!type.isMarkedNullable && it.value == null) {
-                    throw IllegalStateException("Parameter \"${name}\" has to be marked nullable when having a null default value") // TODO: exception type
-                }
+            if (!type.isMarkedNullable && _optional && _defaultValue == null) {
+                throw IllegalStateException("Parameter \"${name}\" has to be marked nullable when having a null default value") // TODO: exception type
             }
 
             val description = annotation?.description?.ifEmpty { null }
 
-            return ParameterSettings(
+            val id = name.splitCamelCase("-")
+            val parameterType = ParameterTypes.get(klass)
+
+            return CommandParameter(
+                id = id,
                 name = name,
-                form = form,
-                klass = klass,
-                suggestions = suggestions,
-                defaultValue = _defaultValue,
+                type = parameterType,
+                suggestions = suggestions ?: parameterType.values ?: { setOf() },
                 description = description,
-                setValue = setValue,
+                form = form,
+                optional = _optional,
+                defaultValue = _defaultValue,
+                defaultValueString = _defaultValueString,
             )
         }
     }
