@@ -1,5 +1,5 @@
-rootProject.name = "gimme-command"
+rootProject.name = "command"
 
-include(":gimme-command-core")
-include(":gimme-command-discord")
-include(":gimme-command-mc")
+include(":command-core")
+include(":command-discord")
+include(":command-mc")

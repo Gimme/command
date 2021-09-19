@@ -1,9 +1,9 @@
 plugins {
-    id("gimme-command")
+    id("command-core")
 }
 
 dependencies {
-    api(project(":gimme-command-core"))
-    api(project(":gimme-command-discord"))
-    api(project(":gimme-command-mc"))
+    api(project(":command-core"))
+    api(project(":command-discord"))
+    api(project(":command-mc"))
 }

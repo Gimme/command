@@ -1,5 +1,5 @@
 plugins {
-    id("gimme-command")
+    id("command-core")
 }
 
 group = "dev.gimme.command"
@@ -12,7 +12,7 @@ repositories {
 
 dependencies {
     // API
-    api(project(":gimme-command-core"))
+    api(project(":command-core"))
     api("net.dv8tion:JDA:4.3.0_277")
 }
 

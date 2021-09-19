@@ -1,5 +1,5 @@
 plugins {
-    id("gimme-command")
+    id("command-core")
 }
 
 dependencies {

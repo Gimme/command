@@ -1,5 +1,5 @@
 plugins {
-    id("gimme-command")
+    id("command-core")
 }
 
 group = "dev.gimme.command"
@@ -13,7 +13,7 @@ repositories {
 
 dependencies {
     // API
-    api(project(":gimme-command-core"))
+    api(project(":command-core"))
 
     // Spigot
     compileOnly("org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT")
