@@ -22,7 +22,7 @@ interface CommandNode {
     val parent: CommandNode?
     var aliases: Set<String>
 
-    val id: String get() = path(" ")
+    val id: String get() = path("/")
     val root: CommandNode get() = parent?.root ?: this
     val isRoot: Boolean get() = parent == null
     val path: List<String> get() = (parent?.path ?: listOf()) + name
@@ -42,6 +42,6 @@ interface CommandNode {
     /**
      * Returns the full [name]-path to this command including all [parent]s separated by the [separator].
      */
-    fun path(separator: String): String = path.joinToString(" ")
+    fun path(separator: String = "/"): String = path.joinToString(separator)
 }
 
