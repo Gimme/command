@@ -1,24 +1,26 @@
 package dev.gimme.command.function
 
+import dev.gimme.command.annotations.Sender
 import dev.gimme.command.node.CommandNode
-import dev.gimme.command.sender.CommandSender
 
 /**
  * Represents a minimal [FunctionCommand] that is set up based on a supplied function.
  *
+ * @param S the sender type
+ * @param R the command result type
  * @property execute the function that this command is based on
  */
-class LambdaCommand<T>(
+class LambdaCommand<S, R>(
     name: String,
     parent: CommandNode? = null,
     aliases: Set<String> = setOf(),
-    val execute: (sender: CommandSender) -> T,
-) : FunctionCommand<T>(
+    val execute: (sender: S) -> R,
+) : FunctionCommand<R>(
     name = name,
     parent = parent,
     aliases = aliases,
 ) {
 
     @CommandFunction
-    private fun foo(sender: CommandSender): T = execute(sender)
+    private fun foo(@Sender sender: S): R = execute(sender)
 }
