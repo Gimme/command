@@ -19,8 +19,8 @@ open class DefaultBaseCommand(
 ) : Command<Any> {
 
     override fun execute(commandSender: CommandSender, args: Map<CommandParameter, Any?>): Any = Unit
-    override var summary = ""
     override var description = ""
+    override var detailedDescription: String? = null
     override val usage = ""
     override val parameters = CommandParameterSet()
     override var aliases = setOf<String>()

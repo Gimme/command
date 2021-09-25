@@ -12,13 +12,13 @@ abstract class PropertyCommand<out R>(
     name: String,
     parent: CommandNode? = null,
     aliases: Set<String> = setOf(),
-    summary: String = "",
     description: String = "",
+    detailedDescription: String? = null,
 ) : BaseCommand<R>(
     name = name,
     parent = parent,
     aliases = aliases,
-    summary = summary,
+    detailedDescription = detailedDescription,
     description = description,
 ) {
 

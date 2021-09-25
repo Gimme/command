@@ -3,18 +3,22 @@ package dev.gimme.command.node
 /**
  * Represents a command node that can be used to create a hierarchical command structure.
  *
- * @property name        the command name (cannot contain spaces)
- * @property parent      the optional parent node
- * @property aliases     aliases for the name
- * @property id          the id of this command (unique among commands with different paths)
- * @property root        the root command in the parent-chain
- * @property isRoot      if this is a root command (no parent)
- * @property path        the full [name]-path to this command
- * @property pathAliases all full paths to this command including [aliases]
+ * @property name                the command name (cannot contain spaces)
+ * @property description         a description of what this command does
+ * @property detailedDescription an optional more detailed description
+ * @property parent              the optional parent node
+ * @property aliases             aliases for the name
+ * @property id                  the id of this command (unique among commands with different paths)
+ * @property root                the root command in the parent-chain
+ * @property isRoot              if this is a root command (no parent)
+ * @property path                the full [name]-path to this command
+ * @property pathAliases         all full paths to this command including [aliases]
  */
 interface CommandNode {
 
     val name: String
+    var description: String
+    var detailedDescription: String?
     val parent: CommandNode?
     var aliases: Set<String>
 

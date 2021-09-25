@@ -10,15 +10,11 @@ import dev.gimme.command.sender.CommandSender
  * Represents an executable command.
  *
  * @param T              the response type
- * @property summary     a short summary of what this command does
- * @property description a detailed description of this command
  * @property usage       information of how to use the command
  * @property parameters  this command's parameters
  */
 interface Command<out T> : CommandNode {
 
-    var summary: String
-    var description: String
     val usage: String
     val parameters: CommandParameterSet
 

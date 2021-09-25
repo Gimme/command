@@ -37,9 +37,15 @@ abstract class BaseCommand<out R>(
     name: String,
     parent: CommandNode? = null,
     aliases: Set<String> = setOf(),
-    override var summary: String = "",
-    override var description: String = "",
-) : BaseCommandNode(name, parent, aliases), Command<R> {
+    description: String = "",
+    detailedDescription: String? = null,
+) : BaseCommandNode(
+    name = name,
+    parent = parent,
+    aliases = aliases,
+    description = description,
+    detailedDescription = detailedDescription
+), Command<R> {
 
     override val parameters: CommandParameterSet by lazy { generateParameters() }
     private val senderTypes: Set<KClass<*>>? by lazy { generateSenders() }

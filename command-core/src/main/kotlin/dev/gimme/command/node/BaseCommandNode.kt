@@ -9,6 +9,8 @@ open class BaseCommandNode(
     final override val name: String,
     final override val parent: CommandNode? = null,
     final override var aliases: Set<String> = setOf(),
+    final override var description: String = "",
+    final override var detailedDescription: String? = null,
 ) : CommandNode {
 
     @JvmOverloads

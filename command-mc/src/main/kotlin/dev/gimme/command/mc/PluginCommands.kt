@@ -24,6 +24,7 @@ private fun Plugin.createCommand(command: Command<*>): PluginCommand {
     val pluginCommand = this.createCommand(rootCommand.name)
 
     pluginCommand.aliases = rootCommand.aliases.toList()
+    pluginCommand.description = rootCommand.description
 
     return pluginCommand
 }

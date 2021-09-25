@@ -16,14 +16,14 @@ abstract class FunctionCommand<out T>(
     name: String,
     parent: CommandNode? = null,
     aliases: Set<String> = setOf(),
-    summary: String = "",
     description: String = "",
+    detailedDescription: String? = null,
 ) : BaseCommand<T>(
     name = name,
     parent = parent,
     aliases = aliases,
-    summary = summary,
     description = description,
+    detailedDescription = detailedDescription,
 ) {
 
     @JvmOverloads
