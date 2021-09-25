@@ -14,6 +14,9 @@ interface CommandCollection : Iterable<Command<*>> {
     /** Adds the given [command] to this collection. */
     fun addCommand(command: Command<*>)
 
+    /** Adds the given [commands] to this collection. */
+    fun addCommands(commands: Iterable<Command<*>>) = commands.forEach(this::addCommand)
+
     /**
      * Returns the command from this collection at the [path], or null if no command at that [path] was found.
      */
