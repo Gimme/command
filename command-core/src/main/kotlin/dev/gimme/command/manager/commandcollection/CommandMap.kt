@@ -9,7 +9,7 @@ import dev.gimme.command.node.CommandNode
  */
 class CommandMap : CommandCollection {
 
-    private val root = Node()
+    val root = Node()
 
     override val commands: MutableSet<Command<*>> = mutableSetOf()
 
@@ -88,7 +88,7 @@ class CommandMap : CommandCollection {
         return node
     }
 
-    private class Node(
+    class Node(
         var command: Command<*>? = null,
         var commandNode: CommandNode? = null,
     ) : LinkedHashMap<String, Node>()
