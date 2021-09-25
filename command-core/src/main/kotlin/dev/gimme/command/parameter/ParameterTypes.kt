@@ -76,6 +76,7 @@ object ParameterTypes {
     ): ParameterType<T> {
         val parameterType = ParameterType(
             name = name,
+            clazz = klass,
             values = values,
         ) { convertOrNull(it) ?: throw ErrorCode.INVALID_ARGUMENT.createException("\"$it\" (Not a valid $name)") }
 
@@ -111,6 +112,7 @@ object ParameterTypes {
 
             val parameterType = ParameterType(
                 name = name,
+                clazz = klass.java,
                 values = values,
                 parse = parse
             )
