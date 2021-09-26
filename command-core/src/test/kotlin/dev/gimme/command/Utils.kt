@@ -24,4 +24,5 @@ open class DefaultBaseCommand(
     override val usage = ""
     override val parameters = CommandParameterSet()
     override var aliases = setOf<String>()
+    override val subcommands: MutableMap<String, CommandNode> = mutableMapOf()
 }

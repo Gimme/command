@@ -6,8 +6,9 @@ package dev.gimme.command.node
  * @property name                the command name (cannot contain spaces)
  * @property description         a description of what this command does
  * @property detailedDescription an optional more detailed description
- * @property parent              the optional parent node
  * @property aliases             aliases for the name
+ * @property parent              the optional parent node
+ * @property subcommands         the subcommands to this command
  * @property id                  the id of this command (unique among commands with different paths)
  * @property root                the root command in the parent-chain
  * @property isRoot              if this is a root command (no parent)
@@ -19,8 +20,10 @@ interface CommandNode {
     val name: String
     var description: String
     var detailedDescription: String?
-    val parent: CommandNode?
     var aliases: Set<String>
+
+    val parent: CommandNode?
+    val subcommands: Map<String, CommandNode>
 
     val id: String get() = path("/")
     val root: CommandNode get() = parent?.root ?: this

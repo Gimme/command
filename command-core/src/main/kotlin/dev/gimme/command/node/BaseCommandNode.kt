@@ -23,7 +23,10 @@ open class BaseCommandNode(
         }
     }
 
+    override val subcommands: MutableMap<String, CommandNode> = mutableMapOf()
+
     override fun hashCode(): Int = id.hashCode()
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
