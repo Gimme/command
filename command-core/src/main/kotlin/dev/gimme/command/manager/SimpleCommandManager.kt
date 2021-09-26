@@ -4,7 +4,7 @@ import dev.gimme.command.Command
 import dev.gimme.command.CommandSearchResult
 import dev.gimme.command.exception.CommandException
 import dev.gimme.command.manager.commandcollection.CommandCollection
-import dev.gimme.command.manager.commandcollection.CommandMap
+import dev.gimme.command.manager.commandcollection.CommandTree
 import dev.gimme.command.parameter.CommandParameter
 import dev.gimme.command.sender.CommandSender
 
@@ -19,12 +19,12 @@ open class SimpleCommandManager<R>(private val defaultResponseParser: (Any?) -> 
     private val registerCommandListeners: MutableList<CommandManager.RegisterCommandListener> = mutableListOf()
     private val executorByCommand: MutableMap<Command<*>, CommandNode<*, R>> = mutableMapOf()
 
-    private val commandCollection: CommandCollection = CommandMap()
+    private val commandCollection: CommandCollection = CommandTree()
 
     override val commands: Iterable<Command<*>> = commandCollection
 
     final override fun <T> registerCommand(command: Command<T>, responseConverter: ((T) -> R)?) {
-        commandCollection.addCommand(command)
+        commandCollection.add(command)
 
         if (responseConverter != null) {
             executorByCommand[command] = CommandNode(command, responseConverter)
@@ -32,15 +32,11 @@ open class SimpleCommandManager<R>(private val defaultResponseParser: (Any?) -> 
         registerCommandListeners.forEach { it.onRegisterCommand(command) }
     }
 
-    override fun getCommand(path: List<String>): Command<*>? = commandCollection.getCommand(path)
+    override fun getCommand(path: List<String>): Command<*>? = commandCollection.get(path)
 
-    override fun hasCommand(path: List<String>): Boolean = commandCollection.containsCommand(path)
+    override fun hasCommand(path: List<String>): Boolean = commandCollection.contains(path)
 
-    override fun findCommand(path: List<String>): CommandSearchResult = commandCollection.findCommand(path)
-
-    override fun getBranches(path: List<String>): Set<String> = commandCollection.getBranches(path)
-
-    override fun getLeafCommands(path: List<String>): Set<Command<*>> = commandCollection.getLeafCommands(path)
+    override fun findCommand(path: List<String>): CommandSearchResult = commandCollection.find(path)
 
     override fun executeCommand(
         commandSender: CommandSender,

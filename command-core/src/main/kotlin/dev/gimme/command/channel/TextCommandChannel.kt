@@ -6,6 +6,7 @@ import dev.gimme.command.exception.ErrorCode
 import dev.gimme.command.exception.IncompleteCommandException
 import dev.gimme.command.manager.CommandManager
 import dev.gimme.command.manager.TextCommandManager
+import dev.gimme.command.node.CommandNode
 import dev.gimme.command.parameter.CommandParameter
 import dev.gimme.command.sender.CommandSender
 import java.util.*
@@ -66,7 +67,7 @@ abstract class TextCommandChannel(
             throw IncompleteCommandException(
                 usedPath = commandSearchResult.path,
                 subBranches = commandSearchResult.subBranches,
-                leafCommands = getLeafCommands(commandPath),
+                leafCommands = commandSearchResult.commandNode?.leafCommands ?: setOf(),
             )
         }
 

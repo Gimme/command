@@ -40,18 +40,6 @@ interface CommandManager<R> {
     fun findCommand(path: List<String>): CommandSearchResult
 
     /**
-     * Returns the roots of all child branches under the command [path], or an empty set if no command exists under that
-     * [path].
-     */
-    fun getBranches(path: List<String>): Set<String>
-
-    /**
-     * Returns all leaves of all child branches under the command [path], or an empty set if no command exists under
-     * that [path].
-     */
-    fun getLeafCommands(path: List<String>): Set<Command<*>>
-
-    /**
      * Executes the registered [command] with the [args] as the given [commandSender] and returns the response.
      *
      * @throws CommandException if the command execution was unsuccessful

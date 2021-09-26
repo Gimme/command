@@ -1,7 +1,6 @@
 package dev.gimme.command.discord
 
 import dev.gimme.command.Command
-import dev.gimme.command.manager.commandcollection.CommandMap
 import dev.gimme.command.node.CommandNode
 import dev.gimme.command.parameter.ParameterType
 import net.dv8tion.jda.api.JDA
@@ -48,46 +47,37 @@ private fun JDA.createCommands(
     guild: Guild? = null,
     exhaustive: Boolean = true, // TODO
 ) {
-    val commandMap = CommandMap()
-    commandMap.addCommands(commands)
-
-    commandMap.root.values.forEach { node ->
-        val commandNode = node.commandNode!! // TODO: !!
-
-        val commandCreateActions: List<CommandCreateAction> = (commandNode as? Command<*>)?.let { command ->
+    commands.forEach(CommandNode::connectParents)
+    commands.map { it.root }.toSet().forEach { root ->
+        val commandCreateActions: List<CommandCreateAction> = root.asCommand()?.let { command ->
             registerCommand(command)
             command.aliases.map { alias ->
                 guild?.upsertCommand(command.toCommandData())?.setName(alias)
                     ?: this.upsertCommand(command.toCommandData()).setName(alias)
             }
-        } ?: commandNode.aliases.map { alias ->
-            guild?.upsertCommand(alias, commandNode.description)
-                ?: this.upsertCommand(alias, commandNode.description)
+        } ?: root.aliases.map { alias ->
+            guild?.upsertCommand(alias, root.description)
+                ?: this.upsertCommand(alias, root.description)
         }
 
         commandCreateActions.forEach { commandCreateAction ->
-            node.values.forEach { subNode ->
-                val subCommandNode = subNode.commandNode!!
-
-                (subCommandNode as? Command<*>)?.also { command ->
+            root.subcommands.values.forEach { subNode ->
+                subNode.asCommand()?.also { command ->
                     registerCommand(command)
                     command.aliases.map { alias ->
                         commandCreateAction.addSubcommands(command.toSubCommandData()).setName(alias)
                     }
                 } ?: run {
-                    subCommandNode.aliases.map { alias ->
-                        val subCommandGroupData = subCommandNode.toSubCommandGroupData().setName(alias)
+                    subNode.aliases.map { alias ->
+                        val subCommandGroupData = subNode.toSubCommandGroupData().setName(alias)
 
-                        subNode.values.forEach { subSubNode ->
-                            val subSubCommandNode = subSubNode.commandNode!!
-
-                            (subSubCommandNode as? Command<*>)?.also { command ->
+                        subNode.subcommands.values.forEach { subSubNode ->
+                            subSubNode.asCommand()?.also { command ->
                                 registerCommand(command)
                                 command.aliases.map { alias ->
                                     subCommandGroupData.addSubcommands(command.toSubCommandData()).setName(alias)
                                 }
-                            }
-                                ?: throw IllegalArgumentException("Too many nested command layers: ${subSubCommandNode.path()}")
+                            } ?: throw IllegalArgumentException("Too many nested command layers: ${subSubNode.path()}")
                         }
 
                         commandCreateAction.addSubcommandGroups(subCommandGroupData)

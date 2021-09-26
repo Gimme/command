@@ -1,5 +1,7 @@
 package dev.gimme.command.node
 
+import dev.gimme.command.Command
+
 /**
  * Represents a command node that can be used to create a hierarchical command structure.
  *
@@ -23,7 +25,7 @@ interface CommandNode {
     var aliases: Set<String>
 
     val parent: CommandNode?
-    val subcommands: Map<String, CommandNode>
+    val subcommands: MutableMap<String, CommandNode>
 
     val id: String get() = path("/")
     val root: CommandNode get() = parent?.root ?: this
@@ -46,5 +48,34 @@ interface CommandNode {
      * Returns the full [name]-path to this command including all [parent]s separated by the [separator].
      */
     fun path(separator: String = "/"): String = path.joinToString(separator)
+
+    /**
+     * Returns this node as a command if possible.
+     */
+    fun asCommand(): Command<*>? = this as? Command<*>
+
+    /**
+     * Returns if this node is a command.
+     */
+    fun isCommand(): Boolean = this.asCommand() != null
+
+    /**
+     * Connects all parent nodes in the hierarchy so that the [subcommands] fields tell the same story as the [parent]
+     * fields.
+     */
+    fun connectParents() {
+        val parent = this.parent ?: return
+        parent.subcommands[this.name] = this
+        parent.connectParents()
+    }
+
+    /**
+     * Returns all real [Command]s under this node in the hierarchy (including itself).
+     */
+    val leafCommands: Set<Command<*>> get() {
+        val result = this.subcommands.values.flatMap(CommandNode::leafCommands).toMutableSet()
+        this.asCommand()?.let { result.add(it) }
+        return result
+    }
 }
 

@@ -18,4 +18,16 @@ data class CommandSearchResult(
     val command: Command<*>?,
     val commandNode: CommandNode?,
     val subBranches: Set<String>,
-)
+) {
+    companion object {
+        /**
+         * Returns an empty result, indicating no command found.
+         */
+        val EMPTY = CommandSearchResult(
+            path = null,
+            command = null,
+            commandNode = null,
+            subBranches = emptySet(),
+        )
+    }
+}
