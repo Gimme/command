@@ -1,6 +1,7 @@
 package dev.gimme.command.function
 
 import dev.gimme.command.DUMMY_COMMAND_SENDER
+import dev.gimme.command.annotations.Default
 import dev.gimme.command.sender.SenderTypes
 import dev.gimme.command.annotations.Parameter
 import dev.gimme.command.channel.TextCommandChannel
@@ -69,11 +70,11 @@ internal class FunctionCommandTest {
 
             @CommandFunction
             private fun call(
-                @Parameter(default = "xyz")
+                @Parameter(value = Default("xyz"))
                 a: String,
-                @Parameter(default = "xyz")
+                @Parameter(value = Default("xyz"))
                 b: String,
-                @Parameter(default = "5")
+                @Parameter(value = Default("5"))
                 c: Int,
             ) {
                 called = true

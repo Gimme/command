@@ -31,18 +31,20 @@ internal fun BaseCommand<*>.generateParameters(): CommandParameterSet {
     }
 
     this.javaClass.declaredFields.forEach { field ->
-        val paramAnnotation: Parameter? = field.kotlinProperty?.findAnnotation()
-
         if (BaseCommand.Param::class.java.isAssignableFrom(field.type)) {
             field.isAccessible = true
             val param = field.get(this) as BaseCommand.Param<*>
 
             parameters.add(this.registerParameter(ParameterSettings.fromParamField(field, param)) { param.set(it) })
-        } else if (paramAnnotation != null) {
-            parameters.add(this.registerParameter(ParameterSettings.fromField(field, paramAnnotation)) { arg ->
-                field.isAccessible = true
-                field.set(this, arg)
-            })
+        } else {
+            field.kotlinProperty?.let {
+                if (it.findAnnotation<Parameter>() == null) return@let
+
+                parameters.add(this.registerParameter(ParameterSettings.fromField(field, it)) { arg ->
+                    field.isAccessible = true
+                    field.set(this, arg)
+                })
+            }
         }
     }
 

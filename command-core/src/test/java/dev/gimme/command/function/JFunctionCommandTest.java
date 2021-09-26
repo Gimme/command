@@ -1,6 +1,7 @@
 package dev.gimme.command.function;
 
 import dev.gimme.command.UtilsKt;
+import dev.gimme.command.annotations.Default;
 import dev.gimme.command.annotations.Parameter;
 import dev.gimme.command.channel.TextCommandChannel;
 import dev.gimme.command.sender.CommandSender;
@@ -53,7 +54,7 @@ class FCmd extends FunctionCommand<Void> {
     }
 
     @CommandFunction
-    private void call(CommandSender s, String a, int b, @Parameter(defaultValue = "3") int c) {
+    private void call(CommandSender s, String a, int b, @Parameter(@Default("3")) int c) {
         called[0] = true;
 
         assertEquals(JFunctionCommandTest.SENDER, s);

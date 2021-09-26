@@ -1,6 +1,8 @@
 package dev.gimme.command.construction
 
 import dev.gimme.command.BaseCommand
+import dev.gimme.command.annotations.Default
+import dev.gimme.command.annotations.Description
 import dev.gimme.command.annotations.Parameter
 import dev.gimme.command.annotations.getDefaultValue
 import dev.gimme.command.annotations.getDefaultValueString
@@ -9,6 +11,8 @@ import dev.gimme.command.function.UnsupportedParameterException
 import dev.gimme.command.parameter.CommandParameter
 import dev.gimme.command.parameter.ParameterTypes
 import java.lang.reflect.Field
+import kotlin.reflect.KAnnotatedElement
+import kotlin.reflect.KClass
 import kotlin.reflect.KParameter
 import kotlin.reflect.KType
 import kotlin.reflect.full.findAnnotation
@@ -20,7 +24,8 @@ import kotlin.reflect.jvm.kotlinProperty
 internal class ParameterSettings {
     companion object {
         fun fromParamField(field: Field, param: BaseCommand.Param<*>): CommandParameter {
-            val type: KType = field.kotlinProperty!!.returnType.let {
+            val property = field.kotlinProperty!!
+            val type: KType = property.returnType.let {
                 if (it.jvmErasure.isSubclassOf(BaseCommand.Param::class)) {
                     it.arguments.first().type!!
                 } else {
@@ -30,7 +35,7 @@ internal class ParameterSettings {
 
             return fromType(
                 name = field.name.removeSuffix("\$delegate"),
-                annotation = null,
+                element = property,
                 type = type,
                 suggestions = param.suggestions,
                 defaultValue = param.defaultValue,
@@ -39,21 +44,22 @@ internal class ParameterSettings {
             )
         }
 
-        fun fromField(field: Field, annotation: Parameter): CommandParameter = fromType(
+        fun fromField(field: Field, element: KAnnotatedElement): CommandParameter = fromType(
             name = field.name,
-            annotation = annotation,
+            element = element,
             type = field.kotlinProperty!!.returnType,
         )
 
         fun fromFunctionParameter(functionParameter: KParameter): CommandParameter = fromType(
             name = functionParameter.name ?: throw UnsupportedParameterException(functionParameter),
-            annotation = functionParameter.findAnnotation(),
+            element = functionParameter,
             type = functionParameter.type,
+            optional = if (functionParameter.isOptional) true else null
         )
 
         private fun fromType(
             name: String,
-            annotation: Parameter?,
+            element: KAnnotatedElement,
             type: KType,
             suggestions: (() -> Set<String>)? = null,
             defaultValue: Any? = null,
@@ -75,20 +81,13 @@ internal class ParameterSettings {
                 jvmErasure
             }
 
-            var _defaultValue = defaultValue ?: annotation?.getDefaultValue(klass)
-            val _defaultValueString = defaultValueString ?: annotation?.getDefaultValueString()
-            var _optional = optional ?: (_defaultValue != null)
+            val values: ParameterSettingsValues = ParameterSettingsValues(
+                defaultValue = defaultValue,
+                defaultValueString = defaultValueString,
+                description = null,
+            ).populateFromAnnotations(element, klass)
 
-            if (_defaultValue == null && type.isMarkedNullable) {
-                _optional = true
-                _defaultValue = null
-            }
-
-            if (!type.isMarkedNullable && _optional && _defaultValue == null) {
-                throw IllegalStateException("Parameter \"${name}\" has to be marked nullable when having a null default value") // TODO: exception type
-            }
-
-            val description = annotation?.description?.ifEmpty { null }
+            val _optional = optional ?: (values.defaultValue != null || type.isMarkedNullable)
 
             val id = name.splitCamelCase("-")
             val parameterType = ParameterTypes.get(klass)
@@ -98,12 +97,30 @@ internal class ParameterSettings {
                 name = name,
                 type = parameterType,
                 suggestions = suggestions ?: parameterType.values ?: { setOf() },
-                description = description,
+                description = values.description,
                 form = form,
                 optional = _optional,
-                defaultValue = _defaultValue,
-                defaultValueString = _defaultValueString,
+                defaultValue = values.defaultValue,
+                defaultValueString = values.defaultValueString,
             )
         }
+
+        private fun ParameterSettingsValues.populateFromAnnotations(element: KAnnotatedElement, klass: KClass<out Any>): ParameterSettingsValues {
+            val parameterA = element.findAnnotation<Parameter>()
+            val defaultA = element.findAnnotation<Default>()
+            val descriptionA = element.findAnnotation<Description>()
+
+            defaultValue = defaultValue ?: (defaultA ?: parameterA?.value)?.getDefaultValue(klass)
+            defaultValueString = defaultValueString ?: (defaultA ?: parameterA?.value)?.getDefaultValueString()
+            description = description ?: descriptionA?.value ?: parameterA?.description?.ifEmpty { null }
+
+            return this
+        }
+
+        private data class ParameterSettingsValues(
+            var defaultValue: Any?,
+            var defaultValueString: String?,
+            var description: String?,
+        )
     }
 }
