@@ -11,6 +11,7 @@ import dev.gimme.command.sender.CommandSender
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.KParameter
+import kotlin.reflect.KVisibility
 import kotlin.reflect.full.createType
 import kotlin.reflect.full.declaredMemberFunctions
 import kotlin.reflect.full.findAnnotation
@@ -130,31 +131,60 @@ internal fun CommandParameter.generateFlags(unavailableFlags: Set<Char> = setOf(
 }
 
 /**
- * Returns the first found method that is annotated with @[CommandFunction].
+ * Returns the overridden version of this function in the [clazz], or null if this function is not declared in the
+ * [clazz].
+ */
+internal fun KFunction<*>.getDeclaredOverride(clazz: KClass<*>): KFunction<*>? =
+    clazz.declaredMemberFunctions.find { function ->
+        function.name == this.name &&
+                function.parameters.filter { it.kind == KParameter.Kind.VALUE } ==
+                this.parameters.filter { it.kind == KParameter.Kind.VALUE } &&
+                function != this
+    }
+
+/**
+ * Returns the command function to use in this command, or null if another strategy is used to handle command execution.
+ *
+ * The function to use is found through the following priority order:
+ * - first found method that is annotated with @[CommandFunction].
  *
  * @throws ClassCastException if the function exists but has the wrong return type
  */
 @Throws(ClassCastException::class)
-internal fun <R> Command<R>.getFirstCommandFunction(): KFunction<R>? {
-    // Look through the public methods in the command class
-    for (function in this::class.declaredMemberFunctions) {
-        // Make sure it has the right annotation
-        if (!function.hasAnnotation<CommandFunction>()) continue
+internal fun <R> BaseCommand<R>.getFirstCommandFunction(): KFunction<R>? {
+    var firstCommandFunction: KFunction<*>? = null
+    var firstPublicFunction: KFunction<*>? = null
+    var firstInternalFunction: KFunction<*>? = null
+    var firstFunction: KFunction<*>? = null
 
-        return try {
-            @Suppress("UNCHECKED_CAST")
-            function as KFunction<R>
-        } catch (e: ClassCastException) {
-            throw ClassCastException(
-                "The return type: \"${function.returnType.jvmErasure.qualifiedName}\"" +
-                        " of the command function: \"${function.name}\"" +
-                        " in ${this::class.qualifiedName}" +
-                        " does not match the command's return type."
-            ).initCause(e)
+    for (function in this::class.declaredMemberFunctions) {
+        if (function.hasAnnotation<CommandFunction>()) {
+            firstCommandFunction = function
+        } else if (function.visibility == KVisibility.PUBLIC) {
+            firstPublicFunction = function
+        } else if (function.visibility == KVisibility.INTERNAL) {
+            firstInternalFunction = function
+        } else {
+            firstFunction = function
         }
     }
 
-    return null
+    if (firstCommandFunction == null && this.getCallFunctionOverride() != null) return null
+
+    val function: KFunction<*> =
+        firstCommandFunction ?: firstPublicFunction ?: firstInternalFunction ?: firstFunction ?: return null
+
+    return try {
+        @Suppress("UNCHECKED_CAST")
+        function as KFunction<R>
+    } catch (e: ClassCastException) {
+        throw ClassCastException(
+            "The return type: \"${function.returnType.jvmErasure.qualifiedName}\"" +
+                    " of the command function: \"${function.name}\"" +
+                    " in ${this::class.qualifiedName}" +
+                    " does not match the command's return type."
+        ).initCause(e)
+    }
 }
 
 /**

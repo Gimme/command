@@ -4,6 +4,7 @@ import dev.gimme.command.annotations.Sender
 import dev.gimme.command.construction.generateParameters
 import dev.gimme.command.construction.generateSenders
 import dev.gimme.command.construction.generateUsage
+import dev.gimme.command.construction.getDeclaredOverride
 import dev.gimme.command.construction.getFirstCommandFunction
 import dev.gimme.command.exception.CommandException
 import dev.gimme.command.exception.ErrorCode
@@ -98,10 +99,22 @@ abstract class BaseCommand<out R>(
         }
     }
 
+    /**
+     * Calls this command.
+     *
+     * Does not get called if there is another defined command function.
+     *
+     * @throws CommandException if the call failed
+     */
     @Throws(CommandException::class)
     protected open fun call(): R {
         throw NotImplementedError()
     }
+
+    /**
+     * Returns the overridden version of the [call] function if exists.
+     */
+    internal fun getCallFunctionOverride(): KFunction<*>? = this::call.getDeclaredOverride(this::class)
 
     /**
      * Attempts to execute this command as the [commandSender] with the args mapping of parameters to arguments and
