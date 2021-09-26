@@ -4,7 +4,6 @@ import dev.gimme.command.BaseCommand
 import dev.gimme.command.Command
 import dev.gimme.command.annotations.Parameter
 import dev.gimme.command.annotations.Sender
-import dev.gimme.command.exception.CommandException
 import dev.gimme.command.function.CommandFunction
 import dev.gimme.command.parameter.CommandParameter
 import dev.gimme.command.parameter.CommandParameterSet
@@ -23,7 +22,7 @@ import kotlin.reflect.jvm.kotlinProperty
 internal fun BaseCommand<*>.generateParameters(): CommandParameterSet {
     val parameters = mutableListOf<CommandParameter>()
 
-    this.getFirstCommandFunction()?.also { commandFunction ->
+    this.commandFunction?.also { commandFunction ->
         commandFunction.parameters
             .filter { it.isCommandParameter() }
             .onEach { param ->
@@ -76,7 +75,7 @@ internal fun BaseCommand<*>.generateSenders(): Set<KClass<*>>? {
         }
     }
 
-    getFirstCommandFunction()?.also { commandFunction ->
+    this.commandFunction?.also { commandFunction ->
         senderSettings.addAll(
             commandFunction.parameters
                 .filter { it.isSenderParameter() }
@@ -131,10 +130,9 @@ internal fun CommandParameter.generateFlags(unavailableFlags: Set<Char> = setOf(
 /**
  * Returns the first found method that is annotated with @[CommandFunction].
  *
- * @throws IllegalStateException if there is no method annotated with @[CommandFunction] or if it has the wrong
- * return type
+ * @throws ClassCastException if the function exists but has the wrong return type
  */
-@Throws(CommandException::class)
+@Throws(ClassCastException::class)
 internal fun <R> Command<R>.getFirstCommandFunction(): KFunction<R>? {
     // Look through the public methods in the command class
     for (function in this::class.declaredMemberFunctions) {
@@ -150,7 +148,7 @@ internal fun <R> Command<R>.getFirstCommandFunction(): KFunction<R>? {
                         " of the command function: \"${function.name}\"" +
                         " in ${this::class.qualifiedName}" +
                         " does not match the command's return type."
-            )
+            ).initCause(e)
         }
     }
 

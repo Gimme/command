@@ -52,7 +52,7 @@ abstract class BaseCommand<out R>(
 
     override val usage: String by lazy { generateUsage() }
 
-    private val commandFunction: KFunction<R>? = getFirstCommandFunction()
+    internal val commandFunction: KFunction<R>? = getFirstCommandFunction()
 
     private val argumentPropertySetters: MutableMap<CommandParameter, (Any?) -> Unit> = mutableMapOf()
     private val senderFields: MutableSet<Field> = mutableSetOf()
