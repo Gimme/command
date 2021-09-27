@@ -4,6 +4,7 @@ import dev.gimme.command.exception.CommandException
 import dev.gimme.command.node.CommandNode
 import dev.gimme.command.parameter.CommandParameter
 import dev.gimme.command.parameter.CommandParameterSet
+import dev.gimme.command.permission.Permission
 import dev.gimme.command.sender.CommandSender
 
 /**
@@ -13,7 +14,7 @@ import dev.gimme.command.sender.CommandSender
  * @property usage       information of how to use the command
  * @property parameters  this command's parameters
  */
-interface Command<out T> : CommandNode {
+interface Command<out T> : CommandNode, Permission {
 
     val usage: String
     val parameters: CommandParameterSet

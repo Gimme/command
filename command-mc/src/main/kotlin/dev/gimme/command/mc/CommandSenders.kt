@@ -26,6 +26,8 @@ class McCommandSender(
 
     override fun sendMessage(message: String) = this.spigot.sendMessage(message)
 
+    override fun hasPermission(permission: String): Boolean = spigot.hasPermission(permission)
+
     companion object {
         init {
             SenderTypes.registerAdapter { s: McCommandSender -> s.spigot }

@@ -40,6 +40,7 @@ abstract class BaseCommand<out R>(
     aliases: Set<String> = setOf(),
     description: String = "",
     detailedDescription: String? = null,
+    override val permission: String? = null,
 ) : BaseCommandNode(
     name = name,
     parent = parent,

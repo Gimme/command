@@ -3,6 +3,7 @@ package dev.gimme.command.manager
 import dev.gimme.command.Command
 import dev.gimme.command.CommandSearchResult
 import dev.gimme.command.exception.CommandException
+import dev.gimme.command.exception.ErrorCode
 import dev.gimme.command.manager.commandcollection.CommandCollection
 import dev.gimme.command.manager.commandcollection.CommandTree
 import dev.gimme.command.parameter.CommandParameter
@@ -43,8 +44,9 @@ open class SimpleCommandManager<R>(private val defaultResponseParser: (Any?) -> 
         command: Command<*>,
         args: Map<CommandParameter, Any?>,
     ): R {
-        val commandNode = executorByCommand[command]
+        if (!commandSender.hasPermission(command)) throw ErrorCode.PERMISSION_DENIED.createException()
 
+        val commandNode = executorByCommand[command]
         return commandNode?.execute(commandSender, args) ?: defaultResponseParser(command.execute(commandSender, args))
     }
 

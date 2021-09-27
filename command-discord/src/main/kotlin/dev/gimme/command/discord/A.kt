@@ -23,6 +23,12 @@ private fun <T> JDA.registerCommand(
         override fun onSlashCommand(event: SlashCommandEvent) {
             if (!command.pathAliases.contains(event.commandPath.split("/"))) return
 
+            val commandSender = event.interaction.user.gimme
+            if (!commandSender.hasPermission(command)) {
+                event.reply("Permission denied")
+                return
+            }
+
             val response = command.execute(
                 event.interaction.user.gimme,
                 event.options.associate {

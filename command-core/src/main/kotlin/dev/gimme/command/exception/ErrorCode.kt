@@ -30,6 +30,9 @@ enum class ErrorCode(val message: String) {
 
     /** A required parameter was not supplied with the command. */
     REQUIRED_PARAMETER("Missing a required parameter"),
+
+    /** Permission not granted for this command. */
+    PERMISSION_DENIED("Permission denied"),
     ;
 
     /** Returns the identifier code. */

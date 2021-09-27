@@ -3,6 +3,7 @@ package dev.gimme.command;
 import dev.gimme.command.annotations.Parameter;
 import dev.gimme.command.annotations.Sender;
 import dev.gimme.command.parameter.CommandParameter;
+import dev.gimme.command.permission.Permission;
 import dev.gimme.command.sender.CommandSender;
 import javax.annotation.Nullable;
 
@@ -133,6 +134,16 @@ class JPlayerSender implements CommandSender {
 
     @Override
     public void sendMessage(@NotNull String message) {
+    }
+
+    @Override
+    public boolean hasPermission(@NotNull String permission) {
+        return true;
+    }
+
+    @Override
+    public boolean hasPermission(@NotNull Permission permission) {
+        return true;
     }
 }
 

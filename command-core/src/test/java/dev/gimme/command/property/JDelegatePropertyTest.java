@@ -2,6 +2,7 @@ package dev.gimme.command.property;
 
 import dev.gimme.command.UtilsKt;
 import dev.gimme.command.parameter.CommandParameter;
+import dev.gimme.command.permission.Permission;
 import dev.gimme.command.sender.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
@@ -102,6 +103,16 @@ class Sender1 implements CommandSender {
     @Override
     public void sendMessage(@NotNull String message) {
     }
+
+    @Override
+    public boolean hasPermission(@NotNull String permission) {
+        return true;
+    }
+
+    @Override
+    public boolean hasPermission(@NotNull Permission permission) {
+        return true;
+    }
 }
 
 class Sender2 implements CommandSender {
@@ -113,6 +124,16 @@ class Sender2 implements CommandSender {
 
     @Override
     public void sendMessage(@NotNull String message) {
+    }
+
+    @Override
+    public boolean hasPermission(@NotNull String permission) {
+        return true;
+    }
+
+    @Override
+    public boolean hasPermission(@NotNull Permission permission) {
+        return true;
     }
 }
 
@@ -128,6 +149,16 @@ class PlayerSender implements CommandSender {
 
     @Override
     public void sendMessage(@NotNull String message) {
+    }
+
+    @Override
+    public boolean hasPermission(@NotNull String permission) {
+        return true;
+    }
+
+    @Override
+    public boolean hasPermission(@NotNull Permission permission) {
+        return true;
     }
 }
 
