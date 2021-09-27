@@ -1,6 +1,6 @@
 package dev.gimme.command.mc
 
-import dev.gimme.command.Command
+import dev.gimme.command.node.CommandNode
 import org.bukkit.command.CommandMap
 import org.bukkit.command.PluginCommand
 import org.bukkit.plugin.Plugin
@@ -11,14 +11,14 @@ import java.lang.reflect.Field
 /**
  * Registers the root of the [command] to this plugin and returns the generated [PluginCommand].
  */
-internal fun Plugin.registerCommand(command: Command<*>): PluginCommand {
+internal fun Plugin.registerCommand(command: CommandNode): PluginCommand {
     val pluginCommand = this.createCommand(command)
 
     this.getCommandMap().register(this.name, pluginCommand)
     return pluginCommand
 }
 
-private fun Plugin.createCommand(command: Command<*>): PluginCommand {
+private fun Plugin.createCommand(command: CommandNode): PluginCommand {
     val rootCommand = command.root
 
     val pluginCommand = this.createCommand(rootCommand.name)
