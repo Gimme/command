@@ -1,11 +1,11 @@
-package dev.gimme.command.manager
+package dev.gimme.command.channel.manager
 
 import dev.gimme.command.Command
 import dev.gimme.command.CommandSearchResult
 import dev.gimme.command.exception.CommandException
 import dev.gimme.command.exception.ErrorCode
-import dev.gimme.command.manager.commandcollection.CommandCollection
-import dev.gimme.command.manager.commandcollection.CommandTree
+import dev.gimme.command.channel.manager.commandcollection.CommandCollection
+import dev.gimme.command.channel.manager.commandcollection.CommandTree
 import dev.gimme.command.parameter.CommandParameter
 import dev.gimme.command.sender.CommandSender
 

@@ -1,9 +1,9 @@
-package dev.gimme.command.manager
+package dev.gimme.command.channel.manager
 
 import dev.gimme.command.Command
-import dev.gimme.command.DUMMY_COMMAND
-import dev.gimme.command.DUMMY_COMMAND_SENDER
-import dev.gimme.command.DefaultBaseCommand
+import dev.gimme.command.channel.DUMMY_COMMAND
+import dev.gimme.command.channel.DUMMY_COMMAND_SENDER
+import dev.gimme.command.channel.DefaultBaseCommand
 import dev.gimme.command.parameter.CommandParameter
 import dev.gimme.command.sender.CommandSender
 import io.mockk.every

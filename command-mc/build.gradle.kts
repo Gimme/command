@@ -14,6 +14,7 @@ repositories {
 dependencies {
     // API
     api(project(":command-core"))
+    api(project(":command-channel"))
 
     // Spigot
     compileOnly("org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT")

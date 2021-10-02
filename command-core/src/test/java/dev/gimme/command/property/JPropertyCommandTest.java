@@ -1,14 +1,16 @@
 package dev.gimme.command.property;
 
 import dev.gimme.command.UtilsKt;
-import dev.gimme.command.channel.TextCommandChannel;
+import dev.gimme.command.parameter.CommandParameter;
 import dev.gimme.command.sender.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -18,39 +20,24 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class JPropertyCommandTest {
 
-    private final TextCommandChannel channel = new TextCommandChannel() {
-        @Override
-        public void onDisable() {
-        }
-
-        @Override
-        public void onEnable() {
-        }
-    };
-
     static List<Object> args = List.of(
             "abc",
             123,
-            0.0,
-            0.5,
-            "x"
+            List.of(0.0, 0.5),
+            Set.of("x")
     );
 
     @Test
     void test() {
-        String commandName = "k";
         CommandSender sender = UtilsKt.getDUMMY_COMMAND_SENDER();
-        PCmd command = new PCmd(commandName);
+        PCmd command = new PCmd("k");
 
-        String input = commandName + " " + args.stream()
-                .map(Object::toString)
-                .collect(Collectors.joining(" "));
+        Map<CommandParameter, Object> input = IntStream.range(0, args.size())
+                .boxed()
+                .collect(Collectors.toMap(i -> command.getParameters().getAt(i), args::get));
 
         assertFalse(command.called[0]);
-
-        channel.getCommandManager().registerCommand(command);
-        channel.parseInput(sender, input);
-
+        command.execute(sender, input);
         assertTrue(command.called[0]);
 
         assertNotNull(command.getParameters().get("a"));
@@ -84,8 +71,8 @@ class PCmd extends PropertyCommand<Void> {
 
         assertEquals(args.get(0), a.get());
         assertEquals(args.get(1), b.get());
-        assertIterableEquals(List.of(args.get(2), args.get(3)), list.get());
-        assertIterableEquals(Set.of(args.get(4)), set.get());
+        assertIterableEquals((List<Double>) args.get(2), list.get());
+        assertIterableEquals((Set<String>) args.get(3), set.get());
 
         return null;
     }

@@ -3,45 +3,44 @@ package dev.gimme.command.function;
 import dev.gimme.command.UtilsKt;
 import dev.gimme.command.annotations.Default;
 import dev.gimme.command.annotations.Parameter;
-import dev.gimme.command.channel.TextCommandChannel;
+import dev.gimme.command.parameter.CommandParameter;
 import dev.gimme.command.sender.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class JFunctionCommandTest {
-
-    private final TextCommandChannel channel = new TextCommandChannel() {
-        @Override
-        public void onDisable() {
-        }
-
-        @Override
-        public void onEnable() {
-        }
-    };
 
     static final CommandSender SENDER = UtilsKt.getDUMMY_COMMAND_SENDER();
 
     @Test
     void test() {
-        String commandName = "k";
         String arg1 = "abc";
         int arg2 = 123;
-        FCmd c = new FCmd(commandName);
+        List<Object> args = List.of(arg1, arg2);
+
+        FCmd c = new FCmd("k");
+
+        Map<CommandParameter, Object> input = IntStream.range(0, args.size())
+                .boxed()
+                .collect(Collectors.toMap(i -> c.getParameters().getAt(i), args::get));
 
         assertFalse(c.called[0]);
-
-        channel.getCommandManager().registerCommand(c);
-        channel.parseInput(SENDER, commandName
-                + " " + arg1
-                + " " + arg2
-        );
-
+        c.execute(SENDER, input);
         assertTrue(c.called[0]);
+
+        assertNotNull(c.getParameters().get("arg1"));
+        assertNotNull(c.getParameters().get("arg2"));
+        assertNotNull(c.getParameters().get("arg3"));
     }
 }
 
@@ -54,7 +53,7 @@ class FCmd extends FunctionCommand<Void> {
     }
 
     @CommandFunction
-    private void call(CommandSender s, String a, int b, @Parameter(@Default("3")) int c) {
+    private void call(CommandSender s, String a, int b, @Parameter(value = @Default("3")) int c) {
         called[0] = true;
 
         assertEquals(JFunctionCommandTest.SENDER, s);

@@ -4,7 +4,6 @@ import dev.gimme.command.DUMMY_COMMAND_SENDER
 import dev.gimme.command.annotations.Default
 import dev.gimme.command.sender.SenderTypes
 import dev.gimme.command.annotations.Parameter
-import dev.gimme.command.channel.TextCommandChannel
 import dev.gimme.command.sender.CommandSender
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
@@ -16,25 +15,16 @@ internal class FunctionCommandTest {
 
     private val sender = DUMMY_COMMAND_SENDER
 
-    private val channel = object : TextCommandChannel() {
-        override fun onEnable() {
-        }
-
-        override fun onDisable() {
-        }
-    }
-
     @Test
     fun `Calls function command with parameters`() {
         var called = false
 
-        val commandName = "k"
         val arg1 = "abc"
         val arg2 = 123
-        val arg3 = "three"
-        val arg4 = "four"
+        val arg3 = listOf("three", "four")
+        val args = listOf<Any>(arg1, arg2, arg3)
 
-        val command = object : FunctionCommand<Any?>(commandName) {
+        val command = object : FunctionCommand<Any?>("k") {
 
             @CommandFunction
             private fun call(s: CommandSender, a: String, b: Int, c: List<String>) {
@@ -43,15 +33,12 @@ internal class FunctionCommandTest {
                 assertEquals(s, sender)
                 assertEquals(arg1, a)
                 assertEquals(arg2, b)
-                assertEquals(listOf(arg3, arg4), c)
+                assertEquals(arg3, c)
             }
         }
 
         assertFalse(called)
-
-        channel.commandManager.registerCommand(command)
-        channel.parseInput(sender, "$commandName $arg1 $arg2 $arg3 $arg4")
-
+        command.execute(sender, args.mapIndexed { index, arg -> command.parameters.getAt(index) to arg }.toMap())
         assertTrue(called)
 
         assertNotNull(command.parameters["a"])
@@ -63,10 +50,10 @@ internal class FunctionCommandTest {
     fun `Uses default values`() {
         var called = false
 
-        val commandName = "k"
         val arg1 = "abc"
+        val args = listOf<Any>(arg1)
 
-        val command = object : FunctionCommand<Any?>(commandName) {
+        val command = object : FunctionCommand<Any?>("k") {
 
             @CommandFunction
             private fun call(
@@ -86,10 +73,7 @@ internal class FunctionCommandTest {
         }
 
         assertFalse(called)
-
-        channel.commandManager.registerCommand(command)
-        channel.parseInput(sender, "$commandName $arg1")
-
+        command.execute(sender, args.mapIndexed { index, arg -> command.parameters.getAt(index) to arg }.toMap())
         assertTrue(called)
     }
 
@@ -105,9 +89,7 @@ internal class FunctionCommandTest {
 
         var called = false
 
-        val commandName = "k"
-
-        val command = object : FunctionCommand<Any?>(commandName) {
+        val command = object : FunctionCommand<Any?>("k") {
 
             @CommandFunction
             private fun call(playerSender: PlayerSender, playerSender2: PlayerSender?) {
@@ -119,10 +101,7 @@ internal class FunctionCommandTest {
         }
 
         assertFalse(called)
-
-        channel.commandManager.registerCommand(command)
-        channel.parseInput(sender, commandName)
-
+        command.execute(sender, mapOf())
         assertTrue(called)
     }
 
@@ -141,9 +120,7 @@ internal class FunctionCommandTest {
 
         var called = false
 
-        val commandName = "k"
-
-        val command = object : FunctionCommand<Any?>(commandName) {
+        val command = object : FunctionCommand<Any?>("k") {
 
             @CommandFunction
             private fun call(@dev.gimme.command.annotations.Sender player: Player) {
@@ -154,10 +131,7 @@ internal class FunctionCommandTest {
         }
 
         assertFalse(called)
-
-        channel.commandManager.registerCommand(command)
-        channel.parseInput(sender, commandName)
-
+        command.execute(sender, mapOf())
         assertTrue(called)
     }
 }

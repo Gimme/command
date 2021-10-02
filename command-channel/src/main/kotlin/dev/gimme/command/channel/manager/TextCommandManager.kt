@@ -1,4 +1,4 @@
-package dev.gimme.command.manager
+package dev.gimme.command.channel.manager
 
 /**
  * A command manager with text response type.

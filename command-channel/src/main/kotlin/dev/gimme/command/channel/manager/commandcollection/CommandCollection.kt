@@ -1,4 +1,4 @@
-package dev.gimme.command.manager.commandcollection
+package dev.gimme.command.channel.manager.commandcollection
 
 import dev.gimme.command.Command
 import dev.gimme.command.CommandSearchResult

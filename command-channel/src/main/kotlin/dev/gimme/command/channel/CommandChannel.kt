@@ -1,6 +1,6 @@
 package dev.gimme.command.channel
 
-import dev.gimme.command.manager.CommandManager
+import dev.gimme.command.channel.manager.CommandManager
 import dev.gimme.command.sender.MessageReceiver
 import dev.gimme.command.common.Enableable
 

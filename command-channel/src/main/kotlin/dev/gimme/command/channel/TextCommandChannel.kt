@@ -4,9 +4,8 @@ import dev.gimme.command.Command
 import dev.gimme.command.exception.CommandException
 import dev.gimme.command.exception.ErrorCode
 import dev.gimme.command.exception.IncompleteCommandException
-import dev.gimme.command.manager.CommandManager
-import dev.gimme.command.manager.TextCommandManager
-import dev.gimme.command.node.CommandNode
+import dev.gimme.command.channel.manager.CommandManager
+import dev.gimme.command.channel.manager.TextCommandManager
 import dev.gimme.command.parameter.CommandParameter
 import dev.gimme.command.sender.CommandSender
 import java.util.*
@@ -63,20 +62,19 @@ abstract class TextCommandChannel(
         val commandPath = commandSearchResult.path
             ?: throw ErrorCode.NOT_A_COMMAND.createException()
 
-        if (commandSearchResult.command == null) {
-            throw IncompleteCommandException(
-                usedPath = commandSearchResult.path,
+        val command = commandSearchResult.command
+            ?: throw IncompleteCommandException(
+                usedPath = commandPath,
                 subBranches = commandSearchResult.subBranches,
                 leafCommands = commandSearchResult.commandNode?.leafCommands ?: setOf(),
             )
-        }
 
         val commandLabel = commandPath.joinToString(" ")
 
         // Remove command name, leaving only the arguments
         val argsInput = commandInput.removePrefix(commandLabel)
 
-        val args = parseArgsInput(argsInput, commandSearchResult.command)
+        val args = parseArgsInput(argsInput, command)
 
         // TODO: Convert string input to mapped args
 
