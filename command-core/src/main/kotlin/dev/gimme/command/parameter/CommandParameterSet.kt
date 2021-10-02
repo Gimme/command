@@ -7,7 +7,7 @@ package dev.gimme.command.parameter
  */
 class CommandParameterSet(parameters: Collection<CommandParameter> = listOf()): MutableSet<CommandParameter> {
 
-    private val parameters: MutableSet<CommandParameter> = parameters.toMutableSet()
+    private val parameters: LinkedHashSet<CommandParameter> = LinkedHashSet(parameters)
     private val parameterById: MutableMap<String, CommandParameter> = parameters.map { it.id to it }.toMap().toMutableMap()
     private val parameterByFlag: MutableMap<Char, CommandParameter> = mutableMapOf()
 
@@ -24,6 +24,15 @@ class CommandParameterSet(parameters: Collection<CommandParameter> = listOf()): 
      * in this set.
      */
     operator fun get(id: String): CommandParameter? = parameterById[id]
+
+    /**
+     * Returns the parameter at the given [index] or throws an [IndexOutOfBoundsException] if the [index] is out of
+     * bounds of this collection.
+     *
+     * @throws IndexOutOfBoundsException if the index is out of bounds
+     */
+    @Throws(IndexOutOfBoundsException::class)
+    fun getAt(index: Int): CommandParameter = parameters.elementAt(index)
 
     /**
      * Returns the parameter corresponding to the given [flag], or `null` if a parameter with such a [flag] is not
