@@ -32,4 +32,12 @@ interface CommandCollection : Collection<Command<*>> {
     fun find(path: List<String>): CommandSearchResult
 
     override fun iterator(): Iterator<Command<*>> = commands.iterator()
+
+    override val size: Int get() = commands.size
+
+    override fun isEmpty(): Boolean = commands.isEmpty()
+
+    override fun contains(element: Command<*>): Boolean = commands.contains(element)
+
+    override fun containsAll(elements: Collection<Command<*>>): Boolean = commands.containsAll(elements)
 }

@@ -60,11 +60,5 @@ class CommandTree : CommandCollection {
         return node
     }
 
-    override fun contains(element: Command<*>): Boolean = commands.contains(element)
-
-    override fun containsAll(elements: Collection<Command<*>>): Boolean = commands.containsAll(elements)
-
     override fun isEmpty(): Boolean = rootNodes.isEmpty()
-
-    override val size: Int = commands.size
 }
