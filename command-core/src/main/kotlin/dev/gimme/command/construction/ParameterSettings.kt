@@ -3,6 +3,7 @@ package dev.gimme.command.construction
 import dev.gimme.command.BaseCommand
 import dev.gimme.command.annotations.Default
 import dev.gimme.command.annotations.Description
+import dev.gimme.command.annotations.Name
 import dev.gimme.command.annotations.Parameter
 import dev.gimme.command.annotations.getDefaultValue
 import dev.gimme.command.annotations.getDefaultValueString
@@ -82,19 +83,20 @@ internal class ParameterSettings {
             }
 
             val values: ParameterSettingsValues = ParameterSettingsValues(
+                name = null,
+                description = null,
                 defaultValue = defaultValue,
                 defaultValueString = defaultValueString,
-                description = null,
             ).populateFromAnnotations(element, klass)
 
             val _optional = optional ?: (values.defaultValue != null || type.isMarkedNullable)
-
-            val id = name.splitCamelCase("-")
+            val _name = values.name ?: name
+            val id = _name.splitCamelCase("-")
             val parameterType = ParameterTypes.get(klass)
 
             return CommandParameter(
                 id = id,
-                name = name,
+                name = _name,
                 type = parameterType,
                 suggestions = suggestions ?: parameterType.values ?: { setOf() },
                 description = values.description,
@@ -107,20 +109,23 @@ internal class ParameterSettings {
 
         private fun ParameterSettingsValues.populateFromAnnotations(element: KAnnotatedElement, klass: KClass<out Any>): ParameterSettingsValues {
             val parameterA = element.findAnnotation<Parameter>()
-            val defaultA = element.findAnnotation<Default>()
+            val nameA = element.findAnnotation<Name>()
             val descriptionA = element.findAnnotation<Description>()
+            val defaultA = element.findAnnotation<Default>()
 
-            defaultValue = defaultValue ?: (defaultA ?: parameterA?.value)?.getDefaultValue(klass)
-            defaultValueString = defaultValueString ?: (defaultA ?: parameterA?.value)?.getDefaultValueString()
+            name = name ?: nameA?.value ?: parameterA?.value?.ifEmpty { null }
             description = description ?: descriptionA?.value ?: parameterA?.description?.ifEmpty { null }
+            defaultValue = defaultValue ?: (defaultA ?: parameterA?.def)?.getDefaultValue(klass)
+            defaultValueString = defaultValueString ?: (defaultA ?: parameterA?.def)?.getDefaultValueString()
 
             return this
         }
 
         private data class ParameterSettingsValues(
+            var name: String?,
+            var description: String?,
             var defaultValue: Any?,
             var defaultValueString: String?,
-            var description: String?,
         )
     }
 }

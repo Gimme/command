@@ -6,6 +6,11 @@ package dev.gimme.command.annotations
 @Target(AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.PROPERTY, AnnotationTarget.FIELD)
 annotation class Parameter(
     /**
+     * The name of this parameter.
+     */
+    val value: String = "",
+
+    /**
      * The description of this parameter.
      */
     val description: String = "",
@@ -13,5 +18,5 @@ annotation class Parameter(
     /**
      * The default value used if this parameter is optional.
      */
-    val value: Default = Default("", ""),
+    val def: Default = Default("", ""),
 )

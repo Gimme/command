@@ -2,6 +2,7 @@ package dev.gimme.command.function
 
 import dev.gimme.command.DUMMY_COMMAND_SENDER
 import dev.gimme.command.annotations.Default
+import dev.gimme.command.annotations.Name
 import dev.gimme.command.sender.SenderTypes
 import dev.gimme.command.annotations.Parameter
 import dev.gimme.command.sender.CommandSender
@@ -57,11 +58,11 @@ internal class FunctionCommandTest {
 
             @CommandFunction
             private fun call(
-                @Parameter(value = Default("xyz"))
+                @Parameter(def = Default("xyz"))
                 a: String,
-                @Parameter(value = Default("xyz"))
+                @Parameter(def = Default("xyz"))
                 b: String,
-                @Parameter(value = Default("5"))
+                @Parameter(def = Default("5"))
                 c: Int,
             ) {
                 called = true
@@ -75,6 +76,38 @@ internal class FunctionCommandTest {
         assertFalse(called)
         command.execute(sender, args.mapIndexed { index, arg -> command.parameters.getAt(index) to arg }.toMap())
         assertTrue(called)
+    }
+
+    @Test
+    fun `Uses named parameters`() {
+        var called = false
+
+        val arg1 = "abc"
+        val arg2 = "xyz"
+        val args = listOf<Any>(arg1, arg2)
+
+        val command = object : FunctionCommand<Any?>("k") {
+
+            @CommandFunction
+            private fun call(
+                @Parameter(value = "param1")
+                a: String,
+                @Name("p2")
+                b: String,
+            ) {
+                called = true
+
+                assertEquals(arg1, a)
+                assertEquals(arg2, b)
+            }
+        }
+
+        assertFalse(called)
+        command.execute(sender, args.mapIndexed { index, arg -> command.parameters.getAt(index) to arg }.toMap())
+        assertTrue(called)
+
+        assertNotNull(command.parameters["param1"])
+        assertNotNull(command.parameters["p2"])
     }
 
     @Test

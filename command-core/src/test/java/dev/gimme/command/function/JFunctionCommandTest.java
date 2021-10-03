@@ -40,7 +40,7 @@ class JFunctionCommandTest {
 
         assertNotNull(c.getParameters().get("arg1"));
         assertNotNull(c.getParameters().get("arg2"));
-        assertNotNull(c.getParameters().get("arg3"));
+        assertNotNull(c.getParameters().get("c"));
     }
 }
 
@@ -53,7 +53,12 @@ class FCmd extends FunctionCommand<Void> {
     }
 
     @CommandFunction
-    private void call(CommandSender s, String a, int b, @Parameter(value = @Default("3")) int c) {
+    private void call(
+          CommandSender s,
+          String a,
+          int b,
+          @Parameter(value = "c", def = @Default("3")) int c
+    ) {
         called[0] = true;
 
         assertEquals(JFunctionCommandTest.SENDER, s);

@@ -116,11 +116,11 @@ class TextCommandChannelTest {
 
             @CommandFunction
             private fun call(
-                @Parameter(value = Default("xyz"))
+                @Parameter(def = Default("xyz"))
                 a: String,
-                @Parameter(value = Default("xyz"))
+                @Parameter(def = Default("xyz"))
                 b: String,
-                @Parameter(value = Default("5"))
+                @Parameter(def = Default("5"))
                 c: Int,
             ) {
                 called = true

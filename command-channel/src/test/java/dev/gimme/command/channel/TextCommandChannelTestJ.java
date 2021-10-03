@@ -2,6 +2,7 @@ package dev.gimme.command.channel;
 
 import dev.gimme.command.BaseCommand;
 import dev.gimme.command.annotations.Default;
+import dev.gimme.command.annotations.Name;
 import dev.gimme.command.annotations.Parameter;
 import dev.gimme.command.function.CommandFunction;
 import dev.gimme.command.sender.CommandSender;
@@ -56,10 +57,10 @@ class TextCommandChannelTestJ {
 
         assertTrue(command.called[0]);
 
-        assertNotNull(command.getParameters().get("arg1"));
-        assertNotNull(command.getParameters().get("arg2"));
-        assertNotNull(command.getParameters().get("arg3"));
-        assertNotNull(command.getParameters().get("arg4"));
+        assertNotNull(command.getParameters().get("a"));
+        assertNotNull(command.getParameters().get("b"));
+        assertNotNull(command.getParameters().get("list"));
+        assertNotNull(command.getParameters().get("set"));
     }
 }
 
@@ -72,7 +73,13 @@ class TestCommandJ extends BaseCommand<Void> {
     }
 
     @CommandFunction
-    private void call(CommandSender s, String a, int b, List<Double> list, Set<String> set) {
+    private void call(
+            CommandSender s,
+            @Name("a") String a,
+            @Name("b") int b,
+            @Name("list") List<Double> list,
+            @Name("set") Set<String> set
+    ) {
         called[0] = true;
 
         var args = TextCommandChannelTestJ.args;

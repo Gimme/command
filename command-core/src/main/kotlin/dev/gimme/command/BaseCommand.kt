@@ -137,27 +137,25 @@ abstract class BaseCommand<out R>(
         val typedArgsMap: MutableMap<KParameter, Any?> = mutableMapOf(params[0] to this)
 
         // Inject command senders
-        params.forEach { param ->
-            val sender: Any? = when {
-                commandSender::class.isSubclassOf(param.type.jvmErasure) -> {
-                    param.type.jvmErasure.safeCast(commandSender)
+        var order = 0
+        params
+            .filter { it.kind == KParameter.Kind.VALUE }
+            .forEach { param ->
+                val senderIsSubclass = commandSender::class.isSubclassOf(param.type.jvmErasure)
+                if (senderIsSubclass || param.hasAnnotation<Sender>()) { // Sender
+                    val sender: Any? =
+                        if (senderIsSubclass) param.type.jvmErasure.safeCast(commandSender)
+                        else SenderTypes.adapt(commandSender, param.type.jvmErasure)
+
+                    val optional = param.type.isMarkedNullable
+                    if (sender == null && !optional) throw ErrorCode.INCOMPATIBLE_SENDER.createException()
+
+                    typedArgsMap[param] = sender
+                } else { // Argument
+                    val arg = args[parameters.getAt(order++)]
+                    typedArgsMap[param] = arg
                 }
-                param.hasAnnotation<Sender>() -> {
-                    SenderTypes.adapt(commandSender, param.type.jvmErasure)
-                }
-                else -> return@forEach
             }
-
-            val optional = param.type.isMarkedNullable
-            if (sender == null && !optional) throw ErrorCode.INCOMPATIBLE_SENDER.createException()
-
-            typedArgsMap[param] = sender
-        }
-
-        args.forEach { (key, value) ->
-            val p = params.find { it.name == key.id } ?: throw ErrorCode.INVALID_PARAMETER.createException(key.id)
-            typedArgsMap[p] = value
-        }
 
         function.isAccessible = true
         return function.callBy(typedArgsMap)
