@@ -35,13 +35,15 @@ internal class ParameterSettings {
             }
 
             return fromType(
-                name = field.name.removeSuffix("\$delegate"),
+                name = param.name ?: field.name.removeSuffix("\$delegate"),
                 element = property,
                 type = type,
                 suggestions = param.suggestions,
                 defaultValue = param.defaultValue,
                 defaultValueString = param.defaultValueString,
                 optional = param.optional,
+                description = param.description,
+                flags = param.flags,
             )
         }
 
@@ -66,6 +68,8 @@ internal class ParameterSettings {
             defaultValue: (() -> Any?)? = null,
             defaultValueString: String? = null,
             optional: Boolean? = null,
+            description: String? = null,
+            flags: Set<Char> = setOf(),
         ): CommandParameter {
             val jvmErasure = type.jvmErasure
 
@@ -84,7 +88,7 @@ internal class ParameterSettings {
 
             val values: ParameterSettingsValues = ParameterSettingsValues(
                 name = null,
-                description = null,
+                description = description,
                 defaultValue = defaultValue,
                 defaultValueString = defaultValueString,
             ).populateFromAnnotations(element, klass)
@@ -104,6 +108,7 @@ internal class ParameterSettings {
                 optional = _optional,
                 defaultValue = values.defaultValue,
                 defaultValueString = values.defaultValueString,
+                flags = flags.toMutableSet(),
             )
         }
 

@@ -59,7 +59,14 @@ internal fun BaseCommand<*>.generateParameters(): CommandParameterSet {
             throw RuntimeException("A parameter with the name \"${it}\" already exists") // TODO: exception type
         }
 
-    parameters.onEach {
+    parameters.forEach {
+        val duplicateFlags = it.flags.filter { flag -> usedFlags.contains(flag) }.toSet()
+        it.flags.removeAll(duplicateFlags)
+        usedFlags.addAll(it.flags)
+    }
+
+    parameters.forEach {
+        if (it.flags.isNotEmpty()) return@forEach
         it.flags.addAll(it.generateFlags(usedFlags))
         usedFlags.addAll(it.flags)
     }

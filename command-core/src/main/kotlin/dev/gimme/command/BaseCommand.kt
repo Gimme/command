@@ -187,6 +187,9 @@ abstract class BaseCommand<out R>(
     protected inner class ParamBuilder<T> internal constructor() : CommandProperty<T> {
 
         private val param = object : Param<T> {
+            override var name: String? = null
+            override var description: String? = null
+            override var flags: Set<Char> = setOf()
             override var suggestions: (() -> Set<String>)? = null
             override var optional: Boolean = false
             override var defaultValue: (() -> T)? = null
@@ -206,6 +209,10 @@ abstract class BaseCommand<out R>(
             }
         }
 
+        fun name(name: String) = apply { param.name = name }
+        fun description(description: String) = apply { param.description = description }
+        fun flags(vararg flags: Char) = apply { param.flags = flags.toSet() }
+
         @JvmName("defaultValue")
         fun default(value: T) = default(value?.toString()) { value }
 
@@ -216,6 +223,7 @@ abstract class BaseCommand<out R>(
             param.defaultValueString = representation
         }
 
+        fun suggestions(vararg suggestions: String) = suggestions { suggestions.toSet() }
         fun suggestions(suggestions: () -> Set<String>) = apply { param.suggestions = suggestions }
 
         @JvmSynthetic
@@ -229,6 +237,9 @@ abstract class BaseCommand<out R>(
     }
 
     interface Param<out T> : CommandDelegate<T> {
+        val name: String?
+        val description: String?
+        val flags: Set<Char>
         val suggestions: (() -> Set<String>)?
         val optional: Boolean
         val defaultValue: (() -> T)?
