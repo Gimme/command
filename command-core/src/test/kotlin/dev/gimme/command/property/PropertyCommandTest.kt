@@ -1,5 +1,6 @@
 package dev.gimme.command.property
 
+import dev.gimme.command.BaseCommand
 import dev.gimme.command.DUMMY_COMMAND_SENDER
 import org.junit.jupiter.api.Assertions.assertAll
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -23,7 +24,7 @@ internal class PropertyCommandTest {
             setOf("x"),
         )
 
-        val command = object : PropertyCommand<Unit>("k") {
+        val command = object : BaseCommand<Unit>("k") {
 
             val a: String? by param()
 

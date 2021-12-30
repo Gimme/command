@@ -1,5 +1,6 @@
 package dev.gimme.command.property
 
+import dev.gimme.command.BaseCommand
 import dev.gimme.command.DUMMY_COMMAND_SENDER
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
@@ -15,7 +16,7 @@ internal class DelegatePropertyTest {
 
         var called = false
 
-        val command = object : PropertyCommand<Unit>("test-command") {
+        val command = object : BaseCommand<Unit>("test-command") {
 
             val string: String by param()
             val int: Int by param()

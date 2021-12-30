@@ -1,5 +1,6 @@
 package dev.gimme.command.property;
 
+import dev.gimme.command.BaseCommand;
 import dev.gimme.command.UtilsKt;
 import dev.gimme.command.parameter.CommandParameter;
 import dev.gimme.command.permission.Permission;
@@ -45,7 +46,7 @@ class JDelegatePropertyTest {
     }
 }
 
-class DelegateTestCommand extends PropertyCommand<Void> {
+class DelegateTestCommand extends BaseCommand<Void> {
 
     final boolean[] called = {false};
 

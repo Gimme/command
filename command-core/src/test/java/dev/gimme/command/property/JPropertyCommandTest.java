@@ -1,5 +1,6 @@
 package dev.gimme.command.property;
 
+import dev.gimme.command.BaseCommand;
 import dev.gimme.command.UtilsKt;
 import dev.gimme.command.parameter.CommandParameter;
 import dev.gimme.command.sender.CommandSender;
@@ -47,7 +48,7 @@ class JPropertyCommandTest {
     }
 }
 
-class PCmd extends PropertyCommand<Void> {
+class PCmd extends BaseCommand<Void> {
 
     final boolean[] called = {false};
 
