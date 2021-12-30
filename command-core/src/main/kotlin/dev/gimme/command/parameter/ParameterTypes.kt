@@ -17,7 +17,7 @@ object ParameterTypes {
         register(name = "String") { it }
         register(name = "Integer") { it.toIntOrNull() }
         register(name = "Number") { it.toDoubleOrNull() }
-        register(name = "Boolean", values = { setOf("true", "false", "1", "0") }) {
+        register(name = "Boolean", values = { setOf("true", "false") }) {
             when {
                 it.equals("true", true) || it == "1" -> true
                 it.equals("false", true) || it == "0" -> false
@@ -71,13 +71,13 @@ object ParameterTypes {
     fun <T : Any> register(
         klass: Class<T>,
         name: String = klass.simpleName ?: "?",
-        values: (() -> Set<String>)? = null,
+        values: (() -> Collection<String>)? = null,
         convertOrNull: (String) -> T?,
     ): ParameterType<T> {
         val parameterType = ParameterType(
             name = name,
             clazz = klass,
-            values = values,
+            values = values?.let { { it().toSet()} },
         ) { convertOrNull(it) ?: throw ErrorCode.INVALID_ARGUMENT.createException("\"$it\" (Not a valid $name)") }
 
         put(klass.kotlin, parameterType)
@@ -89,7 +89,7 @@ object ParameterTypes {
      */
     inline fun <reified T : Any> register(
         name: String = T::class.simpleName ?: "?",
-        noinline values: (() -> Set<String>)? = null,
+        noinline values: (() -> Collection<String>)? = null,
         noinline convertOrNull: (String) -> T?,
     ): ParameterType<T> = register(T::class.java, name, values, convertOrNull)
 

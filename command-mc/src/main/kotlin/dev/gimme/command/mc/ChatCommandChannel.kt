@@ -64,4 +64,11 @@ class ChatCommandChannel(
 
         return parseInput(sender.gimme, input.toString())
     }
+
+    companion object {
+        init {
+            registerBaseSenderTypes()
+            registerBaseParameterTypes()
+        }
+    }
 }

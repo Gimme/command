@@ -1,10 +1,16 @@
 package dev.gimme.command.mc
 
 import dev.gimme.command.sender.CommandSender
-import dev.gimme.command.sender.SenderTypes
+import dev.gimme.command.sender.SenderTypes.registerAdapter
 import org.bukkit.command.ConsoleCommandSender
 import org.bukkit.entity.Player
 import org.bukkit.command.CommandSender as SpigotCommandSender
+
+internal fun registerBaseSenderTypes() {
+    registerAdapter { s: McCommandSender -> s.spigot }
+    registerAdapter { s: McCommandSender -> s.spigot as? Player }
+    registerAdapter { s: McCommandSender -> s.spigot as? ConsoleCommandSender }
+}
 
 /**
  * Returns this [SpigotCommandSender] as a new [CommandSender].
@@ -27,12 +33,4 @@ class McCommandSender(
     override fun sendMessage(message: String) = this.spigot.sendMessage(message)
 
     override fun hasPermission(permission: String): Boolean = spigot.hasPermission(permission)
-
-    companion object {
-        init {
-            SenderTypes.registerAdapter { s: McCommandSender -> s.spigot }
-            SenderTypes.registerAdapter { s: McCommandSender -> s.spigot as? Player }
-            SenderTypes.registerAdapter { s: McCommandSender -> s.spigot as? ConsoleCommandSender }
-        }
-    }
 }
