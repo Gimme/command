@@ -27,7 +27,6 @@ tasks.test {
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions {
-        jvmTarget = "14"
         allWarningsAsErrors = true
         freeCompilerArgs = listOf("-progressive")
     }
