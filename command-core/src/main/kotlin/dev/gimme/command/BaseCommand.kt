@@ -153,7 +153,9 @@ abstract class BaseCommand<out R>(
                     typedArgsMap[param] = sender
                 } else { // Argument
                     val arg = args[parameters.getAt(order++)]
-                    typedArgsMap[param] = arg
+                    if (!(param.isOptional && arg == null)) {
+                        typedArgsMap[param] = arg
+                    }
                 }
             }
 
