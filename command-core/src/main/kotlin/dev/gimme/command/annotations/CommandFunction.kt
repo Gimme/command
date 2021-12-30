@@ -1,4 +1,4 @@
-package dev.gimme.command.function
+package dev.gimme.command.annotations
 
 /**
  * Marks a function as the command template.

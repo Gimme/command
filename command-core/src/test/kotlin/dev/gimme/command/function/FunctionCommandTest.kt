@@ -2,6 +2,7 @@ package dev.gimme.command.function
 
 import dev.gimme.command.BaseCommand
 import dev.gimme.command.DUMMY_COMMAND_SENDER
+import dev.gimme.command.annotations.CommandFunction
 import dev.gimme.command.annotations.Default
 import dev.gimme.command.annotations.Name
 import dev.gimme.command.sender.SenderTypes

@@ -1,7 +1,7 @@
 package dev.gimme.command
 
 import dev.gimme.command.commands.HelpCommand
-import dev.gimme.command.function.CommandFunction
+import dev.gimme.command.annotations.CommandFunction
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 

@@ -8,7 +8,7 @@ import dev.gimme.command.annotations.Parameter
 import dev.gimme.command.annotations.getDefaultValue
 import dev.gimme.command.annotations.getDefaultValueString
 import dev.gimme.command.common.splitCamelCase
-import dev.gimme.command.function.UnsupportedParameterException
+import dev.gimme.command.exception.UnsupportedParameterException
 import dev.gimme.command.parameter.CommandParameter
 import dev.gimme.command.parameter.ParameterTypes
 import java.lang.reflect.Field

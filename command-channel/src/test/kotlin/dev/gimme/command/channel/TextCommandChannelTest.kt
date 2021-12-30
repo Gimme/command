@@ -4,7 +4,7 @@ import dev.gimme.command.BaseCommand
 import dev.gimme.command.annotations.Default
 import dev.gimme.command.annotations.Parameter
 import dev.gimme.command.channel.manager.TextCommandManager
-import dev.gimme.command.function.CommandFunction
+import dev.gimme.command.annotations.CommandFunction
 import dev.gimme.command.parameter.CommandParameter
 import dev.gimme.command.parameter.ParameterTypes
 import dev.gimme.command.sender.CommandSender

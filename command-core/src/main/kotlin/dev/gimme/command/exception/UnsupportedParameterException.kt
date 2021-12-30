@@ -1,4 +1,4 @@
-package dev.gimme.command.function
+package dev.gimme.command.exception
 
 import dev.gimme.command.parameter.CommandParameter
 import kotlin.reflect.KParameter

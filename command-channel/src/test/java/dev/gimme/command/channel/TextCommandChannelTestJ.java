@@ -1,10 +1,8 @@
 package dev.gimme.command.channel;
 
 import dev.gimme.command.BaseCommand;
-import dev.gimme.command.annotations.Default;
 import dev.gimme.command.annotations.Name;
-import dev.gimme.command.annotations.Parameter;
-import dev.gimme.command.function.CommandFunction;
+import dev.gimme.command.annotations.CommandFunction;
 import dev.gimme.command.sender.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;

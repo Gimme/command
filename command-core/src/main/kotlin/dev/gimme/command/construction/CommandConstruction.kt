@@ -4,7 +4,7 @@ import dev.gimme.command.BaseCommand
 import dev.gimme.command.Command
 import dev.gimme.command.annotations.Parameter
 import dev.gimme.command.annotations.Sender
-import dev.gimme.command.function.CommandFunction
+import dev.gimme.command.annotations.CommandFunction
 import dev.gimme.command.parameter.CommandParameter
 import dev.gimme.command.parameter.CommandParameterSet
 import dev.gimme.command.sender.CommandSender

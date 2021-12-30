@@ -8,7 +8,7 @@ import dev.gimme.command.construction.getDeclaredOverride
 import dev.gimme.command.construction.getCommandFunction
 import dev.gimme.command.exception.CommandException
 import dev.gimme.command.exception.ErrorCode
-import dev.gimme.command.function.CommandFunction
+import dev.gimme.command.annotations.CommandFunction
 import dev.gimme.command.node.BaseCommandNode
 import dev.gimme.command.node.CommandNode
 import dev.gimme.command.parameter.CommandParameter
