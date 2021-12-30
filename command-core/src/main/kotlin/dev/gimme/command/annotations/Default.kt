@@ -19,5 +19,7 @@ annotation class Default(
     val valueRepresentation: String = "",
 )
 
-fun Default.getDefaultValue(klass: KClass<*>): Any? = value.ifEmpty { null }?.let { ParameterTypes.get(klass).parse(it) }
+fun Default.getDefaultValue(klass: KClass<*>): (() -> Any?)? =
+    value.ifEmpty { null }?.let { value -> { ParameterTypes.get(klass).parse(value) } }
+
 fun Default.getDefaultValueString(): String? = valueRepresentation.ifEmpty { value.ifEmpty { null } }

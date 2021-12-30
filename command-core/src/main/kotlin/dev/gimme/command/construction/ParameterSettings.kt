@@ -63,7 +63,7 @@ internal class ParameterSettings {
             element: KAnnotatedElement,
             type: KType,
             suggestions: (() -> Set<String>)? = null,
-            defaultValue: Any? = null,
+            defaultValue: (() -> Any?)? = null,
             defaultValueString: String? = null,
             optional: Boolean? = null,
         ): CommandParameter {
@@ -124,7 +124,7 @@ internal class ParameterSettings {
         private data class ParameterSettingsValues(
             var name: String?,
             var description: String?,
-            var defaultValue: Any?,
+            var defaultValue: (() -> Any?)?,
             var defaultValueString: String?,
         )
     }

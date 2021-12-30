@@ -23,7 +23,7 @@ data class CommandParameter(
     val form: Form = Form.VALUE,
     val flags: MutableSet<Char> = mutableSetOf(),
     val optional: Boolean = false,
-    val defaultValue: Any? = null,
+    val defaultValue: (() -> Any?)? = null,
     val defaultValueString: String? = null
 ) {
 

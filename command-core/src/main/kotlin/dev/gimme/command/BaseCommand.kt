@@ -72,7 +72,7 @@ abstract class BaseCommand<out R>(
         @Suppress("NAME_SHADOWING")
         val args = args.toMutableMap()
         parameters.filter { it.optional && args[it] == null }.forEach {
-            args[it] = it.defaultValue
+            args[it] = it.defaultValue?.invoke()
         }
 
         args.forEach { (parameter, arg) ->
@@ -182,7 +182,7 @@ abstract class BaseCommand<out R>(
         private val param = object : Param<T> {
             override var suggestions: (() -> Set<String>)? = null
             override var optional: Boolean = false
-            override var defaultValue: Any? = null
+            override var defaultValue: (() -> T)? = null
             override var defaultValueString: String? = null
 
             private var value: Any? = null
@@ -196,8 +196,15 @@ abstract class BaseCommand<out R>(
 
         @JvmOverloads
         @JvmName("defaultValue")
-        @Suppress("UNCHECKED_CAST")
         fun default(value: T, representation: String? = value?.toString()) = apply {
+            param.optional = true
+            param.defaultValue = { value }
+            param.defaultValueString = representation
+        }
+
+        @JvmOverloads
+        @JvmName("defaultValue")
+        fun default(value: () -> T, representation: String? = null) = apply {
             param.optional = true
             param.defaultValue = value
             param.defaultValueString = representation
@@ -218,7 +225,7 @@ abstract class BaseCommand<out R>(
     interface Param<out T> : CommandDelegate<T> {
         val suggestions: (() -> Set<String>)?
         val optional: Boolean
-        val defaultValue: Any?
+        val defaultValue: (() -> T)?
         val defaultValueString: String?
 
         fun get(): T
