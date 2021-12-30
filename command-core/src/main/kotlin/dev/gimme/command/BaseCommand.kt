@@ -5,7 +5,7 @@ import dev.gimme.command.construction.generateParameters
 import dev.gimme.command.construction.generateSenders
 import dev.gimme.command.construction.generateUsage
 import dev.gimme.command.construction.getDeclaredOverride
-import dev.gimme.command.construction.getFirstCommandFunction
+import dev.gimme.command.construction.getCommandFunction
 import dev.gimme.command.exception.CommandException
 import dev.gimme.command.exception.ErrorCode
 import dev.gimme.command.function.CommandFunction
@@ -54,7 +54,7 @@ abstract class BaseCommand<out R>(
 
     override val usage: String by lazy { generateUsage() }
 
-    internal val commandFunction: KFunction<R>? = getFirstCommandFunction()
+    internal val commandFunction: KFunction<R>? = getCommandFunction()
 
     private val argumentPropertySetters: MutableMap<CommandParameter, (Any?) -> Unit> = mutableMapOf()
     private val senderFields: MutableSet<Field> = mutableSetOf()

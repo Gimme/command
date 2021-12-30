@@ -145,13 +145,16 @@ internal fun KFunction<*>.getDeclaredOverride(clazz: KClass<*>): KFunction<*>? =
 /**
  * Returns the command function to use in this command, or null if another strategy is used to handle command execution.
  *
- * The function to use is found through the following priority order:
- * - first found method that is annotated with @[CommandFunction].
+ * The function to use is found by the following priority:
+ * - first method annotated with @[CommandFunction]
+ * - first public method
+ * - first internal method
+ * - first method
  *
  * @throws ClassCastException if the function exists but has the wrong return type
  */
 @Throws(ClassCastException::class)
-internal fun <R> BaseCommand<R>.getFirstCommandFunction(): KFunction<R>? {
+internal fun <R> BaseCommand<R>.getCommandFunction(): KFunction<R>? {
     var firstCommandFunction: KFunction<*>? = null
     var firstPublicFunction: KFunction<*>? = null
     var firstInternalFunction: KFunction<*>? = null
