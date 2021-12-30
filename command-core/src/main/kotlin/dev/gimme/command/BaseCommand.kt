@@ -9,6 +9,8 @@ import dev.gimme.command.construction.getCommandFunction
 import dev.gimme.command.exception.CommandException
 import dev.gimme.command.exception.ErrorCode
 import dev.gimme.command.annotations.CommandFunction
+import dev.gimme.command.common.JAVA_ONLY
+import dev.gimme.command.common.JAVA_ONLY_WARNING
 import dev.gimme.command.node.BaseCommandNode
 import dev.gimme.command.node.CommandNode
 import dev.gimme.command.parameter.CommandParameter
@@ -175,44 +177,45 @@ abstract class BaseCommand<out R>(
 
     protected fun <T> param(): ParamBuilder<T> = ParamBuilder()
 
-    protected inner class ParamBuilder<out T> internal constructor() : CommandProperty<T>, CommandDelegate<T>,
-        Param<T> {
+    protected inner class ParamBuilder<T> internal constructor() : CommandProperty<T> {
 
-        override var suggestions: (() -> Set<String>)? = null
-        override var optional: Boolean = false
-        override var defaultValue: Any? = null
-        override var defaultValueString: String? = null
+        private val param = object : Param<T> {
+            override var suggestions: (() -> Set<String>)? = null
+            override var optional: Boolean = false
+            override var defaultValue: Any? = null
+            override var defaultValueString: String? = null
 
-        private var value: Any? = null
+            private var value: Any? = null
 
-        @Suppress("UNCHECKED_CAST")
-        override fun get() = value as T
-        override fun set(value: Any?) {
-            this.value = value
+            @Suppress("UNCHECKED_CAST")
+            override fun get(): T = value as T
+            override fun set(value: Any?) {
+                this.value = value
+            }
         }
 
         @JvmOverloads
         @JvmName("defaultValue")
         @Suppress("UNCHECKED_CAST")
-        fun <T> default(value: T?, representation: String? = value?.toString()) =
-            apply {
-                this.optional = true
-                this.defaultValue = value
-                this.defaultValueString = representation
-            } as ParamBuilder<T>
-
-        fun suggestions(suggestions: () -> Set<String>) = apply { this.suggestions = suggestions }
-
-        @JvmSynthetic
-        override operator fun provideDelegate(thisRef: BaseCommand<*>, property: KProperty<*>): ParamBuilder<T> {
-            return this
+        fun default(value: T, representation: String? = value?.toString()) = apply {
+            param.optional = true
+            param.defaultValue = value
+            param.defaultValueString = representation
         }
 
+        fun suggestions(suggestions: () -> Set<String>) = apply { param.suggestions = suggestions }
+
         @JvmSynthetic
-        override operator fun getValue(thisRef: BaseCommand<*>, property: KProperty<*>): T = get()
+        override operator fun provideDelegate(thisRef: BaseCommand<*>, property: KProperty<*>): Param<T> = buildParam()
+
+        @Suppress(JAVA_ONLY_WARNING, "UNCHECKED_CAST")
+        @SinceKotlin(JAVA_ONLY)
+        fun <T> build(): Param<T> = buildParam() as Param<T>
+
+        private fun buildParam(): Param<T> = param
     }
 
-    interface Param<out T> {
+    interface Param<out T> : CommandDelegate<T> {
         val suggestions: (() -> Set<String>)?
         val optional: Boolean
         val defaultValue: Any?
@@ -220,5 +223,8 @@ abstract class BaseCommand<out R>(
 
         fun get(): T
         fun set(value: Any?)
+
+        @JvmSynthetic
+        override operator fun getValue(thisRef: BaseCommand<*>, property: KProperty<*>): T = get()
     }
 }

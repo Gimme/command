@@ -52,13 +52,13 @@ class PCmd extends BaseCommand<Void> {
 
     final boolean[] called = {false};
 
-    private final Param<String> a = param();
+    private final Param<String> a = param().build();
 
-    private final Param<Integer> b = param();
+    private final Param<Integer> b = param().build();
 
-    private final Param<List<Double>> list = param();
+    private final Param<List<Double>> list = param().build();
 
-    private final Param<Set<String>> set = param();
+    private final Param<Set<String>> set = param().build();
 
     PCmd(@NotNull String name) {
         super(name);

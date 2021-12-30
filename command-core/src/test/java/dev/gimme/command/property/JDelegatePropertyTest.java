@@ -8,11 +8,7 @@ import dev.gimme.command.sender.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static java.util.Objects.requireNonNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -51,24 +47,30 @@ class DelegateTestCommand extends BaseCommand<Void> {
     final boolean[] called = {false};
 
     private final Param<String> string = param()
-            .defaultValue("a");
+            .defaultValue("a")
+            .build();
 
-    private final Param<Integer> i = param();
+    private final Param<Integer> i = param()
+            .suggestions(HashSet::new)
+            .build();
 
     private final Param<Double> d = param()
-            .defaultValue(2d);
+            .defaultValue(2d)
+            .build();
 
     private final Param<Boolean> b = param()
-            .defaultValue(true);
+            .defaultValue(true)
+            .build();
 
     private final Param<List<String>> list = param()
-            .defaultValue(new ArrayList<>());
+            .defaultValue(new ArrayList<>())
+            .build();
 
-    private final Param<Set<String>> set = param();
+    private final Param<Set<String>> set = param().build();
 
-    private final Param<? extends Collection<String>> collection = param();
+    private final Param<? extends Collection<String>> collection = param().build();
 
-    private final Param<? extends Iterable<String>> iterable = param();
+    private final Param<? extends Iterable<String>> iterable = param().build();
 
     DelegateTestCommand() {
         super("test-command");

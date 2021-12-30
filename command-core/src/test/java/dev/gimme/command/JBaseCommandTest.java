@@ -183,14 +183,14 @@ class JTestCommand2 extends BaseCommand<Void> {
 
 class JTestCommand3 extends BaseCommand<Void> {
 
-    private final Param<String> string1 = param();
-    private final Param<Integer> int1 = param();
-    private final Param<Double> double1 = param();
-    private final Param<Boolean> boolean1 = param();
-    private final Param<List<String>> list1 = param();
-    private final Param<Set<String>> set1 = param();
-    private final Param<? extends Collection<String>> collection1 = param();
-    private final Param<? extends Iterable<String>> iterable1 = param();
+    private final Param<String> string1 = param().build();
+    private final Param<Integer> int1 = param().build();
+    private final Param<Double> double1 = param().build();
+    private final Param<Boolean> boolean1 = param().build();
+    private final Param<List<String>> list1 = param().build();
+    private final Param<Set<String>> set1 = param().build();
+    private final Param<? extends Collection<String>> collection1 = param().build();
+    private final Param<? extends Iterable<String>> iterable1 = param().build();
 
     @Parameter
     private String string2;

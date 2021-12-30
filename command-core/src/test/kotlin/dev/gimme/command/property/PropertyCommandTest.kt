@@ -28,7 +28,7 @@ internal class PropertyCommandTest {
 
             val a: String? by param()
 
-            val b: Param<Int?> = param()
+            val b: Int? by param()
 
             val list: List<Double> by param()
 
@@ -40,7 +40,7 @@ internal class PropertyCommandTest {
                 assertAll(
                     { assertEquals(sender, sender) },
                     { assertEquals(args[0], a) },
-                    { assertEquals(args[1], b.get()) },
+                    { assertEquals(args[1], b) },
                     { assertEquals(args[2], list) },
                     { assertEquals(args[3], set) },
                 )
