@@ -69,16 +69,6 @@ abstract class BaseCommand<out R>(
                 commandSender::class.isSubclassOf(it) || SenderTypes.adapt(commandSender, it) != null
             } == false) throw ErrorCode.INCOMPATIBLE_SENDER.createException()
 
-        @Suppress("NAME_SHADOWING")
-        val args = args.toMutableMap()
-        parameters.filter { it.optional && args[it] == null }.forEach {
-            args[it] = it.defaultValue?.invoke()
-        }
-
-        args.forEach { (parameter, arg) ->
-            argumentPropertySetters[parameter]?.invoke(arg)
-        }
-
         senderFields.forEach { field ->
             val klass = field.type.kotlin
             var value: Any? = null
@@ -93,6 +83,17 @@ abstract class BaseCommand<out R>(
 
             field.isAccessible = true
             field.set(this, value)
+        }
+
+        @Suppress("NAME_SHADOWING")
+        val args = args.toMutableMap()
+
+        parameters.forEach { parameter ->
+            if (parameter.optional && args[parameter] == null) {
+                args[parameter] = parameter.defaultValue?.invoke()
+            }
+            val arg = args[parameter]
+            argumentPropertySetters[parameter]?.invoke(arg)
         }
 
         return if (commandFunction != null) {
@@ -194,17 +195,11 @@ abstract class BaseCommand<out R>(
             }
         }
 
-        @JvmOverloads
         @JvmName("defaultValue")
-        fun default(value: T, representation: String? = value?.toString()) = apply {
-            param.optional = true
-            param.defaultValue = { value }
-            param.defaultValueString = representation
-        }
+        fun default(value: T) = default(value?.toString()) { value }
 
-        @JvmOverloads
         @JvmName("defaultValue")
-        fun default(value: () -> T, representation: String? = null) = apply {
+        fun default(representation: String? = null, value: () -> T) = apply {
             param.optional = true
             param.defaultValue = value
             param.defaultValueString = representation
