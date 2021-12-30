@@ -130,30 +130,6 @@ class BaseCommandTest {
             val collection1: Collection<String> by param()
             val iterable1: Iterable<String> by param()
 
-            @Parameter
-            lateinit var string2: String
-
-            @Parameter
-            var int2: Int = 0
-
-            @Parameter
-            var double2: Double = 0.0
-
-            @Parameter
-            var boolean2: Boolean = false
-
-            @Parameter
-            lateinit var list2: List<String>
-
-            @Parameter
-            lateinit var set2: Set<String>
-
-            @Parameter
-            lateinit var collection2: Collection<String>
-
-            @Parameter
-            lateinit var iterable2: Iterable<String>
-
             override fun call() {
                 val iter = args.iterator()
 
@@ -165,15 +141,6 @@ class BaseCommandTest {
                 assertEquals(iter.next(), set1)
                 assertEquals(iter.next(), collection1)
                 assertEquals(iter.next(), iterable1)
-
-                assertEquals(iter.next(), string2)
-                assertEquals(iter.next(), int2)
-                assertEquals(iter.next(), double2)
-                assertEquals(iter.next(), boolean2)
-                assertEquals(iter.next(), list2)
-                assertEquals(iter.next(), set2)
-                assertEquals(iter.next(), collection2)
-                assertEquals(iter.next(), iterable2)
 
                 called = true
             }

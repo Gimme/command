@@ -96,11 +96,15 @@ abstract class BaseCommand<out R>(
             argumentPropertySetters[parameter]?.invoke(arg)
         }
 
-        return if (commandFunction != null) {
+        val response = if (commandFunction != null) {
             executeByFunction(commandFunction, commandSender, args)
         } else {
             call()
         }
+
+        argumentPropertySetters.values.forEach { it(null) }
+
+        return response
     }
 
     /**
