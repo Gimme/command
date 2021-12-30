@@ -1,16 +1,16 @@
 package dev.gimme.command.commands
 
+import dev.gimme.command.BaseCommand
 import dev.gimme.command.Command
-import dev.gimme.command.function.FunctionCommand
-import dev.gimme.command.function.CommandFunction
 
 /**
  * Displays a list of available commands.
  */
-class HelpCommand(private val commands: () -> Iterable<Command<*>>) : FunctionCommand<List<HelpCommand.CommandHelp>>("help") {
+class HelpCommand(private val commands: () -> Iterable<Command<*>>) : BaseCommand<List<HelpCommand.CommandHelp>>("help") {
 
-    /** Prints available commands. */
-    @CommandFunction
+    /**
+     * Prints available commands.
+     */
     fun printCommands(): List<CommandHelp> = commands().map { CommandHelp(it.path(" "), it.usage) }
 
     /**

@@ -2,7 +2,6 @@ package dev.gimme.command
 
 import dev.gimme.command.commands.HelpCommand
 import dev.gimme.command.function.CommandFunction
-import dev.gimme.command.function.FunctionCommand
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
@@ -23,7 +22,7 @@ class HelpCommandTest {
         assertEquals("three", response[2].name)
     }
 
-    private class DummyCommand(name: String) : FunctionCommand<Any>(name) {
+    private class DummyCommand(name: String) : BaseCommand<Any>(name) {
         @CommandFunction
         fun execute() {
         }

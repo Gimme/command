@@ -1,5 +1,6 @@
 package dev.gimme.command.function
 
+import dev.gimme.command.BaseCommand
 import dev.gimme.command.DUMMY_COMMAND_SENDER
 import dev.gimme.command.annotations.Default
 import dev.gimme.command.annotations.Name
@@ -25,7 +26,7 @@ internal class FunctionCommandTest {
         val arg3 = listOf("three", "four")
         val args = listOf<Any>(arg1, arg2, arg3)
 
-        val command = object : FunctionCommand<Any?>("k") {
+        val command = object : BaseCommand<Any?>("k") {
 
             @CommandFunction
             private fun call(s: CommandSender, a: String, b: Int, c: List<String>) {
@@ -54,7 +55,7 @@ internal class FunctionCommandTest {
         val arg1 = "abc"
         val args = listOf<Any>(arg1)
 
-        val command = object : FunctionCommand<Any?>("k") {
+        val command = object : BaseCommand<Any?>("k") {
 
             @CommandFunction
             private fun call(
@@ -86,7 +87,7 @@ internal class FunctionCommandTest {
         val arg2 = "xyz"
         val args = listOf<Any>(arg1, arg2)
 
-        val command = object : FunctionCommand<Any?>("k") {
+        val command = object : BaseCommand<Any?>("k") {
 
             @CommandFunction
             private fun call(
@@ -122,7 +123,7 @@ internal class FunctionCommandTest {
 
         var called = false
 
-        val command = object : FunctionCommand<Any?>("k") {
+        val command = object : BaseCommand<Any?>("k") {
 
             @CommandFunction
             private fun call(playerSender: PlayerSender, playerSender2: PlayerSender?) {
@@ -153,7 +154,7 @@ internal class FunctionCommandTest {
 
         var called = false
 
-        val command = object : FunctionCommand<Any?>("k") {
+        val command = object : BaseCommand<Any?>("k") {
 
             @CommandFunction
             private fun call(@dev.gimme.command.annotations.Sender player: Player) {
@@ -177,7 +178,7 @@ class JFunctionCommandTest {
     fun `should execute reflection command with all types`() {
         var called = false
 
-        val command = object : FunctionCommand<Any>("c") {
+        val command = object : BaseCommand<Any>("c") {
             @CommandExecutor
             fun c(
                 string1: String,
@@ -213,7 +214,7 @@ class JFunctionCommandTest {
     fun `command without return type should execute`() {
         var called = false
 
-        val command = object : FunctionCommand<Any>("c") {
+        val command = object : BaseCommand<Any>("c") {
             @CommandExecutor
             fun c(string1: String) {
                 called = true
@@ -245,7 +246,7 @@ class JFunctionCommandTest {
 
     @Test
     fun `should execute reflection command when using sender subtypes`() {
-        val command = object : FunctionCommand<String>("c") {
+        val command = object : BaseCommand<String>("c") {
             @CommandExecutor
             fun c(sender: CommandSenderImpl): String {
                 assertEquals(1, sender.getInt())
@@ -267,7 +268,7 @@ class JFunctionCommandTest {
         errorCode: ErrorCode?,
         sender: CommandSender,
     ) {
-        val command = object : FunctionCommand<String>("c") {
+        val command = object : BaseCommand<String>("c") {
             @CommandExecutor
             fun c(sender: CommandSenderImpl, a: Int, b: Int? = null): String {
                 assertEquals(1, sender.getInt())
@@ -288,7 +289,7 @@ class JFunctionCommandTest {
 
     @Test
     fun `should get command usage`() {
-        val command = object : FunctionCommand<Any>("c") {
+        val command = object : BaseCommand<Any>("c") {
             @CommandExecutor("", "2")
             fun a(paramOne: Int, paramTwo: Int = 2) {
             }
@@ -299,7 +300,7 @@ class JFunctionCommandTest {
 
     @Test
     fun `should get command usage with command sender`() {
-        val command = object : FunctionCommand<Any>("c") {
+        val command = object : BaseCommand<Any>("c") {
             @CommandExecutor("", "2")
             fun a(sender: CommandSender, paramOne: Int, paramTwo: Int = 2) {
             }
@@ -314,7 +315,7 @@ class JFunctionCommandTest {
             // BASIC TESTS
             Arguments.of(
                 null,
-                object : FunctionCommand<String>("c") {
+                object : BaseCommand<String>("c") {
                     @CommandExecutor
                     fun c(): String = DUMMY_RESPONSE
                 },
@@ -324,7 +325,7 @@ class JFunctionCommandTest {
             // VARARG TESTS
             Arguments.of(
                 null,
-                object : FunctionCommand<String>("c") {
+                object : BaseCommand<String>("c") {
                     @CommandExecutor
                     fun c(vararg strings: String): String {
                         assertIterableEquals(listOf<String>(), strings.asIterable())
@@ -335,7 +336,7 @@ class JFunctionCommandTest {
             ),
             Arguments.of(
                 "string1 string2 string3",
-                object : FunctionCommand<String>("c") {
+                object : BaseCommand<String>("c") {
                     @CommandExecutor
                     fun c(vararg strings: String): String {
                         assertIterableEquals(listOf("string1", "string2", "string3"), strings.asIterable())
@@ -346,7 +347,7 @@ class JFunctionCommandTest {
             ),
             Arguments.of(
                 "a 1 2 3",
-                object : FunctionCommand<String>("c") {
+                object : BaseCommand<String>("c") {
                     @CommandExecutor
                     fun c(string: String, vararg ints: Int): String {
                         assertEquals("a", string)
@@ -358,7 +359,7 @@ class JFunctionCommandTest {
             ),
             Arguments.of(
                 "1",
-                object : FunctionCommand<String>("c") {
+                object : BaseCommand<String>("c") {
                     @CommandExecutor
                     fun c(vararg a: Double): String = DUMMY_RESPONSE
                 },
@@ -366,7 +367,7 @@ class JFunctionCommandTest {
             ),
             Arguments.of(
                 "true",
-                object : FunctionCommand<String>("c") {
+                object : BaseCommand<String>("c") {
                     @CommandExecutor
                     fun c(vararg a: Boolean): String = DUMMY_RESPONSE
                 },
@@ -375,7 +376,7 @@ class JFunctionCommandTest {
 
             Arguments.of(
                 null,
-                object : FunctionCommand<String>("c") {
+                object : BaseCommand<String>("c") {
                     @CommandExecutor
                     fun c(a: String): String = DUMMY_RESPONSE
                 },
@@ -383,7 +384,7 @@ class JFunctionCommandTest {
             ),
             Arguments.of(
                 "a b",
-                object : FunctionCommand<String>("c") {
+                object : BaseCommand<String>("c") {
                     @CommandExecutor
                     fun c(a: String): String = DUMMY_RESPONSE
                 },
@@ -391,7 +392,7 @@ class JFunctionCommandTest {
             ),
             Arguments.of(
                 "a",
-                object : FunctionCommand<String>("c") {
+                object : BaseCommand<String>("c") {
                     @CommandExecutor
                     fun c(a: Int): String = DUMMY_RESPONSE
                 },
@@ -399,7 +400,7 @@ class JFunctionCommandTest {
             ),
             Arguments.of(
                 "1.0",
-                object : FunctionCommand<String>("c") {
+                object : BaseCommand<String>("c") {
                     @CommandExecutor
                     fun c(vararg a: Int): String = DUMMY_RESPONSE
                 },
@@ -407,7 +408,7 @@ class JFunctionCommandTest {
             ),
             Arguments.of(
                 "a",
-                object : FunctionCommand<String>("c") {
+                object : BaseCommand<String>("c") {
                     @CommandExecutor
                     fun c(a: Boolean): String = DUMMY_RESPONSE
                 },
@@ -417,7 +418,7 @@ class JFunctionCommandTest {
             // DEFAULTS TESTS
             Arguments.of(
                 "a",
-                object : FunctionCommand<String>("c") {
+                object : BaseCommand<String>("c") {
                     @CommandExecutor
                     fun c(a: String = "def"): String {
                         assertEquals("a", a)
@@ -428,7 +429,7 @@ class JFunctionCommandTest {
             ),
             Arguments.of(
                 "a",
-                object : FunctionCommand<String>("c") {
+                object : BaseCommand<String>("c") {
                     @CommandExecutor
                     fun c(a: String, b: String = "def"): String {
                         assertEquals("a", a)
@@ -440,7 +441,7 @@ class JFunctionCommandTest {
             ),
             Arguments.of(
                 "1",
-                object : FunctionCommand<String>("c") {
+                object : BaseCommand<String>("c") {
                     @CommandExecutor
                     fun c(a: Int = 0, b: Int = 3, c: Int = 44): String {
                         assertEquals(1, a)
@@ -453,7 +454,7 @@ class JFunctionCommandTest {
             ),
             Arguments.of(
                 null,
-                object : FunctionCommand<String>("c") {
+                object : BaseCommand<String>("c") {
                     @CommandExecutor
                     fun c(a: Int? = 4): String {
                         assertEquals(4, a)
@@ -464,7 +465,7 @@ class JFunctionCommandTest {
             ),
             Arguments.of(
                 null,
-                object : FunctionCommand<String>("c") {
+                object : BaseCommand<String>("c") {
                     @CommandExecutor
                     fun c(a: Int? = null): String {
                         assertEquals(null, a)
@@ -475,7 +476,7 @@ class JFunctionCommandTest {
             ),
             Arguments.of(
                 "abc",
-                object : FunctionCommand<String>("c") {
+                object : BaseCommand<String>("c") {
                     @CommandExecutor
                     fun c(a: Int? = null): String = DUMMY_RESPONSE
                 },
@@ -485,7 +486,7 @@ class JFunctionCommandTest {
             // COMMAND SENDER TESTS
             Arguments.of(
                 null,
-                object : FunctionCommand<String>("c") {
+                object : BaseCommand<String>("c") {
                     @CommandExecutor
                     fun c(sender: CommandSender): String {
                         assertEquals(DUMMY_COMMAND_SENDER, sender)
@@ -496,7 +497,7 @@ class JFunctionCommandTest {
             ),
             Arguments.of(
                 "1",
-                object : FunctionCommand<String>("c") {
+                object : BaseCommand<String>("c") {
                     @CommandExecutor
                     fun c(sender: CommandSender, a: Int = 0): String {
                         assertEquals(DUMMY_COMMAND_SENDER, sender)
@@ -557,7 +558,7 @@ class JFunctionCommandTest {
 
     @Test
     fun `should get first command executor function`() {
-        val commandExecutorFunction = object : FunctionCommand<String>("c") {
+        val commandExecutorFunction = object : BaseCommand<String>("c") {
             fun c1(): String {
                 return ""
             }
@@ -579,7 +580,7 @@ class JFunctionCommandTest {
     @Test
     fun `getting non-existing command executor should throw exception`() {
         assertThrows<IllegalStateException> {
-            object : FunctionCommand<String>("c") {
+            object : BaseCommand<String>("c") {
                 fun c(): String {
                     return ""
                 }
@@ -589,7 +590,7 @@ class JFunctionCommandTest {
 
     @Test
     fun `should execute command`() {
-        val command = object : FunctionCommand<String>("c") {
+        val command = object : BaseCommand<String>("c") {
             @CommandExecutor
             fun c(): String {
                 return "abc"
@@ -601,7 +602,7 @@ class JFunctionCommandTest {
 
     @Test
     fun `executing command with wrong return type should throw exception`() {
-        val command = object : FunctionCommand<String>("c") {
+        val command = object : BaseCommand<String>("c") {
             @CommandExecutor
             fun c(): Int {
                 return 1

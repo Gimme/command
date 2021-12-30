@@ -1,10 +1,10 @@
 package dev.gimme.command.channel
 
+import dev.gimme.command.BaseCommand
 import dev.gimme.command.annotations.Default
 import dev.gimme.command.annotations.Parameter
 import dev.gimme.command.channel.manager.TextCommandManager
 import dev.gimme.command.function.CommandFunction
-import dev.gimme.command.function.FunctionCommand
 import dev.gimme.command.parameter.CommandParameter
 import dev.gimme.command.parameter.ParameterTypes
 import dev.gimme.command.sender.CommandSender
@@ -80,7 +80,7 @@ class TextCommandChannelTest {
         val arg3 = "three"
         val arg4 = "four"
 
-        val command = object : FunctionCommand<Any?>(commandName) {
+        val command = object : BaseCommand<Any?>(commandName) {
 
             @CommandFunction
             private fun call(s: CommandSender, a: String, b: Int, c: List<String>) {
@@ -112,7 +112,7 @@ class TextCommandChannelTest {
         val commandName = "k"
         val arg1 = "abc"
 
-        val command = object : FunctionCommand<Any?>(commandName) {
+        val command = object : BaseCommand<Any?>(commandName) {
 
             @CommandFunction
             private fun call(

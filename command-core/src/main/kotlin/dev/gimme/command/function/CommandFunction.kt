@@ -1,10 +1,9 @@
 package dev.gimme.command.function
 
 /**
- * Marks a function in a [FunctionCommand] class as a command executor, meaning it gets called when that command gets
- * executed with arguments that conform to the function's parameters.
+ * Marks a function as the command template.
  *
- * Only one command function is allowed per class.
+ * The command gets its parameters from the function and calls the function on execution.
  */
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FUNCTION)

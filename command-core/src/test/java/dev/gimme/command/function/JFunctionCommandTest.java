@@ -1,5 +1,6 @@
 package dev.gimme.command.function;
 
+import dev.gimme.command.BaseCommand;
 import dev.gimme.command.UtilsKt;
 import dev.gimme.command.annotations.Default;
 import dev.gimme.command.annotations.Parameter;
@@ -44,7 +45,7 @@ class JFunctionCommandTest {
     }
 }
 
-class FCmd extends FunctionCommand<Void> {
+class FCmd extends BaseCommand<Void> {
 
     final boolean[] called = {false};
 
