@@ -59,6 +59,7 @@ abstract class BaseCommand<out R>(
     internal val commandFunction: KFunction<R>? = getCommandFunction()
 
     private val argumentPropertySetters: MutableMap<CommandParameter, (Any?) -> Unit> = mutableMapOf()
+    private val initializedProperties: MutableSet<Param<*>> = mutableSetOf()
     private val senderFields: MutableSet<Field> = mutableSetOf()
 
     @JvmOverloads
@@ -87,6 +88,7 @@ abstract class BaseCommand<out R>(
 
         @Suppress("NAME_SHADOWING")
         val args = args.toMutableMap()
+        initializedProperties.clear()
 
         parameters.forEach { parameter ->
             if (parameter.optional && args[parameter] == null) {
@@ -193,9 +195,14 @@ abstract class BaseCommand<out R>(
             private var value: Any? = null
 
             @Suppress("UNCHECKED_CAST")
-            override fun get(): T = value as T
+            override fun get(): T {
+                if (!initializedProperties.contains(this)) throw UninitializedPropertyAccessException("Trying to access argument before it has been initialized")
+                return value as T
+            }
+
             override fun set(value: Any?) {
                 this.value = value
+                initializedProperties.add(this)
             }
         }
 
