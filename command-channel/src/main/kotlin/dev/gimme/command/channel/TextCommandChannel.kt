@@ -98,15 +98,57 @@ abstract class TextCommandChannel(
 
     @Throws(CommandException::class)
     private fun parseArgsInput(argsInput: List<String>, command: Command<*>): Map<CommandParameter, Any?> {
-        // TODO: get named args
+        val args = mutableMapOf<CommandParameter, MutableList<Any?>>()
+        val unusedParameters = command.parameters.toMutableSet()
 
-        val parameterStack: Queue<CommandParameter> = ArrayDeque(command.parameters)
-        val tokenStack: Queue<String> = ArrayDeque(argsInput)
+        val argsInputTokens = mutableListOf<String>()
+        argsInput.forEach {
+            if (it.startsWith("-") && !it.startsWith("--")) {
+                val flags = it.removePrefix("-").toCharArray().map { char -> "-$char" }
+                argsInputTokens.addAll(flags)
+            } else {
+                argsInputTokens.add(it)
+            }
+        }
+
+        var i = argsInputTokens.size
+        while (--i >= 0) {
+            val value = argsInputTokens[i]
+
+            var parameterToken: String
+            var stringArg: String
+
+            if (value.startsWith("-")) {
+//                if (parameter.type.clazz != Boolean::class.java) TODO("throw: argument-less named parameters have to be booleans")
+                parameterToken = argsInputTokens.removeAt(i)
+                stringArg = "true"
+            } else {
+                if (i == 0 || !argsInputTokens[i - 1].startsWith("-")) continue
+                stringArg = argsInputTokens.removeAt(i)
+                i--
+                parameterToken = argsInputTokens.removeAt(i)
+            }
+
+            val parameter = if (parameterToken.startsWith("--")) {
+                val parameterId = parameterToken.removePrefix("--")
+                command.parameters[parameterId] ?: TODO("throw: named parameter doesn't exist")
+            } else {
+                val flag = parameterToken.removePrefix("-")
+                if (flag.length != 1) TODO("throw: invalid flag")
+                command.parameters.getByFlag(flag.single()) ?: TODO("throw: no parameter with that flag")
+            }
+            unusedParameters.remove(parameter)
+
+            val typedArg = stringArg.let { parameter.type.parse(it) }
+
+            args[parameter] = (args[parameter] ?: mutableListOf()).apply { add(typedArg) }
+        }
+
+        val parameterStack: Queue<CommandParameter> = ArrayDeque(unusedParameters)
+        val tokenStack: Queue<String> = ArrayDeque(argsInputTokens)
 
         // TODO: default values in case of collections should accept empty "" or null for 0 and spaced "a b" for multiple values
         // TODO: handle multiple vararg parameters?
-
-        val args = mutableMapOf<CommandParameter, MutableList<Any?>>()
 
         while (parameterStack.isNotEmpty()) {
             val parameter = parameterStack.peek()

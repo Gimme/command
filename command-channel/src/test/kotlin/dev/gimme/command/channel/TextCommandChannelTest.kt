@@ -138,4 +138,86 @@ class TextCommandChannelTest {
 
         assertTrue(called)
     }
+
+    @Test
+    fun `Handles named argument`() {
+        var called = 0
+
+        val commandName = "k"
+        val arg1 = "aa"
+
+        val command = object : BaseCommand<Unit>(commandName) {
+            val abc: String by param()
+
+            override fun call() {
+                assertEquals(arg1, abc)
+                called++
+            }
+        }
+
+        assertEquals(0, called)
+
+        channel.commandManager.registerCommand(command)
+        channel.parseInput(sender, "$commandName --abc $arg1")
+        channel.parseInput(sender, "$commandName -a $arg1")
+
+        assertEquals(2, called)
+    }
+
+    @Test
+    fun `Handles multiple named arguments`() {
+        var called = 0
+
+        val commandName = "k"
+        val arg1 = "aa"
+        val arg2 = 1
+        val arg3 = true
+
+        val command = object : BaseCommand<Unit>(commandName) {
+            val abc: String by param()
+            val def: Int by param()
+            val ghi: Boolean by param()
+
+            override fun call() {
+                called++
+            }
+        }
+
+        assertEquals(0, called)
+
+        channel.commandManager.registerCommand(command)
+        channel.parseInput(sender, "$commandName --abc $arg1 --ghi $arg3 --def $arg2")
+        channel.parseInput(sender, "$commandName -a $arg1 -g $arg3 $arg2")
+        channel.parseInput(sender, "$commandName -g $arg3 $arg1 $arg2")
+
+        assertEquals(3, called)
+    }
+
+    @Test
+    fun `Handles boolean named arguments`() {
+        var called = 0
+
+        val commandName = "k"
+
+        val command = object : BaseCommand<Unit>(commandName) {
+            val abc: Boolean by param<Boolean>().default(false)
+            val def: Boolean by param<Boolean>().default(false)
+            val ghi: Boolean by param<Boolean>().default(false)
+
+            override fun call() {
+                assertTrue(abc)
+                assertFalse(def)
+                assertTrue(ghi)
+                called++
+            }
+        }
+
+        assertEquals(0, called)
+
+        channel.commandManager.registerCommand(command)
+        channel.parseInput(sender, "$commandName --abc true -g")
+        channel.parseInput(sender, "$commandName -agd false")
+
+        assertEquals(2, called)
+    }
 }
